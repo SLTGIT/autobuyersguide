@@ -1,0 +1,137 @@
+/* Vehicle Inventory Manager - Admin Styles */
+
+.vim-meta-box table.form-table th {
+    width: 200px;
+}
+
+.vim-meta-box input[type="number"],
+.vim-meta-box input[type="text"],
+.vim-meta-box select,
+.vim-meta-box textarea {
+    width: 100%;
+    max-width: 500px;
+}
+
+.vim-meta-box .small-text {
+    max-width: 100px;
+}
+
+/* Gallery Styles */
+.vim-gallery-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.vim-gallery-item {
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    background: #f9f9f9;
+}
+
+.vim-gallery-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 2px;
+}
+
+.vim-remove-image {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #dc3232;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0;
+}
+
+.vim-remove-image:hover {
+    background: #a00;
+}
+
+/* Admin Column Styles */
+.column-featured_image {
+    width: 80px;
+}
+
+.vim-condition-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.vim-condition-new {
+    background: #d4edda;
+    color: #155724;
+}
+
+.vim-condition-used {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.vim-condition-demo {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* Import Page Styles */
+.vim-import-container {
+    max-width: 800px;
+    background: #fff;
+    padding: 20px;
+    margin-top: 20px;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+}
+
+.vim-import-container h2 {
+    margin-top: 0;
+}
+
+.vim-import-container pre {
+    background: #f5f5f5;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 12px;
+}
+
+/* Feed Logs Styles */
+.vim-log-status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.vim-log-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.vim-log-error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.vim-log-warning {
+    background: #fff3cd;
+    color: #856404;
+}
