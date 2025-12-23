@@ -1,12 +1,18 @@
-@import "tailwindcss";
+@import "bootstrap/dist/css/bootstrap.min.css";
 @import "theme";
 @import "variables";
 @import "base";
 @import "utilities";
 
 // Global utility classes using variables
-.text-primary { color: $color-primary; }
-.bg-primary { background-color: $color-primary; }
+.text-primary {
+  color: $color-primary;
+}
+
+.bg-primary {
+  background-color: $color-primary;
+}
+
 .btn-primary {
   background-color: var(--primary, $color-primary);
   color: var(--white, #ffffff);
@@ -16,7 +22,7 @@
   transition: all 0.2s;
   border: none;
   cursor: pointer;
-  
+
   &:hover {
     background-color: var(--primary-darkened, $color-primary-dark);
   }

@@ -15,7 +15,7 @@ export default async function Header() {
       getMenuByName('main-menu'),
       getSiteSettings()
     ]);
-    
+
     settings = fetchedSettings;
 
     if (settings?.title) {
@@ -51,16 +51,16 @@ export default async function Header() {
 
   // Normalize URLs centrally
   const cmsUrl = settings?.url || process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.split('/wp-json')[0] || '';
-  
+
   const normalizedMenuItems = menuItems.map(item => {
     let href = item.url || '/';
-    
+
     // Only normalize internal links that start with the CMS URL
     if (cmsUrl && href.startsWith(cmsUrl)) {
       href = href.replace(cmsUrl, '');
       if (!href.startsWith('/')) href = '/' + href;
     }
-    
+
     return {
       ...item,
       url: href
@@ -72,13 +72,13 @@ export default async function Header() {
       <nav className="header__nav">
         {/* Logo */}
         <Link href="/" className="header__logo">
-           <Image
+          <Image
             src="/assets/images/logo.png"
             alt={siteTitle}
             width={160}
             height={40}
             priority
-            className="h-10 w-auto"
+            style={{ height: '40px', width: 'auto' }}
           />
         </Link>
 
@@ -87,11 +87,11 @@ export default async function Header() {
           {normalizedMenuItems.map((item) => {
             const isExternal = item.url.startsWith('http');
             const href = item.url;
-            
+
             return (
               <li key={item.ID}>
                 {isExternal ? (
-                  <a 
+                  <a
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -99,8 +99,8 @@ export default async function Header() {
                     dangerouslySetInnerHTML={{ __html: item.title }}
                   />
                 ) : (
-                  <Link 
-                    href={href} 
+                  <Link
+                    href={href}
                     className="header__link"
                   >
                     <span dangerouslySetInnerHTML={{ __html: item.title }} />
