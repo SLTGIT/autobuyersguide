@@ -1,4 +1,5 @@
 import { getPageBySlug } from '@/lib/wordpress';
+import { getMetadata } from '@/lib/wordpress/seo';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
@@ -18,10 +19,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
         };
     }
 
-    return {
-        title: `${page.title.rendered} | Auto Buyers Guide`,
-        description: page.excerpt?.rendered?.replace(/<[^>]*>/g, '').slice(0, 160) || `Read ${page.title.rendered}`,
-    };
+    return getMetadata(page);
 }
 
 export default async function DynamicPage(props: PageProps) {
@@ -33,30 +31,26 @@ export default async function DynamicPage(props: PageProps) {
     }
 
     return (
-        <div className="container mx-auto px-4 py-12">
-            <article className="max-w-4xl mx-auto">
+        <div className="cms-page">
+            <article className="cms-page__article">
                 {/* Header */}
-                <header className="mb-8">
-                    <h1 
-                        className="text-4xl font-bold text-gray-800 mb-4"
-                        dangerouslySetInnerHTML={{ __html: page.title.rendered }} 
-                    />
+                <header className="cms-page__header">
+                    <h1 dangerouslySetInnerHTML={{ __html: page.title.rendered }} />
                 </header>
 
                 {/* Featured Image */}
                 {page._embedded?.['wp:featuredmedia']?.[0]?.source_url && (
-                    <div className="mb-8 h-96 w-full overflow-hidden rounded-lg shadow-lg">
+                    <div className="cms-page__featured-image">
                         <img 
                             src={page._embedded['wp:featuredmedia'][0].source_url} 
                             alt={page.title.rendered}
-                            className="w-full h-full object-cover"
                         />
                     </div>
                 )}
 
                 {/* Content */}
                 <div 
-                    className="prose prose-lg max-w-none prose-a:text-blue-600 hover:prose-a:text-blue-700"
+                    className="cms-page__content"
                     dangerouslySetInnerHTML={{ __html: page.content.rendered }} 
                 />
             </article>

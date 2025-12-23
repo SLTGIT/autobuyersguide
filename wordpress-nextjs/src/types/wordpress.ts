@@ -36,6 +36,8 @@ export interface WPPost {
     'wp:featuredmedia'?: WPMedia[];
     'wp:term'?: WPCategory[][];
   };
+  acf?: any;
+  yoast_head_json?: any;
 }
 
 export interface WPPage {
@@ -71,6 +73,8 @@ export interface WPPage {
     author?: WPUser[];
     'wp:featuredmedia'?: WPMedia[];
   };
+  acf?: any;
+  yoast_head_json?: any;
 }
 
 export interface WPUser {

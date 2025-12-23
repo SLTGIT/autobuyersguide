@@ -3,7 +3,6 @@ import VehicleGrid from '@/components/vehicles/VehicleGrid';
 import VehicleFilters from '@/components/vehicles/VehicleFilters';
 import VehicleSort from '@/components/vehicles/VehicleSort';
 import { VehicleFilters as VehicleFiltersType } from '@/types/vehicle';
-import './vehicles.css';
 
 interface VehiclesPageProps {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

@@ -1,0 +1,115 @@
+@import "variables";
+
+// Alerts
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: $border-radius;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    border: 1px solid transparent;
+
+    &-success {
+        background-color: var(--success-page-background, #d4edda);
+        color: var(--success, #155724);
+        border-color: var(--success, #c3e6cb);
+    }
+
+    &-error {
+        background-color: var(--emergency-banner-background, #f8d7da);
+        color: var(--emergency-banner-color, #721c24);
+        border-color: var(--danger, #f5c6cb);
+    }
+
+    &-warning {
+        background-color: var(--topBanner-background, #fff3cd);
+        color: var(--topBanner-color, #856404);
+        border-color: var(--warning, #ffeeba);
+    }
+
+    &-info {
+        background-color: var(--breadcrumb-background, #d1ecf1);
+        color: var(--breadcrumb-color, #0c5460);
+        border-color: var(--info, #bee5eb);
+    }
+}
+
+// Text Colors
+.text-success { color: var(--success, #28a745); }
+.text-error { color: var(--danger, #dc3545); }
+.text-warning { color: var(--warning, #ffc107); }
+.text-info { color: var(--info, #17a2b8); }
+.text-muted { color: $color-text-muted; }
+
+// Code Blocks
+code {
+    background-color: var(--grey300, #f8f9fa);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-family: monospace;
+}
+
+pre {
+    background-color: var(--dark, #343a40);
+    color: var(--white, #fff);
+    padding: 1rem;
+    border-radius: $border-radius;
+    overflow-x: auto;
+    font-size: 0.875rem;
+}
+
+.code-block {
+    display: block;
+    padding: 1rem;
+    background-color: var(--dark, #343a40);
+    color: var(--white, #fff);
+    border-radius: $border-radius;
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+
+// Section Header
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: $color-text-main;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        font-size: 1.25rem;
+        color: $color-text-muted;
+        max-width: 40rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+// Subheader
+.subheader {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $color-text-main;
+    margin-bottom: 1.5rem;
+}
+
+// Grid layout helper
+.grid-3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+
+    @media (min-width: $breakpoint-md) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+// Section spacing
+.py-section {
+    padding-top: $spacing-xl * 2;
+    padding-bottom: $spacing-xl * 2;
+}

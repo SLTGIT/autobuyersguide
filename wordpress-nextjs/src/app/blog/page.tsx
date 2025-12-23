@@ -47,13 +47,11 @@ export default async function Blog({ searchParams }: BlogPageProps) {
     const hasPrevPage = currentPage > 1;
 
     return (
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto py-12 px-4">
             {/* Page Header */}
-            <div className="text-center mb-12">
-                <h1 className="text-4xl font-bold mb-4 text-gray-800">Blog</h1>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                    Insights, tutorials, and updates from our team
-                </p>
+            <div className="text-center py-12 bg-gray-50 rounded-3xl mb-12">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-4" dangerouslySetInnerHTML={{ __html: 'Blog' }} />
+                <p className="text-gray-600 max-w-2xl mx-auto">Insights, tutorials, and updates from our team</p>
             </div>
 
             {/* API Error Notice */}
@@ -67,37 +65,27 @@ export default async function Blog({ searchParams }: BlogPageProps) {
 
             {/* Category Filter */}
             {categories.length > 0 && (
-                <div className="max-w-6xl mx-auto mb-8">
-                    <div className="flex flex-wrap gap-2 justify-center">
+                <div className="flex flex-wrap justify-center gap-4 mb-12">
+                    <Link
+                        href="/blog"
+                        className={`px-6 py-2 rounded-full border transition-colors ${!categoryFilter ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:border-blue-600'}`}
+                    >
+                        All
+                    </Link>
+                    {categories.map((category) => (
                         <Link
-                            href="/blog"
-                            className={`px-4 py-2 rounded-lg transition-colors ${
-                                !categoryFilter
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                            }`}
+                            key={category.id}
+                            href={`/blog?category=${category.id}`}
+                            className={`px-6 py-2 rounded-full border transition-colors ${categoryFilter === category.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:border-blue-600'}`}
                         >
-                            All
+                            {category.name} ({category.count})
                         </Link>
-                        {categories.map((category) => (
-                            <Link
-                                key={category.id}
-                                href={`/blog?category=${category.id}`}
-                                className={`px-4 py-2 rounded-lg transition-colors ${
-                                    categoryFilter === category.id
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                }`}
-                            >
-                                {category.name} ({category.count})
-                            </Link>
-                        ))}
-                    </div>
+                    ))}
                 </div>
             )}
 
             {/* Blog Posts Grid */}
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-7xl mx-auto">
                 {posts.length > 0 ? (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -113,35 +101,36 @@ export default async function Blog({ searchParams }: BlogPageProps) {
                                 });
 
                                 return (
-                                    <article key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                                    <article key={post.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 flex flex-col h-full group">
                                         {featuredImage && (
-                                            <div className="h-48 overflow-hidden">
+                                            <div className="h-56 overflow-hidden">
                                                 <img 
                                                     src={featuredImage} 
                                                     alt={post.title.rendered}
-                                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                 />
                                             </div>
                                         )}
-                                        <div className="p-6">
-                                            <div className="flex items-center justify-between mb-3">
-                                                <span className="text-sm text-blue-600 font-semibold">{primaryCategory}</span>
-                                                <span className="text-sm text-gray-500">{formattedDate}</span>
+                                        <div className="p-8 flex-grow flex flex-col">
+                                            <div className="flex items-center gap-4 text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider">
+                                                <span className="text-blue-600">{primaryCategory}</span>
+                                                <span>•</span>
+                                                <span>{formattedDate}</span>
                                             </div>
-                                            <h2 className="text-xl font-bold mb-3 text-gray-800 hover:text-blue-600 transition-colors">
+                                            <h2 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
                                                 <Link href={`/blog/${post.slug}`}>
                                                     <span dangerouslySetInnerHTML={{ __html: post.title.rendered }} />
                                                 </Link>
                                             </h2>
                                             <div 
-                                                className="text-gray-600 mb-4 line-clamp-3"
+                                                className="text-gray-600 text-sm mb-6 line-clamp-3 flex-grow"
                                                 dangerouslySetInnerHTML={{ __html: post.excerpt.rendered }}
                                             />
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm text-gray-500">By {author}</span>
+                                            <div className="flex items-center justify-between pt-6 border-t border-gray-50 mt-auto">
+                                                <span className="text-sm text-gray-500 italic">By {author}</span>
                                                 <Link
                                                     href={`/blog/${post.slug}`}
-                                                    className="text-blue-600 hover:text-blue-700 font-semibold text-sm"
+                                                    className="text-blue-600 font-bold hover:text-blue-800 transition-colors"
                                                 >
                                                     Read More →
                                                 </Link>
@@ -154,22 +143,22 @@ export default async function Blog({ searchParams }: BlogPageProps) {
 
                         {/* Pagination */}
                         {(hasNextPage || hasPrevPage) && (
-                            <div className="mt-12 flex justify-center gap-2">
+                            <div className="flex justify-center items-center gap-2 mt-12">
                                 {hasPrevPage && (
                                     <Link
                                         href={`/blog?page=${currentPage - 1}${categoryFilter ? `&category=${categoryFilter}` : ''}`}
-                                        className="px-4 py-2 bg-gray-200 text-gray-600 rounded hover:bg-gray-300 transition-colors"
+                                        className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-medium"
                                     >
                                         Previous
                                     </Link>
                                 )}
-                                <span className="px-4 py-2 bg-blue-600 text-white rounded">
+                                <span className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">
                                     {currentPage}
                                 </span>
                                 {hasNextPage && (
                                     <Link
                                         href={`/blog?page=${currentPage + 1}${categoryFilter ? `&category=${categoryFilter}` : ''}`}
-                                        className="px-4 py-2 bg-gray-200 text-gray-600 rounded hover:bg-gray-300 transition-colors"
+                                        className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-medium"
                                     >
                                         Next
                                     </Link>

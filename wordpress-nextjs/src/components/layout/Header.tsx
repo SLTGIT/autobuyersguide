@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { getMenuByName, getNavigationPages, getSiteSettings } from '@/lib/wordpress';
 import MobileMenu from './MobileMenu';
-
+import Image from 'next/image';
 
 export default async function Header() {
   // Fetch menu and site settings from WordPress
   let menuItems: any[] = [];
   let siteTitle = 'WordPress Next.js';
+  let sitelogo = '';
   let settings: { title: string; description: string; url: string } | null = null;
 
   try {
@@ -67,46 +68,51 @@ export default async function Header() {
   });
 
   return (
-    <header className="bg-white shadow-md">
-      <nav className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="text-2xl font-bold text-gray-800 hover:text-gray-600">
-            {siteTitle}
-          </Link>
+    <header className="header">
+      <nav className="header__nav">
+        {/* Logo */}
+        <Link href="/" className="header__logo">
+           <Image
+            src="/assets/images/logo.png"
+            alt={siteTitle}
+            width={160}
+            height={40}
+            priority
+            className="h-10 w-auto"
+          />
+        </Link>
 
-          {/* Desktop Menu */}
-          <ul className="hidden md:flex space-x-8">
-            {normalizedMenuItems.map((item) => {
-              const isExternal = item.url.startsWith('http');
-              const href = item.url;
-              
-              return (
-                <li key={item.ID}>
-                  {isExternal ? (
-                    <a 
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-700 hover:text-blue-600 transition-colors"
-                      dangerouslySetInnerHTML={{ __html: item.title }}
-                    />
-                  ) : (
-                    <Link 
-                      href={href} 
-                      className="text-gray-700 hover:text-blue-600 transition-colors"
-                    >
-                      <span dangerouslySetInnerHTML={{ __html: item.title }} />
-                    </Link>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+        {/* Desktop Menu */}
+        <ul className="header__menu">
+          {normalizedMenuItems.map((item) => {
+            const isExternal = item.url.startsWith('http');
+            const href = item.url;
+            
+            return (
+              <li key={item.ID}>
+                {isExternal ? (
+                  <a 
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="header__link"
+                    dangerouslySetInnerHTML={{ __html: item.title }}
+                  />
+                ) : (
+                  <Link 
+                    href={href} 
+                    className="header__link"
+                  >
+                    <span dangerouslySetInnerHTML={{ __html: item.title }} />
+                  </Link>
+                )}
+              </li>
+            );
+          })}
+        </ul>
 
-          {/* Mobile Menu */}
-          <MobileMenu menuItems={normalizedMenuItems} />
-        </div>
+        {/* Mobile Menu */}
+        <MobileMenu menuItems={normalizedMenuItems} />
       </nav>
     </header>
   );

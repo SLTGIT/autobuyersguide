@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import "@/styles/globals.css";
+import "@/styles/globals.scss";
+import { Inter } from "next/font/google";
 import { Layout } from "@/components/layout";
 import NextTopLoader from "nextjs-toploader";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "WordPress Next.js",
@@ -15,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className={inter.className}>
         <NextTopLoader
           color="#2563eb"
           height={3}

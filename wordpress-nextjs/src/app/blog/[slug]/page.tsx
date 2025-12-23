@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getPostBySlug, getPosts } from '@/lib/wordpress';
+import { getMetadata } from '@/lib/wordpress/seo';
 
 interface BlogPostProps {
   params: Promise<{
@@ -20,10 +21,7 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
     };
   }
 
-  return {
-    title: `${post.title.rendered} | Blog`,
-    description: post.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 160),
-  };
+  return getMetadata(post);
 }
 
 export default async function BlogPost({ params }: BlogPostProps) {
@@ -50,110 +48,85 @@ export default async function BlogPost({ params }: BlogPostProps) {
   });
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="max-w-4xl mx-auto">
-        {/* Back Link */}
-        <Link href="/blog" className="text-blue-600 hover:text-blue-700 mb-6 inline-block">
+    <div className="bg-white min-h-screen">
+      <div className="container mx-auto py-12 px-4">
+        <Link href="/blog" className="inline-flex items-center text-blue-600 font-bold mb-8 hover:gap-2 transition-all">
           ← Back to Blog
         </Link>
+        
+        <article className="max-w-4xl mx-auto">
+          {/* Post Header */}
+          <header className="mb-12 text-center">
+            <h1 
+              className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight"
+              dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+            />
+            
+            <div className="flex flex-wrap items-center justify-center gap-6 text-gray-500 font-medium bg-gray-50 py-4 px-6 rounded-2xl">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-600">👤</span>
+                <span>{author?.name || 'Unknown'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-600">📅</span>
+                <span>{formattedDate}</span>
+              </div>
+              {primaryCategory && (
+                <div className="flex items-center gap-2">
+                  <span className="text-blue-600">📂</span>
+                  <span>{primaryCategory.name}</span>
+                </div>
+              )}
+            </div>
+          </header>
 
-        {/* Article Header */}
-        <article className="bg-white rounded-lg shadow-md overflow-hidden">
           {/* Featured Image */}
           {featuredImage && (
-            <div className="w-full h-96 overflow-hidden">
+            <div className="mb-12 rounded-3xl overflow-hidden shadow-2xl">
               <img 
                 src={featuredImage.source_url} 
                 alt={featuredImage.alt_text || post.title.rendered}
-                className="w-full h-full object-cover"
+                className="w-full h-auto object-cover max-h-[600px]"
               />
             </div>
           )}
 
-          <div className="p-8">
-            {/* Category and Date */}
-            <div className="mb-6">
-              {primaryCategory && (
-                <span className="text-sm text-blue-600 font-semibold">
-                  {primaryCategory.name}
-                </span>
+          {/* Post Content */}
+          <div 
+            className="prose prose-lg max-w-none prose-blue prose-headings:text-gray-900 prose-headings:font-bold prose-a:text-blue-600 prose-img:rounded-2xl"
+            dangerouslySetInnerHTML={{ __html: post.content.rendered }}
+          />
+
+          {/* Author Section */}
+          {author && (
+            <div className="mt-16 p-8 bg-gray-50 rounded-3xl flex flex-col md:flex-row items-center gap-8 border border-gray-100">
+              {author.avatar_urls?.['96'] && (
+                <img 
+                  src={author.avatar_urls['96']} 
+                  alt={author.name} 
+                  className="w-24 h-24 rounded-full shadow-lg border-4 border-white"
+                />
               )}
-              <h1 
-                className="text-4xl font-bold mt-2 mb-4 text-gray-800"
-                dangerouslySetInnerHTML={{ __html: post.title.rendered }}
-              />
-              <div className="flex items-center text-gray-600 text-sm">
-                {author && (
-                  <>
-                    <span>By {author.name}</span>
-                    <span className="mx-2">•</span>
-                  </>
-                )}
-                <time>{formattedDate}</time>
+              <div className="text-center md:text-left">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">About {author.name}</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {author.description || 'Content creator and technical writer focusing on WordPress and modern web development technologies.'}
+                </p>
               </div>
             </div>
+          )}
 
-            {/* Article Content */}
-            <div
-              className="prose prose-lg max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-a:text-blue-600 prose-strong:text-gray-800 prose-img:rounded-lg"
-              dangerouslySetInnerHTML={{ __html: post.content.rendered }}
-            />
-
-            {/* Tags */}
-            {postCategories.length > 0 && (
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Categories:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {postCategories.map((category) => (
-                    <Link
-                      key={category.id}
-                      href={`/blog?category=${category.id}`}
-                      className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
-                    >
-                      {category.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Author Info */}
-            {author && (
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <div className="flex items-center gap-4">
-                  {author.avatar_urls?.['96'] && (
-                    <img 
-                      src={author.avatar_urls['96']} 
-                      alt={author.name}
-                      className="w-16 h-16 rounded-full"
-                    />
-                  )}
-                  <div>
-                    <h3 className="font-bold text-gray-800">{author.name}</h3>
-                    {author.description && (
-                      <p className="text-gray-600 text-sm mt-1">{author.description}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+          {/* Navigation */}
+          <div className="mt-16 pt-16 border-t border-gray-100">
+            <h3 className="text-2xl font-bold text-gray-900 mb-8">Continue Reading</h3>
+            <Link 
+              href="/blog"
+              className="inline-flex items-center text-blue-600 font-bold hover:gap-2 transition-all"
+            >
+              ← Back to Blog
+            </Link>
           </div>
         </article>
-
-        {/* Related Posts */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">Continue Reading</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Link href="/blog" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-              <h3 className="text-xl font-bold mb-2 text-gray-800">View All Posts</h3>
-              <p className="text-gray-600">Explore more articles and tutorials</p>
-            </Link>
-            <Link href="/" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-              <h3 className="text-xl font-bold mb-2 text-gray-800">Back to Home</h3>
-              <p className="text-gray-600">Return to the homepage</p>
-            </Link>
-          </div>
-        </div>
       </div>
     </div>
   );
