@@ -1,0 +1,31 @@
+// Typography
+$font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+$font-family-serif: 'Georgia', serif;
+
+// Colors
+$color-primary: var(--primary, #fe0009);
+$color-primary-dark: var(--primary-darkened, #b20006);
+$color-secondary: var(--secondary, #6c757d);
+$color-accent: var(--warning, #ffc107);
+
+$color-text-main: var(--grey900, #212529);
+$color-text-muted: var(--grey600, #6c757d);
+$color-bg-light: var(--light, #f8f9fa);
+$color-white: var(--white, #ffffff);
+$color-black: var(--black, #000000);
+$color-dark: var(--dark, #343a40);
+$color-border: var(--grey300, #dee2e6);
+$border-radius: var(--border-radius, 0.25rem);
+
+// Breakpoints
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+
+// Spacing
+$spacing-unit: 1rem;
+$spacing-sm: $spacing-unit * 0.5;
+$spacing-md: $spacing-unit;
+$spacing-lg: $spacing-unit * 1.5;
+$spacing-xl: $spacing-unit * 2;

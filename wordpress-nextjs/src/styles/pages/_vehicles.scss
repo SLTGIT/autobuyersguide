@@ -1,0 +1,131 @@
+@import "../variables";
+
+/* Vehicle Pages - Modern Brand Styling */
+
+.vehicles-page {
+    min-height: 100vh;
+    background-color: var(--search-listings-background, #f8f9fa);
+    padding: 2rem 0;
+}
+
+.vehicles-container {
+    max-width: var(--model-menu-width, 1450px);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* Header */
+.vehicles-header {
+    background: var(--white, #ffffff);
+    padding: 2rem;
+    border-radius: var(--border-radius, 0.25rem);
+    margin-bottom: 2rem;
+    box-shadow: var(--header-box-shadow, 0 5px 3px -3px rgba(0,0,0,.15));
+    border-bottom: var(--search-panel-border-bottom, 1px solid #e8e8e8);
+}
+
+.vehicles-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--search-listings-color, #040404);
+    margin: 0 0 0.5rem 0;
+}
+
+.vehicles-meta {
+    display: flex;
+    gap: 1rem;
+    color: var(--secondary, #6c757d);
+    font-size: 0.95rem;
+}
+
+/* Sidebar */
+.vehicles-sidebar {
+    background: var(--white, #ffffff);
+    padding: 1.5rem;
+    border-radius: var(--border-radius, 0.25rem);
+    height: fit-content;
+    position: sticky;
+    top: 5rem;
+    border: 1px solid var(--grey300, #dee2e6);
+}
+
+/* Filter Input Styles */
+.filter-input,
+.filter-select {
+    width: 100%;
+    padding: 0.625rem;
+    border: 1px solid var(--grey300, #dee2e6);
+    border-radius: var(--border-radius, 0.25rem);
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    background-color: var(--white, #fff);
+
+    &:focus {
+        outline: none;
+        border-color: var(--primary, $color-primary);
+        box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+    }
+}
+
+/* Vehicle Card - Overriding some properties from base card for listings */
+.vehicle-card {
+    background: var(--car-search-item-background, #ffffff);
+    border: var(--car-search-item-border, 1px solid #dee2e6);
+    // Inherits rounded and shadow from .card
+}
+
+.vehicle-price {
+    .price-amount {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary, $color-primary);
+        display: block;
+    }
+}
+
+.vehicle-card-button, .contact-button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--primary, $color-primary);
+    color: var(--white, #ffffff);
+    border: none;
+    border-radius: var(--border-radius, 0.25rem);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background-color: var(--primary-darkened, $color-primary-dark);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* Pagination */
+.pagination-link {
+    padding: 0.5rem 1rem;
+    color: var(--pagination-link-color, $color-primary);
+    text-decoration: none;
+    border: 1px solid var(--grey300, #dee2e6);
+    border-radius: var(--border-radius, 0.25rem);
+    font-weight: 500;
+    transition: all 0.2s;
+
+    &:hover {
+        color: var(--pagination-link-hover-color, $color-primary);
+        background-color: var(--light, #f8f9fa);
+    }
+
+    &.active {
+        background-color: var(--pagination-link-item-selected-background-color, $color-primary);
+        border-color: var(--pagination-link-item-selected-border-color, $color-primary);
+        color: var(--pagination-link-item-selected-color, #ffffff);
+    }
+}
+
+/* Vehicle Detail Page specific */
+.vehicle-detail-page {
+    min-height: 100vh;
+    background: var(--vdp-car-page-background, linear-gradient(#f8f9fa, #e9ecef));
+    padding: 2rem 0;
+}
