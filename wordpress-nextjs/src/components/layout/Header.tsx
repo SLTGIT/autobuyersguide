@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getMenuByName, getNavigationPages, getSiteSettings } from '@/lib/wordpress';
 import MobileMenu from './MobileMenu';
-
+import Image from 'next/image';
 
 export default async function Header() {
   // Fetch menu and site settings from WordPress
@@ -72,7 +72,14 @@ export default async function Header() {
       <nav className="header__nav">
         {/* Logo */}
         <Link href="/" className="header__logo">
-          {siteTitle}
+           <Image
+            src="/assets/images/logo.png"
+            alt={siteTitle}
+            width={160}
+            height={40}
+            priority
+            className="h-10 w-auto"
+          />
         </Link>
 
         {/* Desktop Menu */}
