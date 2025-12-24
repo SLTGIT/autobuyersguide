@@ -1,108 +1,129 @@
 import Link from 'next/link';
-import { getMenuByLocation, getSiteSettings, getNavigationPages } from '@/lib/wordpress';
+import Image from 'next/image';
+import styles from './Footer.module.scss';
 
-export default async function Footer() {
+export default function Footer() {
   const currentYear = new Date().getFullYear();
-  
-  // Fetch footer menu and site settings from WordPress
-  let footerMenuItems: any[] = [];
-  let siteTitle = 'WordPress Next.js';
-  let siteDescription = 'A modern Next.js application powered by WordPress REST API. Built with TypeScript and Tailwind CSS for optimal performance.';
-
-  try {
-    const [footerMenu, settings] = await Promise.all([
-      getMenuByLocation('footer_menu'),
-      getSiteSettings()
-    ]);
-
-    if (settings?.title) {
-      siteTitle = settings.title;
-    }
-    if (settings?.description) {
-      siteDescription = settings.description;
-    }
-
-    // If footer menu exists, use it
-    if (footerMenu && footerMenu.items && footerMenu.items.length > 0) {
-      footerMenuItems = footerMenu.items;
-    } else {
-      // Fallback: Use pages as footer navigation
-      const pages = await getNavigationPages();
-      footerMenuItems = [
-        { title: 'Home', url: '/', ID: 0 },
-        ...pages.slice(0, 4).map(page => ({
-          title: page.title.rendered,
-          url: `/${page.slug}`,
-          ID: page.id
-        }))
-      ];
-    }
-  } catch (error) {
-    console.error('Error fetching footer data:', error);
-    // Default fallback menu
-    footerMenuItems = [
-      { title: 'Home', url: '/', ID: 1 },
-      { title: 'About', url: '/about', ID: 2 },
-      { title: 'Blog', url: '/blog', ID: 3 },
-      { title: 'Contact', url: '/contact', ID: 4 }
-    ];
-  }
 
   return (
-    <footer className="footer">
-      <div className="footer__content">
-        {/* About Section */}
-        <div className="footer__section">
-          <h3>{siteTitle}</h3>
-          <p>{siteDescription}</p>
-        </div>
+    <footer className={styles['site-footer']}>
+      <div className={styles['arc__upper']}></div>
+      
+      <div className={styles['pre-footer']}>
+        <div className="container-mid">
+          <div className="row">
+            {/* Support Column */}
+            <div className="col-md-6 col-lg-3">
+              <div className={styles['footer-menu-container']}>
+                <div className={styles['footer-menu-title']}>
+                  Support
+                </div>
+                <div className={styles['footer-menu-contact']}>
+                  <div className={styles['footer-menu-contact-title']}>Mail</div>
+                  <a href="mailto:hello@autobuyersguide.com.au">hello@autobuyersguide.com.au</a>
+                </div>
+                <div className={styles['footer-menu-contact']}>
+                  <div className={styles['footer-menu-contact-title']}>Phone</div>
+                  <a href="tel:+61432515483">+61 432 515 483</a>
+                </div>
+                <div className={styles['footer-menu-contact']}>
+                  <div className={styles['footer-menu-contact-title']}>Address</div>
+                  <a href="#">Brisbane, QLD, Australia, Queensland</a>
+                </div>
+              </div>
+            </div>
 
-        {/* Quick Links */}
-        <div className="footer__section">
-          <h3>Quick Links</h3>
-          <ul className="footer__list">
-            {footerMenuItems.map((item) => {
-              const isExternal = item.url?.startsWith('http');
-              const href = isExternal ? item.url : (item.url || '/');
+            {/* Dealer Column */}
+            <div className="col-md-6 col-lg-3">
+              <div className={styles['footer-menu-container']}>
+                <div className={styles['footer-menu-title']}>
+                  Dealer
+                </div>
+                <ul>
+                  <li><Link href="#">Dealer Login</Link></li>
+                  <li><Link href="#">Dealer Help Centre</Link></li>
+                </ul>
+              </div>
+            </div>
 
-              return (
-                <li key={item.ID}>
-                  {isExternal ? (
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="transition-colors"
-                      dangerouslySetInnerHTML={{ __html: item.title }}
-                    />
-                  ) : (
-                    <Link 
-                      href={href} 
-                      className="transition-colors"
-                    >
-                      <span dangerouslySetInnerHTML={{ __html: item.title }} />
-                    </Link>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+            {/* Company Column */}
+            <div className="col-md-6 col-lg-3">
+              <div className={styles['footer-menu-container']}>
+                <div className={styles['footer-menu-title']}>
+                  Company
+                </div>
+                <ul className="list-unstyled">
+                  <li><Link href="/about">About Us</Link></li>
+                  <li><Link href="/contact">Contact Us</Link></li>
+                  <li><Link href="#">Locations</Link></li>
+                </ul>
+              </div>
+            </div>
 
-        {/* Contact Info */}
-        <div className="footer__section">
-          <h3>Contact</h3>
-          <ul className="footer__contact">
-            <li>Email: info@example.com</li>
-            <li>Phone: +1 234 567 890</li>
-            <li>Address: 123 Main St, City, Country</li>
-          </ul>
+            {/* Contact Us / Social Column */}
+            <div className="col-md-6 col-lg-3">
+              <div className={styles['footer-menu-container']}>
+                <div className={styles['footer-menu-title']}>
+                  Contact Us
+                </div>
+                <ul>
+                  <li><Link href="/advertise">Advertise With Us</Link></li>
+                  <li><Link href="/vehicles">Vehicles</Link></li>
+                </ul>
+                <ul className="list-inline d-flex justify-content-start gap-2 mt-4 social-icons">
+                  <li className="list-inline-item me-3">
+                    <a href="#" className="social-icon facebook" aria-label="Facebook">
+                      <div className="icon-box">
+                        <Image width={24} height={24} src="/assets/images/facebook.svg" alt="Facebook" />
+                      </div>
+                    </a>
+                  </li>
+                  <li className="list-inline-item me-3">
+                     <a href="#" className="social-icon twitter" aria-label="Twitter">
+                      <div className="icon-box">
+                        <Image width={24} height={24} src="/assets/images/twitter.svg" alt="Twitter" />
+                      </div>
+                    </a>
+                  </li>
+                  <li className="list-inline-item me-3">
+                    <a href="#" className="social-icon instagram" aria-label="Instagram">
+                      <div className="icon-box">
+                         <Image width={24} height={24} src="/assets/images/instagram.svg" alt="Instagram" />
+                      </div>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="footer__bottom">
-        <p>&copy; {currentYear} {siteTitle}. All rights reserved.</p>
+      <div className={styles['copyright-text']}>
+        <div className="container-mid">
+          <div className={styles['copyright-text-container']}>
+            <div className={styles['footer-logo']}>
+               {/* Update path to match copied assets */}
+              <Image 
+                src="/assets/images/my-logos/ab-logo.webp" 
+                className="img-fluid" 
+                alt="Auto Buyers" 
+                title="Auto Buyers"
+                width={130} 
+                height={100}
+              />
+            </div>
+
+            <div className={styles['copyright-text-content']}>
+              <p>
+                <Link href="/">Auto Buyers Guide.</Link> Copyright © {currentYear}. All Rights Reserved | 
+                <Link href="#"> Sitemap</Link> | 
+                <Link href="#"> Terms of Use</Link> | 
+                <Link href="#"> Privacy Policy</Link>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </footer>
   );

@@ -1,0 +1,93 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.popularCarType {
+    padding: 70px 0 50px;
+
+    // Use :global for Bootstrap utility classes if we want to override them specifically here
+    // But since gx-custom is used as a class in JSX, we can make it a module class
+    // and apply it. Or, if it's meant to extend global bootstrap behavior, we might need :global.
+    // However, looking at _home.scss, it sets a variable. 
+    
+    .gxCustom {
+        --bs-gutter-x: 52px;
+
+        @include sm {
+            --bs-gutter-x: 20px;
+        }
+    }
+     
+     // flex-table support for grid
+    .colItem {
+         display: flex;
+         flex-direction: column;
+    }
+
+    .popularCarGrid {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        flex: 1;
+        background: #fcf6ef;
+        margin-bottom: 50px;
+        padding: 20px;
+        border-radius: 10px;
+        transition: .3s ease-in-out;
+        text-decoration: none;
+
+        p {
+            margin: 5px 0;
+            color: var(--primary-color);
+        }
+
+        .popularCarGridImg {
+            max-width: 200px;
+            position: relative;
+            top: 10px;
+            margin-bottom: -34px;
+            transition: .3s ease-in-out;
+        }
+
+        h3 {
+            transition: .3s ease-in-out;
+            font-size: 18px;
+            color: var(--dark-color);
+        }
+
+        &:hover {
+            background: var(--secondary-color);
+            color: var(--white-color);
+
+            .popularCarGridImg {
+                transform: scale(1.1);
+                transition: .3s ease-in-out;
+            }
+
+            p {
+                color: var(--white-color);
+            }
+
+            h3 {
+                color: var(--white-color);
+            }
+        }
+
+        @include sm {
+            padding: 15px;
+            margin-bottom: 20px;
+
+            h3 {
+                font-size: 16px;
+            }
+
+            p {
+                font-size: 14px;
+            }
+
+            .popularCarGridImg {
+                margin-bottom: -20px;
+            }
+        }
+    }
+}

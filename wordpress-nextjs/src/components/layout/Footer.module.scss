@@ -1,4 +1,5 @@
-@import "../mixins";
+@import "../../styles/variables";
+@import "../../styles/mixins";
 
 .site-footer {
     position: relative;
@@ -100,6 +101,12 @@
                     display: block;
                     margin-top: 8px;
                     text-transform: capitalize;
+                    text-decoration: none; // Added consistency
+
+                    &:hover {
+                        color: var(--primary-color);
+                        text-decoration: none;
+                    }
                 }
             }
         }

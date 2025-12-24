@@ -1,0 +1,90 @@
+.theme-btn {
+    font-size: 16px;
+    display: inline-block;
+    padding: 14px 25px 15px;
+    min-width: 200px;
+    font-weight: 600;
+    border-radius: 6px;
+    text-align: center;
+    line-height: 1;
+    z-index: 1;
+    overflow: hidden;
+    position: relative;
+    color: var(--light-color);
+    border: 1px solid var(--primary-color);
+    background-color: var(--primary-color);
+    @include transition;
+    cursor: pointer;
+    text-decoration: none; // Ensure link buttons don't have underline
+
+    @include md {
+        min-width: 125px;
+        font-size: 14px;
+    }
+
+    &:hover,
+    &:focus,
+    &:active {
+        color: var(--light-color);
+        border: 1px solid var(--secondary-color);
+        background-color: var(--secondary-color);
+        text-decoration: none;
+    }
+
+    &.primary-btn {
+        border: 1px solid var(--primary-color);
+        background-color: var(--primary-color);
+
+        &:hover,
+        &:focus,
+        &:active {
+            color: var(--light-color);
+            border: 1px solid var(--secondary-color);
+            background-color: var(--secondary-color);
+        }
+    }
+
+    &.secondary-btn {
+        color: var(--light-color);
+        border: 1px solid var(--secondary-color);
+        background-color: var(--secondary-color);
+
+        &:hover,
+        &:focus,
+        &:active {
+            color: var(--light-color);
+            border: 1px solid var(--primary-color);
+            background-color: var(--primary-color);
+        }
+
+    }
+
+    &.white-btn {
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        background-color: var(--white-color);
+
+        &:hover,
+        &:focus,
+        &:active {
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            background-color: #ffecf0;
+        }
+
+    }
+
+    &.light-btn {
+        color: var(--text-color);
+        border: 1px solid var(--text-color);
+        background-color: var(--white-color);
+
+        &:hover,
+        &:focus,
+        &:active {
+            color: var(--white-color);
+            background-color: #444;
+        }
+
+    }
+}

@@ -1,0 +1,99 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.home-banner {
+    position: relative;
+    z-index: 1;
+
+    .homeBanner-image {
+        position: relative; // ensure ::before is positioned correctly
+        max-height: 500px;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+        }
+
+        &::before {
+            content: '';
+            position: absolute;
+            inset: 0; // shorthand for top/right/bottom/left: 0;
+            background: linear-gradient(to right,
+                    rgba(0, 0, 0, 0.85) 0%,
+                    rgba(0, 0, 0, 0.6) 50%,
+                    rgba(0, 0, 0, 0.0) 100%);
+            z-index: 1;
+        }
+    }
+
+    .home-banner-title {
+        position: absolute;
+        inset: 0;
+        z-index: 2; // above overlay
+        display: flex;
+        align-items: center; // vertical center
+        padding: 60px 0;
+
+        @include md {
+            align-items: flex-end;
+            padding-bottom: 40px;
+        }
+
+        .banner-content {
+            max-width: 850px;
+
+            h1 {
+                font-size: 48px;
+                font-weight: 800;
+                line-height: 1.15;
+                margin-bottom: 20px;
+                letter-spacing: -1px;
+                color: var(--white-color);
+
+                @include md {
+                    font-size: 38px;
+                }
+
+                @include sm {
+                    font-size: 30px;
+                }
+            }
+
+            .banner-subtext {
+                font-size: 20px;
+                line-height: 1.6;
+                opacity: 0.9;
+                max-width: 650px;
+                color: var(--white-color);
+
+                @include md {
+                    font-size: 18px;
+                }
+
+                @include sm {
+                    font-size: 16px;
+                }
+            }
+        }
+    }
+
+    @media (max-width: 767px) {
+        .homeBanner-image {
+            height: 400px;
+
+            &::before {
+                background: linear-gradient(to top,
+                        rgba(0, 0, 0, 0.9) 0%,
+                        rgba(0, 0, 0, 0.5) 60%,
+                        rgba(0, 0, 0, 0) 100%);
+            }
+
+            img {
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+    }
+}

@@ -1,0 +1,54 @@
+// -----------------------------------------------------------------------------
+// Responsive Breakpoint Mixins (Max-width)
+// -----------------------------------------------------------------------------
+
+/// Small devices (max-width: 575px)
+@mixin sm {
+    @media (max-width: #{$screen-sm-min}) {
+        @content;
+    }
+}
+
+/// Medium devices (max-width: 767px)
+@mixin md {
+    @media (max-width: #{$screen-md-min}) {
+        @content;
+    }
+}
+
+/// Large devices (max-width: 991px)
+@mixin lg {
+    @media (max-width: #{$screen-lg-min}) {
+        @content;
+    }
+}
+
+/// Extra large devices (max-width: 1200px)
+@mixin xl {
+    @media (max-width: #{$screen-xl-min}) {
+        @content;
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Responsive Mixin (Min-width)
+// -----------------------------------------------------------------------------
+
+/// Custom min-width breakpoint
+/// Usage: @include rwd(768) { ... }
+@mixin rwd($screen) {
+    @media (min-width: #{$screen}px) {
+        @content;
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Transition Utility Mixin
+// -----------------------------------------------------------------------------
+
+/// Smooth transition for all properties (0.5s)
+@mixin transition {
+    transition: all 0.5s ease;
+    -webkit-transition: all 0.5s ease;
+    -ms-transition: all 0.5s ease;
+}

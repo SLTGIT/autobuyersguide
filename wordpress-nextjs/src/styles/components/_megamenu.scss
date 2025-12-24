@@ -1,0 +1,215 @@
+/* ----------------------------------------------------------------------------- 
+   Mega Menu Styles
+----------------------------------------------------------------------------- */
+@import "../mixins";
+
+// Main Navigation
+.main-navigation {
+    .nav-menu {
+        gap: 0;
+
+        .nav-item {
+            position: relative;
+
+            &.has-megamenu {
+                position: static;
+            }
+
+            .nav-link {
+                display: flex;
+                align-items: center;
+                padding: 20px 18px;
+                font-size: 16px;
+                font-weight: 600;
+                color: var(--dark-color);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                position: relative;
+
+                @media (min-width: 992px) and (max-width: 1200px) {
+                    padding: 20px 12px;
+                    font-size: 15px;
+                }
+
+                &::after {
+                    content: '';
+                    border: solid currentColor;
+                    border-width: 0 2px 2px 0;
+                    display: inline-block;
+                    padding: 3px;
+                    transform: rotate(45deg);
+                    margin-left: 10px;
+                    margin-bottom: 4px;
+                    transition: transform 0.3s ease;
+                    opacity: 1;
+                    display: none; // Hidden by default
+                }
+
+                &:hover {
+                    color: var(--primary-color);
+
+                    &::after {
+                        transform: rotate(-135deg);
+                        margin-bottom: -1px;
+                    }
+                }
+
+                // Active/Current state
+                &.active {
+                    color: var(--primary-color);
+
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
+                        height: 3px;
+                        background: var(--primary-color);
+                    }
+                }
+            }
+
+            // Mega Menu Dropdown
+            &.has-megamenu {
+                .nav-link::after {
+                    display: inline-block;
+                }
+
+                &:hover {
+                    .megamenu {
+                        opacity: 1;
+                        visibility: visible;
+                        transform: translateY(0);
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Mega Menu Container
+.megamenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #ffffff;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 40px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px);
+    transition: all 0.3s ease-in-out;
+    z-index: 999;
+    border-top: 3px solid var(--primary-color);
+
+    @media (max-width: 1280px) {
+        width: 95vw;
+    }
+
+    .container-mid {
+        width: 100%;
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+
+    .row {
+        margin: 0 -15px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    [class*="col-"] {
+        padding: 0 15px;
+    }
+}
+
+// Mega Menu Title
+.megamenu-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-bottom: 10px;
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 30px;
+        height: 2px;
+        background: var(--primary-color);
+    }
+}
+
+// Mega Menu List
+.megamenu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+        margin-bottom: 5px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        a {
+            display: block;
+            padding: 8px 12px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            position: relative;
+            padding-left: 24px;
+
+            &::before {
+                content: '›';
+                position: absolute;
+                left: 8px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 18px;
+                color: var(--primary-color);
+                opacity: 1;
+                transition: all 0.3s ease;
+            }
+
+            &:hover {
+                background: #f8f9fa;
+                color: var(--primary-color);
+                padding-left: 28px;
+
+                &::before {
+                    opacity: 1;
+                    left: 12px;
+                }
+            }
+        }
+    }
+}
+
+// Position menus below header
+.site-header {
+    .nav-item.has-megamenu {
+        &:hover .megamenu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+    }
+}

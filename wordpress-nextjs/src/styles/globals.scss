@@ -1,21 +1,30 @@
-@import "bootstrap/dist/css/bootstrap.min.css";
-@import "theme";
+// Bootstrap is imported in layout.tsx
+
 @import "variables";
+@import "mixins";
+@import "base/reboot";
 @import "base";
 @import "utilities";
 
-// Global utility classes using variables
+// Components
+// @import "components/header";
+@import "components/megamenu";
+// @import "components/footer";
+@import "components/button";
+
+// Pages
+// @import "pages/home";
 .text-primary {
-  color: $color-primary;
+  color: var(--primary-color);
 }
 
 .bg-primary {
-  background-color: $color-primary;
+  background-color: var(--primary-color);
 }
 
 .btn-primary {
-  background-color: var(--primary, $color-primary);
-  color: var(--white, #ffffff);
+  background-color: var(--primary-color);
+  color: var(--white-color);
   padding: 0.75rem 1.5rem;
   border-radius: var(--border-radius, 0.25rem);
   font-weight: 600;
@@ -24,20 +33,10 @@
   cursor: pointer;
 
   &:hover {
-    background-color: var(--primary-darkened, $color-primary-dark);
+    background-color: var(--secondary-color);
   }
 }
 
-// Components
-@import "components/card";
-@import "components/header";
-@import "components/footer";
-
-// Pages
-@import "pages/blog";
-@import "pages/post-detail";
-@import "pages/cms-page";
-@import "pages/vehicles";
-@import "pages/home";
-@import "pages/contact";
-@import "pages/about";
+// Pages will be migrated similarly
+// @import "pages/blog"; 
+// ...

@@ -1,0 +1,197 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.main-search-form {
+    width: 100%;
+    background: #fcf6ef;
+
+    .homeBanner-form {
+        position: relative;
+        bottom: 75px;
+        z-index: 2;
+
+        @media (max-width: 991px) {
+            bottom: 30px;
+        }
+
+        @media (max-width: 767px) {
+            bottom: 0px;
+            margin-top: -40px;
+        }
+    }
+
+    .nav-tabs {
+        border: 0;
+        gap: 0; // Seamless connection
+        padding: 0;
+
+        .nav-item {
+            @media (max-width: 767px) {
+                flex: 1;
+            }
+
+            .nav-link {
+                background: var(--secondary-color);
+                color: rgba(255, 255, 255, 0.85);
+                border-radius: 6px 6px 0 0;
+                font-size: 16px;
+                min-width: 144px;
+                padding: 12px 20px;
+                width: 100%;
+                font-weight: 600;
+                border: 0;
+                border-top: 3px solid transparent; // Reserve space for border to prevent shaking
+                margin-right: 2px;
+                transition: all 0.2s ease-in-out;
+                position: relative;
+                top: 1px;
+                cursor: pointer;
+
+                @media (max-width: 767px) {
+                    min-width: unset;
+                    margin-right: 1px;
+                    padding: 10px 5px;
+                    font-size: 14px;
+                }
+
+                &:hover {
+                    background: lighten(#273444, 5%);
+                    color: #fff;
+                }
+
+                &.active {
+                    background: var(--white-color);
+                    color: var(--secondary-color);
+                    border-top-color: var(--primary-color); // Only change color
+                    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+                    z-index: 2;
+                }
+            }
+        }
+    }
+
+    .tab-content {
+        background-color: var(--white-color);
+        padding: 35px;
+        border-radius: 0 6px 6px 6px; // Top-left is 0 to merge with first tab if needed, generally safe
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); // Clean, professional shadow
+        position: relative;
+        z-index: 1;
+
+        // Ensure rounded corners work even if first tab is active
+        border-top-right-radius: 6px;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+
+        // Special case: if first tab is active, top-left radius should be 0 to look seamless. 
+        // We can just set all to 6px generally, visual difference is minimal.
+        border-radius: 6px;
+
+
+        @media (max-width: 767px) {
+            padding: 25px 20px;
+            border-radius: 0 0 6px 6px; // On mobile, tabs might stack or be flush
+        }
+
+        form {
+            @media (max-width: 767px) {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 15px !important;
+            }
+
+            .flex-grow-1 {
+                @media (max-width: 767px) {
+                    flex-direction: column;
+                    gap: 15px !important;
+                }
+            }
+        }
+    }
+
+    .form-group {
+        flex: 1 1 0px; // Force equal width regardless of content
+        width: 0; // Ensure flex-basis works correctly
+        min-width: 0; // Prevent overflow
+
+        @media (max-width: 767px) {
+            width: 100%;
+            flex: unset !important;
+        }
+    }
+
+    .form-select {
+        padding: 10px 15px;
+        height: 54px;
+        border-radius: 6px;
+        background-color: #f1f3f5; // Distinct light gray background
+        border: 1px solid #ced4da; // Visible border
+        color: var(--secondary-color);
+        width: 100%;
+        font-size: 15px;
+        font-weight: 600; // Slightly bolder text
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(254, 0, 9, 0.1);
+            border-color: var(--primary-color);
+            background-color: #fff; // Turn white on focus
+        }
+
+        &:hover {
+            background-color: #e9ecef; // Darker interaction state
+            border-color: #adb5bd;
+        }
+    }
+
+    .theme-btn {
+        font-size: 16px;
+        font-weight: 700;
+        border-radius: 6px;
+        min-width: 220px;
+        height: 54px;
+        transition: transform 0.2s;
+        border: none;
+        background: var(--primary-color);
+        color: #fff;
+
+        &:hover {
+            transform: translateY(-1px); // Subtle feedback
+             background: var(--secondary-color);
+        }
+
+        @media (max-width: 767px) {
+            width: 100%;
+            min-width: unset;
+        }
+    }
+
+    @include lg {
+        position: unset;
+    }
+
+    .mt-2 {
+        @media (max-width: 767px) {
+            margin-top: 5px !important;
+        }
+    }
+
+    .arrow-cta {
+        position: relative;
+        margin-right: 20px;
+        text-decoration: none;
+        color: var(--text-color);
+
+        &:before {
+            content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='black' stroke-width='2.5' viewBox='0 0 16 16'%3E%3Cpath d='M5 2l6 6-6 6'/%3E%3C/svg%3E");
+            vertical-align: middle;
+            position: absolute;
+            right: -15px;
+            top: 1px;
+            height: 12px;
+            width: 12px;
+        }
+    }
+}

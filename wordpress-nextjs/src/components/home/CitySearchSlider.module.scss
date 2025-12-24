@@ -1,0 +1,211 @@
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.searchByCity {
+    padding: 0 0 70px;
+    position: relative;
+    background: #fcf6ef;
+
+    .girdBoxContainer {
+        position: relative;
+         overflow: hidden; // Critical for slider
+
+        .inner {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 26px; // total 52px
+            transition: transform .4s ease;
+        }
+    }
+
+    .boxSlider {
+        flex: 0 0 auto;
+    }
+
+    .cityBox {
+        a {
+            height: 400px;
+            width: 100%;
+            display: block;
+            background-size: cover;
+            background-position: center;
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: .3s ease-in-out;
+            text-decoration: none;
+
+            &::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(to top, rgba(0, 0, 0, .85) 0%, rgba(0, 0, 0, .5) 40%, rgba(0, 0, 0, 0) 100%);
+                opacity: .8;
+                z-index: -1;
+                transition: .3s ease-in-out;
+            }
+
+            &:hover::before {
+                opacity: .2;
+            }
+        }
+
+        .cityBoxContent {
+            display: flex;
+            align-items: flex-end;
+            padding: 15px;
+            height: 100%;
+
+            .cityBoxIcon {
+                width: 50px;
+                height: 50px;
+                background: var(--primary-color);
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+
+                img {
+                    width: 24px;
+                    height: 24px;
+                }
+            }
+
+            .cityName {
+                margin-left: 10px;
+                background: var(--white-color);
+                border-radius: 16px;
+                padding: 15px;
+                font-size: 16px;
+                font-weight: 600;
+                color: var(--dark-color);
+            }
+        }
+    }
+
+    @media (max-width: 1200px) {
+        .boxSlider {
+            flex: 0 0 calc((100% - 52px) / 3);
+        }
+    }
+
+    @media (max-width: 992px) {
+        .boxSlider {
+            flex: 0 0 calc((100% - 26px) / 2);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .boxSlider {
+            flex: 0 0 100%;
+        }
+    }
+
+    .sliderNavs {
+        display: flex;
+        position: relative; // Changed from absolute in global logic if applicable? 
+        // Original: .js-slider-navs { top: 11px; gap: 30px; width: 100px; justify-content: space-between; }
+        // The original HTML structure:
+        // .main-heading
+        // .js-slider-navs (siblings)
+        // Wait. Looking at CitySearchSlider.tsx lines 84-86 (Heading) and 88-105 (Navs). They are siblings.
+        // In design, the Navs are likely aligned to the right or absolute positioned over the grid or near the heading.
+        // In _home.scss for .searchBy-city:
+        /*
+            .js-slider-navs {
+                top: 11px;
+                gap: 30px;
+                width: 100px;
+                justify-content: space-between;
+                ...
+                .slider-prev { position: absolute; left: 0; }
+                .slider-next { position: absolute; right: 0; }
+            }
+        */
+        // This implies the container `.js-slider-navs` needs position relative or absolute.
+        // If it's absolute, where is it positioned relative to?
+        // .searchBy-city has position: relative. So it's relative to the section. `top: 11px`.
+        // So I must keep `position: absolute` on .sliderNavs with `top: 11px`.
+        // And also `right: 0` (from common styles) or specific.
+        // The common style had `right: 0`. The specific style didn't unset it.
+        // So I need:
+        
+        position: absolute;
+        right: 0; // Assuming container-mid has position relative? No.
+        // If .container-mid is standard bootstrap container, it is relative? usually not.
+        // But .searchBy-city section has position relative. 
+        // Note: The navs are inside .container-mid.
+        // If the container is not relative, absolute position will be relative to section. 
+        // But we want it aligned with container edge potentially?
+        // Let's assume we want valid positioning.
+        // If I make .container-mid relative (global change), that's risky.
+        // Let's assume the previous CSS worked because of context.
+        // I will add `right: 0` explicitly here to be safe and `top: 11px`.
+        // Wait, if it's inside container, we probably want right: 15px (padding) or something.
+        // But let's stick to absolute for now to match.
+        // Actually, if I used `display: flex` and `justify-content: space-between` on the heading block, I wouldn't need absolute.
+        // But the Nav is separate from Heading div.
+        // So I'll use absolute.
+        
+        top: 11px;
+        right: 0; // Added based on common styles inference
+        gap: 30px;
+        width: 100px;
+        justify-content: space-between;
+        z-index: 5; // From common
+        
+        @include md {
+           position: relative;
+           top: 0;
+           width: 100%;
+           justify-content: center;
+           margin-bottom: 20px;
+           right: auto;
+        }
+
+        .sliderBtn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            color: #fff;
+            border: none;
+            font-size: 30px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: absolute; // From original specific
+            
+            &.sliderPrev {
+                left: 0;
+            }
+
+            &.sliderNext {
+                right: 0;
+            }
+
+            &:hover {
+                background: lighten(#273444, 10%);
+                color: #fff;
+            }
+
+            &.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                background: var(--secondary-color);
+            }
+            
+            @include md {
+                position: relative;
+                left: auto !important;
+                right: auto !important;
+            }
+        }
+    }
+}

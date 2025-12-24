@@ -1,31 +1,40 @@
-// Typography
-$font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
-$font-family-serif: 'Georgia', serif;
+// -----------------------------------------------------------------------------
+// Responsive Breakpoints
+// -----------------------------------------------------------------------------
+$screen-sm-min: 575px !default;
+$screen-md-min: 767px !default;
+$screen-lg-min: 991px !default;
+$screen-xl-min: 1200px !default;
 
-// Colors
-$color-primary: var(--primary, #fe0009);
-$color-primary-dark: var(--primary-darkened, #b20006);
-$color-secondary: var(--secondary, #6c757d);
-$color-accent: var(--warning, #ffc107);
+// -----------------------------------------------------------------------------
+// Color Palette Map
+// -----------------------------------------------------------------------------
+$colors: (
+    "primary": #fe0009,
+    "secondary": #273444,
+    "light": #f9f9f9,
+    "white": #ffffff,
+    "text": #5b5b5b,
+    "dark": #0b0f19,
+    "accent-1": #ffa319,
+    "accent-2": #8a1fff,
+    "info": #007bff,
+    "success": #28a745
+);
 
-$color-text-main: var(--grey900, #212529);
-$color-text-muted: var(--grey600, #6c757d);
-$color-bg-light: var(--light, #f8f9fa);
-$color-white: var(--white, #ffffff);
-$color-black: var(--black, #000000);
-$color-dark: var(--dark, #343a40);
-$color-border: var(--grey300, #dee2e6);
-$border-radius: var(--border-radius, 0.25rem);
+// Fallback variables for backward compatibility if needed
+$color-primary: map-get($colors, "primary");
+$color-secondary: map-get($colors, "secondary");
+$color-text: map-get($colors, "text");
+$color-white: map-get($colors, "white");
+$color-dark: map-get($colors, "dark");
+$color-light: map-get($colors, "light");
 
-// Breakpoints
-$breakpoint-sm: 640px;
-$breakpoint-md: 768px;
-$breakpoint-lg: 1024px;
-$breakpoint-xl: 1280px;
-
-// Spacing
-$spacing-unit: 1rem;
-$spacing-sm: $spacing-unit * 0.5;
-$spacing-md: $spacing-unit;
-$spacing-lg: $spacing-unit * 1.5;
-$spacing-xl: $spacing-unit * 2;
+// -----------------------------------------------------------------------------
+// Generate Global CSS Variables
+// -----------------------------------------------------------------------------
+:root {
+    @each $name, $value in $colors {
+        --#{$name}-color: #{$value};
+    }
+}

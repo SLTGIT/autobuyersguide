@@ -1,5 +1,13 @@
 @import "variables";
 
+// START FIX: Helper variables for migration
+$border-radius: 6px;
+$color-text-muted: #6c757d;
+$color-text-main: var(--dark-color);
+$breakpoint-md: $screen-md-min;
+$spacing-xl: 3rem;
+// END FIX
+
 // Alerts
 .alert {
     padding: 1rem 1.5rem;

@@ -1,7 +1,7 @@
 import { getVehicleBySlug } from '@/lib/wordpress/api';
 import VehicleGallery from '@/components/vehicles/VehicleGallery';
 import { notFound } from 'next/navigation';
-import '../vehicles.css';
+// import '../vehicles.css';
 
 interface VehicleDetailPageProps {
     params: Promise<{
