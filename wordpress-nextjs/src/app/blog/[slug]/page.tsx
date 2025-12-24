@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { getPostBySlug, getPosts } from '@/lib/wordpress';
+import { getPostBySlug } from '@/lib/wordpress';
 import { getMetadata } from '@/lib/wordpress/seo';
 
 interface BlogPostProps {
@@ -10,15 +10,15 @@ interface BlogPostProps {
   }>;
 }
 
-// Generate metadata for SEO
-export async function generateMetadata({ params }: BlogPostProps): Promise<Metadata> {
+/* SEO Metadata */
+export async function generateMetadata({
+  params,
+}: BlogPostProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
 
   if (!post) {
-    return {
-      title: 'Post Not Found',
-    };
+    return { title: 'Post Not Found' };
   }
 
   return getMetadata(post);
@@ -26,54 +26,56 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
 
 export default async function BlogPost({ params }: BlogPostProps) {
   const { slug } = await params;
-
-  // Fetch the post from WordPress
   const post = await getPostBySlug(slug);
 
   if (!post) {
     notFound();
   }
 
-  // Extract embedded data
   const featuredImage = post._embedded?.['wp:featuredmedia']?.[0];
   const author = post._embedded?.author?.[0];
   const postCategories = post._embedded?.['wp:term']?.[0] || [];
   const primaryCategory = postCategories[0];
 
-  // Format date
   const formattedDate = new Date(post.date).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   });
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="container mx-auto py-12 px-4">
-        <Link href="/blog" className="inline-flex items-center text-blue-600 font-bold mb-8 hover:gap-2 transition-all">
+    <div className="bg-white min-vh-100">
+      <div className="container py-5">
+        {/* Back Link */}
+        <Link
+          href="/blog"
+          className="d-inline-flex align-items-center fw-bold text-primary mb-4 text-decoration-none"
+        >
           ← Back to Blog
         </Link>
-        
-        <article className="max-w-4xl mx-auto">
-          {/* Post Header */}
-          <header className="mb-12 text-center">
-            <h1 
-              className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight"
+
+        <article className="mx-auto" style={{ maxWidth: '900px' }}>
+          {/* Header */}
+          <header className="mb-5 text-center">
+            <h1
+              className="display-5 fw-bold text-dark mb-4"
               dangerouslySetInnerHTML={{ __html: post.title.rendered }}
             />
-            
-            <div className="flex flex-wrap items-center justify-center gap-6 text-gray-500 font-medium bg-gray-50 py-4 px-6 rounded-2xl">
-              <div className="flex items-center gap-2">
-                <span className="text-blue-600">👤</span>
+
+            <div className="d-flex flex-wrap justify-content-center gap-4 bg-light py-3 px-4 rounded-3 text-muted fw-medium">
+              <div className="d-flex align-items-center gap-2">
+                <span className="text-primary">👤</span>
                 <span>{author?.name || 'Unknown'}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-blue-600">📅</span>
+
+              <div className="d-flex align-items-center gap-2">
+                <span className="text-primary">📅</span>
                 <span>{formattedDate}</span>
               </div>
+
               {primaryCategory && (
-                <div className="flex items-center gap-2">
-                  <span className="text-blue-600">📂</span>
+                <div className="d-flex align-items-center gap-2">
+                  <span className="text-primary">📂</span>
                   <span>{primaryCategory.name}</span>
                 </div>
               )}
@@ -82,46 +84,54 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
           {/* Featured Image */}
           {featuredImage && (
-            <div className="mb-12 rounded-3xl overflow-hidden shadow-2xl">
-              <img 
-                src={featuredImage.source_url} 
+            <div className="mb-5 rounded-4 overflow-hidden shadow">
+              <img
+                src={featuredImage.source_url}
                 alt={featuredImage.alt_text || post.title.rendered}
-                className="w-full h-auto object-cover max-h-[600px]"
+                className="img-fluid w-100"
+                style={{ maxHeight: 600, objectFit: 'cover' }}
               />
             </div>
           )}
 
           {/* Post Content */}
-          <div 
-            className="prose prose-lg max-w-none prose-blue prose-headings:text-gray-900 prose-headings:font-bold prose-a:text-blue-600 prose-img:rounded-2xl"
+          <div
+            className="fs-5 text-dark"
+            style={{ lineHeight: 1.8 }}
             dangerouslySetInnerHTML={{ __html: post.content.rendered }}
           />
 
-          {/* Author Section */}
+          {/* Author Box */}
           {author && (
-            <div className="mt-16 p-8 bg-gray-50 rounded-3xl flex flex-col md:flex-row items-center gap-8 border border-gray-100">
+            <div className="mt-5 p-4 bg-light rounded-4 border d-flex flex-column flex-md-row align-items-center gap-4">
               {author.avatar_urls?.['96'] && (
-                <img 
-                  src={author.avatar_urls['96']} 
-                  alt={author.name} 
-                  className="w-24 h-24 rounded-full shadow-lg border-4 border-white"
+                <img
+                  src={author.avatar_urls['96']}
+                  alt={author.name}
+                  className="rounded-circle border shadow"
+                  width={96}
+                  height={96}
                 />
               )}
-              <div className="text-center md:text-left">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">About {author.name}</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {author.description || 'Content creator and technical writer focusing on WordPress and modern web development technologies.'}
+
+              <div className="text-center text-md-start">
+                <h3 className="h5 fw-bold mb-2">
+                  About {author.name}
+                </h3>
+                <p className="text-muted mb-0">
+                  {author.description ||
+                    'Content creator and technical writer focusing on WordPress and modern web development technologies.'}
                 </p>
               </div>
             </div>
           )}
 
-          {/* Navigation */}
-          <div className="mt-16 pt-16 border-t border-gray-100">
-            <h3 className="text-2xl font-bold text-gray-900 mb-8">Continue Reading</h3>
-            <Link 
+          {/* Footer Navigation */}
+          <div className="mt-5 pt-5 border-top">
+            <h3 className="h4 fw-bold mb-4">Continue Reading</h3>
+            <Link
               href="/blog"
-              className="inline-flex items-center text-blue-600 font-bold hover:gap-2 transition-all"
+              className="d-inline-flex align-items-center fw-bold text-primary text-decoration-none"
             >
               ← Back to Blog
             </Link>
