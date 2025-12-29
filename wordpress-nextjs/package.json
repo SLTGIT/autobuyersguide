@@ -20,7 +20,7 @@
     "aos": "^2.3.4",
     "bootstrap": "^5.3.8",
     "lodash": "^4.17.21",
-    "next": "^16.0.10",
+    "next": "^16.1.1",
     "nextjs-toploader": "^3.9.17",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -31,7 +31,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.2",
-    "eslint-config-next": "^16.0.10",
+    "eslint-config-next": "^16.1.1",
     "typescript": "^5.9.3"
   }
 }

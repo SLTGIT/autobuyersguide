@@ -1,19 +1,19 @@
 // Bootstrap is imported in layout.tsx
 
-@import "variables";
-@import "mixins";
-@import "base/reboot";
-@import "base";
-@import "utilities";
+@use "variables";
+@use "mixins";
+@use "base/reboot";
+@use "base";
+@use "utilities";
 
 // Components
-// @import "components/header";
-@import "components/megamenu";
-// @import "components/footer";
-@import "components/button";
+// @use "components/header";
+@use "components/megamenu";
+// @use "components/footer";
+@use "components/button";
 
 // Pages
-// @import "pages/home";
+// @use "pages/home";
 .text-primary {
   color: var(--primary-color);
 }

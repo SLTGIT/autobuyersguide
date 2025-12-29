@@ -1,3 +1,5 @@
+@use "sass:map";
+
 // -----------------------------------------------------------------------------
 // Responsive Breakpoints
 // -----------------------------------------------------------------------------
@@ -23,12 +25,12 @@ $colors: (
 );
 
 // Fallback variables for backward compatibility if needed
-$color-primary: map-get($colors, "primary");
-$color-secondary: map-get($colors, "secondary");
-$color-text: map-get($colors, "text");
-$color-white: map-get($colors, "white");
-$color-dark: map-get($colors, "dark");
-$color-light: map-get($colors, "light");
+$color-primary: map.get($colors, "primary");
+$color-secondary: map.get($colors, "secondary");
+$color-text: map.get($colors, "text");
+$color-white: map.get($colors, "white");
+$color-dark: map.get($colors, "dark");
+$color-light: map.get($colors, "light");
 
 // -----------------------------------------------------------------------------
 // Generate Global CSS Variables

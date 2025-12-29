@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+export const dynamic = 'force-dynamic';
 import { getSiteSettings } from '@/lib/wordpress';
 import HomeBanner from '@/components/home/HomeBanner';
 import SearchForm from '@/components/home/SearchForm';

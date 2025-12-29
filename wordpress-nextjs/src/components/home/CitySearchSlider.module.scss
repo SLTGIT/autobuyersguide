@@ -1,5 +1,6 @@
-@import "../../styles/variables";
-@import "../../styles/mixins";
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+@use "sass:color";
 
 .searchByCity {
     padding: 0 0 70px;
@@ -191,7 +192,7 @@
             }
 
             &:hover {
-                background: lighten(#273444, 10%);
+                background: color.adjust(#273444, $lightness: 10%);
                 color: #fff;
             }
 

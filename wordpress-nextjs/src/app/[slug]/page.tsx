@@ -3,6 +3,8 @@ import { getMetadata } from '@/lib/wordpress/seo';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
     params: Promise<{
         slug: string;
@@ -41,17 +43,17 @@ export default async function DynamicPage(props: PageProps) {
                 {/* Featured Image */}
                 {page._embedded?.['wp:featuredmedia']?.[0]?.source_url && (
                     <div className="cms-page__featured-image">
-                        <img 
-                            src={page._embedded['wp:featuredmedia'][0].source_url} 
+                        <img
+                            src={page._embedded['wp:featuredmedia'][0].source_url}
                             alt={page.title.rendered}
                         />
                     </div>
                 )}
 
                 {/* Content */}
-                <div 
+                <div
                     className="cms-page__content"
-                    dangerouslySetInnerHTML={{ __html: page.content.rendered }} 
+                    dangerouslySetInnerHTML={{ __html: page.content.rendered }}
                 />
             </article>
         </div>
