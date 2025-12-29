@@ -32,7 +32,7 @@ export default async function LatestBlogPosts() {
 
                 <div className="row">
                     {posts.map((post) => (
-                        <div className="col-12 col-md-6 col-lg-4">
+                        <div key={post.id} className="col-12 col-md-6 col-lg-4">
                             <BlogCard key={post.id} post={post} />
                         </div>
                     ))}
