@@ -71,22 +71,20 @@ export default async function Blog({ searchParams }: BlogPageProps) {
                 <div className="d-flex flex-wrap justify-content-center gap-2 mb-5">
                     <Link
                         href="/blog"
-                        className={`btn ${
-                            !categoryFilter ? 'btn-primary' : 'btn-outline-secondary'
-                        } rounded-pill px-4`}
+                        className={`btn ${!categoryFilter ? 'btn-primary' : 'btn-outline-secondary'
+                            } rounded-pill px-4`}
                     >
                         All
                     </Link>
 
-                    {categories.map((category) => (
+                    {categories.map((category) => category.count > 0 && category.name !== 'Uncategorized' && (
                         <Link
                             key={category.id}
                             href={`/blog?category=${category.id}`}
-                            className={`btn ${
-                                categoryFilter === category.id
-                                    ? 'btn-primary'
-                                    : 'btn-outline-secondary'
-                            } rounded-pill px-4`}
+                            className={`btn ${categoryFilter === category.id
+                                ? 'btn-primary'
+                                : 'btn-outline-secondary'
+                                } rounded-pill px-4`}
                         >
                             {category.name} ({category.count})
                         </Link>
@@ -100,21 +98,22 @@ export default async function Blog({ searchParams }: BlogPageProps) {
                     <>
                         <div className="row g-4">
                             {posts.map((post) => (
-                                <BlogCard key={post.id} post={post} />
+                                <div key={post.id} className="col-12 col-md-6 col-lg-4">
+                                    <BlogCard post={post} />
+                                </div>
                             ))}
                         </div>
-                        
+
 
                         {/* Pagination */}
                         {(hasNextPage || hasPrevPage) && (
                             <div className="d-flex justify-content-center align-items-center gap-2 mt-5">
                                 {hasPrevPage && (
                                     <Link
-                                        href={`/blog?page=${currentPage - 1}${
-                                            categoryFilter
-                                                ? `&category=${categoryFilter}`
-                                                : ''
-                                        }`}
+                                        href={`/blog?page=${currentPage - 1}${categoryFilter
+                                            ? `&category=${categoryFilter}`
+                                            : ''
+                                            }`}
                                         className="btn btn-outline-secondary"
                                     >
                                         Previous
@@ -127,11 +126,10 @@ export default async function Blog({ searchParams }: BlogPageProps) {
 
                                 {hasNextPage && (
                                     <Link
-                                        href={`/blog?page=${currentPage + 1}${
-                                            categoryFilter
-                                                ? `&category=${categoryFilter}`
-                                                : ''
-                                        }`}
+                                        href={`/blog?page=${currentPage + 1}${categoryFilter
+                                            ? `&category=${categoryFilter}`
+                                            : ''
+                                            }`}
                                         className="btn btn-outline-secondary"
                                     >
                                         Next
