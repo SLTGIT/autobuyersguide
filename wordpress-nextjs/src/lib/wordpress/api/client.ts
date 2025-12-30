@@ -36,9 +36,9 @@ export async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): 
             ...headers,
             ...(options.headers as Record<string, string>),
         },
-        // Disable cache in development for immediate updates
-        // Change to { revalidate: 60 } in production
-        cache: 'no-store',
+        cache: 'force-cache',
+        next: { revalidate: 3600 },
+        // cache: 'no-store',
     });
 
     if (!response.ok) {
