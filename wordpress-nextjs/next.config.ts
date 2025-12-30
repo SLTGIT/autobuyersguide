@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
   sassOptions: {
     silenceDeprecations: ['legacy-js-api'],
   },
+  allowedDevOrigins: ['127.0.0.1'],
   turbopack: {},
 };
 
