@@ -1,82 +1,114 @@
-'use client';
+"use client";
 
-import { VehicleImage } from '@/types/vehicle';
-import { useState } from 'react';
-import Image from 'next/image';
+import { VehicleImage } from "@/types/vehicle";
+import { useState } from "react";
+import Image from "next/image";
 
 interface VehicleGalleryProps {
-    featuredImage: string;
-    galleryImages: VehicleImage[];
-    title: string;
+  featuredImage: string;
+  galleryImages: VehicleImage[];
+  title: string;
 }
 
-export default function VehicleGallery({ featuredImage, galleryImages, title }: VehicleGalleryProps) {
-    const [selectedImage, setSelectedImage] = useState(featuredImage);
-    const [lightboxOpen, setLightboxOpen] = useState(false);
+export default function VehicleGallery({
+  featuredImage,
+  galleryImages,
+  title,
+}: VehicleGalleryProps) {
+  const [selectedImage, setSelectedImage] = useState(featuredImage);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
-    const allImages = [
-        { url: featuredImage, alt: title },
-        ...galleryImages.map(img => ({ url: img.large, alt: img.alt || title }))
-    ].filter(img => img.url);
+  const allImages = [
+    { url: featuredImage, alt: title },
+    ...galleryImages.map((img) => ({ url: img.large, alt: img.alt || title })),
+  ].filter((img) => img.url);
 
-    return (
-        <div className="vehicle-gallery">
-            {/* Main Image */}
-            <div className="gallery-main" onClick={() => setLightboxOpen(true)}>
-                {selectedImage ? (
-                    <Image
-                        src={selectedImage}
-                        alt={title}
-                        width={800}
-                        height={600}
-                        className="main-image"
-                        priority
-                    />
-                ) : (
-                    <div className="image-placeholder">
-                        <span>No Image Available</span>
-                    </div>
-                )}
-            </div>
+  return (
+    <div className="vehicle-gallery vehicle-gallery--vdp">
+      <div
+        className="vehicle-gallery__stage"
+        onClick={() => setLightboxOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setLightboxOpen(true);
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="Open full size image"
+      >
+        {selectedImage ? (
+          <Image
+            src={selectedImage}
+            alt={title}
+            fill
+            className="vehicle-gallery__stage-img"
+            sizes="(max-width: 991px) 100vw, 58vw"
+            priority
+          />
+        ) : (
+          <div className="vehicle-gallery__placeholder">
+            <span>No image available</span>
+          </div>
+        )}
+      </div>
 
-            {/* Thumbnails */}
-            {allImages.length > 1 && (
-                <div className="gallery-thumbnails">
-                    {allImages.map((image, index) => (
-                        <div
-                            key={index}
-                            className={`thumbnail ${selectedImage === image.url ? 'active' : ''}`}
-                            onClick={() => setSelectedImage(image.url)}
-                        >
-                            <Image
-                                src={image.url}
-                                alt={image.alt}
-                                width={100}
-                                height={75}
-                                className="thumbnail-image"
-                            />
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {/* Lightbox */}
-            {lightboxOpen && (
-                <div className="gallery-lightbox" onClick={() => setLightboxOpen(false)}>
-                    <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-                        <button className="lightbox-close" onClick={() => setLightboxOpen(false)}>
-                            &times;
-                        </button>
-                        <Image
-                            src={selectedImage}
-                            alt={title}
-                            width={1200}
-                            height={900}
-                            className="lightbox-image"
-                        />
-                    </div>
-                </div>
-            )}
+      {allImages.length > 1 && (
+        <div className="vehicle-gallery__thumbs" role="tablist" aria-label="Gallery thumbnails">
+          {allImages.map((image, index) => (
+            <button
+              key={`${image.url}-${index}`}
+              type="button"
+              role="tab"
+              aria-selected={selectedImage === image.url}
+              className={`vehicle-gallery__thumb ${selectedImage === image.url ? "is-active" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedImage(image.url);
+              }}
+            >
+              <Image
+                src={image.url}
+                alt=""
+                fill
+                className="vehicle-gallery__thumb-img"
+                sizes="96px"
+              />
+            </button>
+          ))}
         </div>
-    );
+      )}
+
+      {lightboxOpen && selectedImage && (
+        <div className="vehicle-gallery__lightbox" onClick={() => setLightboxOpen(false)} role="presentation">
+          <div
+            className="vehicle-gallery__lightbox-inner"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Image preview"
+          >
+            <button
+              type="button"
+              className="vehicle-gallery__lightbox-close"
+              onClick={() => setLightboxOpen(false)}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <div className="vehicle-gallery__lightbox-frame">
+              <Image
+                src={selectedImage}
+                alt={title}
+                width={1200}
+                height={900}
+                className="vehicle-gallery__lightbox-img"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }

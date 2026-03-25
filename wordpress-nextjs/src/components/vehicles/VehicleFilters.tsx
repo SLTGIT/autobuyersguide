@@ -111,13 +111,13 @@ export default function VehicleFilters({ filterOptions: initialOptions, currentF
             }
         });
 
-        router.push(`/vehicles?${params.toString()}`);
+        router.push(`/search?${params.toString()}`);
     };
 
     const clearFilters = () => {
         setFilters({});
         setAvailableModels([]); // Reset to empty logic
-        router.push('/vehicles');
+        router.push('/search');
     };
 
     return (
