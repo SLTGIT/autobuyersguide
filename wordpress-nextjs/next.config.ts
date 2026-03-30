@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: "/vehicles", destination: "/search", permanent: true },
+      { source: "/vehicles/:slug", destination: "/cars/:slug", permanent: true },
+    ];
+  },
   images: {
     remotePatterns: [
       {
