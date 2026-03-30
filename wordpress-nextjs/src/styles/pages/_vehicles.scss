@@ -1,4 +1,8 @@
-@import "../variables";
+@use "sass:color";
+@use "../variables" as *;
+
+// Hover / pressed primary shade (computed here so we do not rely on $color-primary-dark from variables)
+$vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 
 /* Vehicle Pages - Modern Brand Styling */
 
@@ -96,7 +100,7 @@
     transition: all 0.2s;
 
     &:hover {
-        background-color: var(--primary-darkened, $color-primary-dark);
+        background-color: var(--primary-darkened, $vehicles-primary-dark);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 }
@@ -782,6 +786,15 @@
     gap: 1rem;
     width: 100%;
     max-width: 100%;
+    min-height: 0;
+}
+
+/* Constrain Next/Image fill + aspect-ratio on the stage */
+.vehicle-gallery__stage-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+    flex-shrink: 0;
 }
 
 .vehicle-gallery__stage {
@@ -1013,8 +1026,8 @@
     border: 2px solid var(--primary, $color-primary);
 
     &:hover {
-        background: var(--primary-darkened, $color-primary-dark);
-        border-color: var(--primary-darkened, $color-primary-dark);
+        background: var(--primary-darkened, $vehicles-primary-dark);
+        border-color: var(--primary-darkened, $vehicles-primary-dark);
         color: #fff;
     }
 }
@@ -1371,8 +1384,8 @@
     border-color: var(--primary, $color-primary);
 
     &:hover {
-        background: var(--primary-darkened, $color-primary-dark);
-        border-color: var(--primary-darkened, $color-primary-dark);
+        background: var(--primary-darkened, $vehicles-primary-dark);
+        border-color: var(--primary-darkened, $vehicles-primary-dark);
         color: #fff;
     }
 }

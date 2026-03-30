@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "sass:map";
 
 // -----------------------------------------------------------------------------
@@ -26,6 +27,7 @@ $colors: (
 
 // Fallback variables for backward compatibility if needed
 $color-primary: map.get($colors, "primary");
+$color-primary-dark: color.adjust($color-primary, $lightness: -10%);
 $color-secondary: map.get($colors, "secondary");
 $color-text: map.get($colors, "text");
 $color-white: map.get($colors, "white");

@@ -6,6 +6,9 @@
 @use "base";
 @use "utilities";
 
+// Dealer inventory + vehicle detail (search, /cars/[slug])
+@use "pages/vehicles";
+
 // Components
 // @use "components/header";
 @use "components/megamenu";
