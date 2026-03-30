@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound, permanentRedirect } from "next/navigation";
 import { fetchDealerInventory } from "@/lib/dealer-solutions/fetch-inventory";
 import {
@@ -7,11 +8,25 @@ import {
   typeCodeLabel,
 } from "@/lib/inventory/transform";
 import { buildVehicleSlug, findVehicleByPublicSlug } from "@/lib/inventory/slug";
+import { getSimilarVehicles } from "@/lib/inventory/similar";
 import VehicleGallery from "@/components/vehicles/VehicleGallery";
+import VehicleVdpDetailGrid from "@/components/vehicles/VehicleVdpDetailGrid";
+import VehicleVdpSidebarActions from "@/components/vehicles/VehicleVdpSidebarActions";
+import VehicleSimilarCarousel, {
+  type SimilarCarItem,
+} from "@/components/vehicles/VehicleSimilarCarousel";
+import VehicleVdpFaq from "@/components/vehicles/VehicleVdpFaq";
 import type { VehicleImage } from "@/types/vehicle";
+import type { DealerVehicle } from "@/types/inventory";
 
 interface VehicleDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+function absoluteShareUrl(path: string): string {
+  const base = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+  if (base) return `${base}${path}`;
+  return path;
 }
 
 export async function generateMetadata({ params }: VehicleDetailPageProps) {
@@ -39,6 +54,26 @@ export async function generateMetadata({ params }: VehicleDetailPageProps) {
   };
 }
 
+function toSimilarItem(v: DealerVehicle): SimilarCarItem {
+  const l = dealerVehicleToListing(v);
+  const tags = [String(l.year), l.body_type, l.transmission, l.fuel_type].filter(
+    Boolean
+  ) as string[];
+  return {
+    slug: l.slug,
+    title: l.title.length > 72 ? `${l.title.slice(0, 69)}…` : l.title,
+    image: l.featured_image,
+    condition: l.condition,
+    price: l.formatted_price || "—",
+    odometer:
+      l.odometer != null && l.odometer > 0
+        ? `${l.odometer.toLocaleString("en-AU")} km`
+        : null,
+    location: l.location_short,
+    tags,
+  };
+}
+
 export default async function VehicleDetailPage({ params }: VehicleDetailPageProps) {
   const { slug } = await params;
   const trimmed = slug.trim();
@@ -60,8 +95,7 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
   }
 
   const listing = dealerVehicleToListing(v);
-  const featured =
-    v.Photos?.[0]?.PhotoUrl ?? listing.featured_image ?? "";
+  const featured = v.Photos?.[0]?.PhotoUrl ?? listing.featured_image ?? "";
   const galleryImages: VehicleImage[] = (v.Photos ?? []).slice(1).map((p, i) => ({
     id: i,
     url: p.PhotoUrl,
@@ -74,21 +108,98 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
   const advertised = v.Pricing?.AdvertisedPrice?.trim();
   const driveAway = v.Pricing?.DriveAwayPrice?.trim();
   const colour = v.BodyColour?.trim() || "—";
-  const statPills = [
+
+  const headline =
+    [v.Make, v.Model].filter(Boolean).join(" ").trim() || listing.title;
+
+  const tagPills = [
     String(listing.year),
-    colour !== "—" ? colour : null,
-    listing.body_type || null,
-    listing.odometer != null && listing.odometer > 0
-      ? `${listing.odometer.toLocaleString("en-AU")} km`
-      : null,
-    listing.transmission || null,
+    listing.drive_type || null,
     listing.fuel_type || null,
+    listing.body_type || null,
   ].filter(Boolean) as string[];
 
+  const dealerPhone = process.env.NEXT_PUBLIC_DEALER_PHONE || "07 3128 7333";
+  const telHref = `tel:${dealerPhone.replace(/\s/g, "")}`;
+  const sharePath = `/cars/${canonicalSlug}`;
+  let shareUrl = absoluteShareUrl(sharePath);
+  if (!shareUrl.startsWith("http")) {
+    const hdrs = await headers();
+    const host = hdrs.get("x-forwarded-host") ?? hdrs.get("host") ?? "localhost:3000";
+    const proto = hdrs.get("x-forwarded-proto") ?? "http";
+    shareUrl = `${proto}://${host}${sharePath}`;
+  }
+  const enquireHref = `/contact?subject=${encodeURIComponent(
+    `Enquiry: ${headline} (Stock ${listing.stock_number || "—"})`
+  )}`;
+  const testDriveHref = `/contact?subject=${encodeURIComponent(
+    `Test drive: ${headline} (Stock ${listing.stock_number || "—"})`
+  )}`;
+  const mailto = listing.stock_number
+    ? `mailto:${process.env.NEXT_PUBLIC_DEALER_EMAIL || "sales@example.com"}?subject=${encodeURIComponent(
+        `Vehicle enquiry — Stock ${listing.stock_number}`
+      )}`
+    : undefined;
+
+  const detailRows = [
+    { label: "Condition", value: `${listing.condition || "Used"} car` },
+    { label: "Transmission", value: listing.transmission || "—" },
+    { label: "Body type", value: listing.body_type || "—" },
+    {
+      label: "Odometer",
+      value:
+        listing.odometer != null && listing.odometer > 0
+          ? `${listing.odometer.toLocaleString("en-AU")} km`
+          : "—",
+    },
+    { label: "Fuel type", value: listing.fuel_type || "—" },
+    { label: "Engine size", value: "—" },
+    { label: "Stock no.", value: listing.stock_number || "—" },
+    { label: "Build year", value: String(listing.year) },
+    { label: "Location", value: listing.location_short || v.Location?.trim() || "—" },
+    { label: "Colour", value: colour },
+    { label: "Drive type", value: listing.drive_type || "—" },
+    { label: "Seats", value: "—" },
+    { label: "Doors", value: "—" },
+    { label: "Power", value: "—" },
+    { label: "Views", value: "—" },
+    { label: "VIN", value: "—" },
+    { label: "Type", value: typeCodeLabel(listing.type_code) || "—" },
+  ];
+
+  const similar = getSimilarVehicles(all, v, 6).map(toSimilarItem);
+
+  const usedCount = all.filter(
+    (x) => (x.Condition || "").toLowerCase().includes("used")
+  ).length;
+  const suvCount = all.filter((x) =>
+    (x.BodyType || "").toLowerCase().includes("suv")
+  ).length;
+  const dieselCount = all.filter((x) =>
+    (x.FuelType || "").toLowerCase().includes("diesel")
+  ).length;
+
+  const moreCars = [
+    { label: "Used cars", count: usedCount, href: "/search?condition=Used" },
+    { label: "SUVs", count: suvCount, href: "/search?q=SUV" },
+    { label: "Diesel", count: dieselCount, href: "/search?q=Diesel" },
+    { label: "Search all", count: all.length, href: "/search" },
+    {
+      label: `${v.Make || "Make"}`,
+      count: all.filter(
+        (x) => x.Make.trim().toLowerCase() === v.Make.trim().toLowerCase()
+      ).length,
+      href: `/search?make=${encodeURIComponent(v.Make.trim().toLowerCase())}`,
+    },
+  ];
+
+  const condLower = (listing.condition || "used").toLowerCase();
+  const isNew = condLower === "new";
+
   return (
-    <div className="vehicles-page vehicle-detail-page inventory-vdp">
+    <div className="vehicles-page vehicle-detail-page inventory-vdp inventory-vdp--design">
       <div className="vehicles-container inventory-vdp-container">
-        <nav className="inventory-breadcrumb" aria-label="Breadcrumb">
+        <nav className="inventory-breadcrumb vdp-breadcrumb" aria-label="Breadcrumb">
           <Link href="/">Home</Link>
           <span className="inventory-breadcrumb-sep" aria-hidden>
             /
@@ -97,130 +208,172 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
           <span className="inventory-breadcrumb-sep" aria-hidden>
             /
           </span>
-          <span className="inventory-breadcrumb-current">
-            {listing.title}
-          </span>
+          <span className="inventory-breadcrumb-current">Vehicle details</span>
         </nav>
 
-        <header className="inventory-vdp-header">
-          <p className="inventory-vdp-eyebrow">{listing.condition}</p>
-          <h1 className="inventory-vdp-heading">{listing.title}</h1>
-          {statPills.length > 0 && (
-            <ul className="inventory-vdp-stat-pills" aria-label="Key details">
-              {statPills.map((label, i) => (
-                <li key={`${i}-${label}`}>
-                  <span className="inventory-vdp-stat-pill">{label}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </header>
-
-        <div className="inventory-vdp-grid">
-          <div className="inventory-vdp-gallery">
-            {featured || galleryImages.length > 0 ? (
-              <VehicleGallery
-                featuredImage={featured}
-                galleryImages={galleryImages}
-                title={listing.title}
-              />
-            ) : (
-              <div className="inventory-vdp-no-image">No photos available</div>
-            )}
-          </div>
-
-          <aside className="inventory-vdp-aside">
-            <div className="inventory-vdp-price-card">
-              {listing.formatted_price && (
-                <p className="inventory-vdp-price-main">
-                  {listing.formatted_price}
-                  {advertised && driveAway && advertised !== driveAway && (
-                    <span className="inventory-vdp-price-note"> advertised</span>
-                  )}
-                </p>
+        <div className="inventory-vdp-grid vdp-main-grid">
+          <div className="inventory-vdp-main-col">
+            <div className="inventory-vdp-gallery">
+              {featured || galleryImages.length > 0 ? (
+                <VehicleGallery
+                  featuredImage={featured}
+                  galleryImages={galleryImages}
+                  title={listing.title}
+                />
+              ) : (
+                <div className="inventory-vdp-no-image">No photos available</div>
               )}
-              {listing.show_drive_away && listing.drive_away_price && (
-                <p className="inventory-vdp-driveaway">
-                  Drive away <strong>{listing.drive_away_price}</strong>
-                </p>
-              )}
-              <p className="inventory-vdp-stock-line">
-                Stock <span className="inventory-vdp-stock-num">{listing.stock_number || "—"}</span>
-              </p>
-              <div className="inventory-vdp-cta-row">
-                <Link href="/contact" className="inventory-vdp-btn inventory-vdp-btn--primary">
-                  Enquire now
-                </Link>
-                <Link href="/search" className="inventory-vdp-btn inventory-vdp-btn--ghost">
-                  More vehicles
-                </Link>
-              </div>
             </div>
 
-            <div className="inventory-vdp-summary">
-              <h2 className="inventory-vdp-section-title">Specifications</h2>
-            <dl className="inventory-vdp-specs">
-              <div>
-                <dt>Stock</dt>
-                <dd>{listing.stock_number || "—"}</dd>
+            <VehicleVdpDetailGrid rows={detailRows} />
+
+            {v.Comments?.trim() ? (
+              <section className="inventory-vdp-comments vdp-dealer-comments">
+                <h2 className="vdp-section-heading">Dealer comments</h2>
+                <div className="inventory-vdp-comments-body">
+                  {splitVehicleDescription(v.Comments).map((para, i) => (
+                    <p key={i} className="inventory-vdp-comment-para">
+                      {para}
+                    </p>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            <section className="vdp-disclaimer" aria-label="Disclaimer">
+              <p>
+                Information on this page is supplied by the seller and may include
+                third-party data. We do not warrant the accuracy of descriptions,
+                pricing, or images — please confirm details with the dealer before
+                purchase.
+              </p>
+            </section>
+
+            <VehicleSimilarCarousel items={similar} />
+
+            <section className="vdp-more-cars" aria-labelledby="vdp-more-heading">
+              <h2 id="vdp-more-heading" className="vdp-section-heading">
+                More cars for you
+              </h2>
+              <div className="vdp-more-grid">
+                {moreCars.map((item) => (
+                  <Link key={item.href} href={item.href} className="vdp-more-card">
+                    <span className="vdp-more-count">{item.count} cars</span>
+                    <span className="vdp-more-label">{item.label}</span>
+                  </Link>
+                ))}
               </div>
-              <div>
-                <dt>Year</dt>
-                <dd>{listing.year}</dd>
+            </section>
+
+            <VehicleVdpFaq />
+          </div>
+
+          <aside className="inventory-vdp-aside vdp-sidebar">
+            <div className="inventory-vdp-price-card vdp-sidebar-card">
+              <div className="vdp-badge-row">
+                <span className={`vdp-badge vdp-badge--${isNew ? "new" : "used"}`}>
+                  {isNew ? "New" : "Used"}
+                </span>
+                <span className="vdp-badge vdp-badge--stock">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                  </svg>
+                  In stock
+                </span>
               </div>
-              <div>
-                <dt>Colour</dt>
-                <dd>{colour}</dd>
+
+              <h1 className="vdp-sidebar-title">{headline}</h1>
+
+              {tagPills.length > 0 && (
+                <ul className="vdp-sidebar-tags" aria-label="Highlights">
+                  {tagPills.map((t) => (
+                    <li key={t}>
+                      <span className="vdp-sidebar-tag">{t}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="vdp-price-block">
+                {listing.show_drive_away && listing.drive_away_price ? (
+                  <>
+                    <p className="inventory-vdp-price-main vdp-price-figure">
+                      {listing.drive_away_price}
+                    </p>
+                    <p className="vdp-price-caption">Drive away price</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="inventory-vdp-price-main vdp-price-figure">
+                      {listing.formatted_price || "—"}
+                    </p>
+                    <p className="vdp-price-caption">Excl. Govt. Charges</p>
+                  </>
+                )}
+                {advertised && driveAway && advertised !== driveAway && (
+                  <p className="vdp-price-alt">
+                    Also advertised at {listing.formatted_price}
+                  </p>
+                )}
               </div>
-              <div>
-                <dt>Odometer</dt>
-                <dd>
-                  {listing.odometer != null && listing.odometer > 0
-                    ? `${listing.odometer.toLocaleString("en-AU")} km`
-                    : "—"}
-                </dd>
+
+              <div className="vdp-sidebar-actions-row">
+                <VehicleVdpSidebarActions title={headline} shareUrl={shareUrl} mailto={mailto} />
               </div>
-              <div>
-                <dt>Body</dt>
-                <dd>{listing.body_type || "—"}</dd>
+
+              <div className="vdp-sidebar-meta">
+                {listing.location_short || v.Location?.trim() ? (
+                  <p className="vdp-meta-line">
+                    <span className="vdp-meta-icon" aria-hidden>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                      </svg>
+                    </span>
+                    {listing.location_short || v.Location?.trim()}
+                  </p>
+                ) : null}
+                {listing.odometer != null && listing.odometer > 0 ? (
+                  <p className="vdp-meta-line">
+                    <span className="vdp-meta-icon" aria-hidden>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z" />
+                      </svg>
+                    </span>
+                    {listing.odometer.toLocaleString("en-AU")} km
+                  </p>
+                ) : null}
               </div>
-              <div>
-                <dt>Transmission</dt>
-                <dd>{listing.transmission || "—"}</dd>
+
+              <div className="vdp-cta-stack">
+                <a className="vdp-cta vdp-cta--call" href={telHref}>
+                  <span className="vdp-cta-icon" aria-hidden>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+                    </svg>
+                  </span>
+                  Call {dealerPhone}
+                </a>
+                {/* <Link className="vdp-cta vdp-cta--outline" href={testDriveHref}>
+                  <span className="vdp-cta-icon" aria-hidden>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 17h14v-5l-2-4H7l-2 4v5zM7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </span>
+                  Book a test drive
+                </Link>
+                <Link className="vdp-cta vdp-cta--outline" href={enquireHref}>
+                  <span className="vdp-cta-icon" aria-hidden>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                      <polyline points="22,6 12,13 2,6" />
+                    </svg>
+                  </span>
+                  Enquire now
+                </Link> */}
               </div>
-              <div>
-                <dt>Fuel</dt>
-                <dd>{listing.fuel_type || "—"}</dd>
-              </div>
-              <div>
-                <dt>Drive</dt>
-                <dd>{listing.drive_type || "—"}</dd>
-              </div>
-              <div>
-                <dt>Type</dt>
-                <dd>{typeCodeLabel(listing.type_code) || "—"}</dd>
-              </div>
-              <div>
-                <dt>Location</dt>
-                <dd>{listing.location_short || v.Location?.trim() || "—"}</dd>
-              </div>
-            </dl>
             </div>
           </aside>
         </div>
-
-        {v.Comments?.trim() ? (
-          <section className="inventory-vdp-comments">
-            <h2 className="inventory-vdp-section-title">Comments</h2>
-            <div className="inventory-vdp-comments-body">
-              {splitVehicleDescription(v.Comments).map((para, i) => (
-                <p key={i} className="inventory-vdp-comment-para">
-                  {para}
-                </p>
-              ))}
-            </div>
-          </section>
-        ) : null}
       </div>
     </div>
   );
