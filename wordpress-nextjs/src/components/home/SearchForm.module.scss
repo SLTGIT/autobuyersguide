@@ -6,6 +6,11 @@
     width: 100%;
     background: #fcf6ef;
 
+    &.main-search-form--embedded {
+        background: transparent;
+        padding: 0;
+    }
+
     .homeBanner-form {
         position: relative;
         bottom: 75px;
@@ -18,6 +23,11 @@
         @media (max-width: 767px) {
             bottom: 0px;
             margin-top: -40px;
+        }
+
+        &.homeBanner-form--embedded {
+            bottom: auto;
+            margin-top: 0;
         }
     }
 
@@ -61,9 +71,9 @@
                 }
 
                 &.active {
-                    background: var(--white-color);
-                    color: var(--secondary-color);
-                    border-top-color: var(--primary-color); // Only change color
+                    background: #fff;
+                    color: #0a0a0a;
+                    border-top-color: var(--primary-color);
                     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
                     z-index: 2;
                 }
@@ -147,20 +157,26 @@
         }
     }
 
+    .theme-btn-inner {
+        display: inline;
+    }
+
     .theme-btn {
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 700;
-        border-radius: 6px;
-        min-width: 220px;
+        border-radius: 8px;
+        min-width: 200px;
         height: 54px;
-        transition: transform 0.2s;
+        transition: transform 0.2s, background 0.2s;
         border: none;
         background: var(--primary-color);
         color: #fff;
+        white-space: nowrap;
 
         &:hover {
-            transform: translateY(-1px); // Subtle feedback
-             background: var(--secondary-color);
+            transform: translateY(-1px);
+            background: color.adjust($color-primary, $lightness: -8%);
+            color: #fff;
         }
 
         @media (max-width: 767px) {

@@ -8,23 +8,25 @@ import { ClientImports } from "@/components/ClientImports";
 const manrope = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "WordPress Next.js",
-    description: "A modern Next.js application powered by WordPress REST API",
+  title: "Statewide Auto Group",
+  description:
+    "Statewide Auto Group is a leading provider of used cars in Australia. We offer a wide range of used cars for sale in Australia.",
+  icons: {
+    icon: "/assets/images/statewide-auto-group.png",
+  },
 };
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <html lang="en">
-            <body className={manrope.className}>
-                <ClientImports />
-                <Layout>
-                    {children}
-                </Layout>
-            </body>
-        </html>
-    );
+  return (
+    <html lang="en">
+      <body className={manrope.className}>
+        <ClientImports />
+        <Layout>{children}</Layout>
+      </body>
+    </html>
+  );
 }

@@ -120,8 +120,8 @@
     --sort-by-tabs-indicator-active-color: var(--primary-foreground);
     --primary-gradient-start: var(--primary);
     --primary-gradient: #000;
-    --primary-faded: rgba(254,0,9,.2);
-    --primary-brightened: #ff3239;
+    --primary-faded: rgba(0, 131, 143, 0.2);
+    --primary-brightened: #00a3b0;
     --primary-darkened: color-mix(in srgb,var(--primary),#000 30%);
     --search-important-background: var(--primary);
     --search-important-variant-category-hover-background: var(--primary);
@@ -509,7 +509,7 @@
     --finance-container-color: var(--search-listings-color);
     --carpage-finance-container-background: none;
     --carpage-finance-container-border-radius: var(--border-radius);
-    --accessories-primary-color: red;
+    --accessories-primary-color: var(--primary);
     --fixed-form-header-height: 64px;
     --buy-online-footer-height: 52px;
     --simple-icon-card-text-container-padding: 1.5rem;
@@ -636,7 +636,7 @@
     --gray: #6c757d;
     --gray-dark: #343a40;
     --grey900: #212529;
-    --primary: #fe0009;
+    --primary: #00838f;
     --secondary: #6c757d;
     --success: #28a745;
     --info: #17a2b8;

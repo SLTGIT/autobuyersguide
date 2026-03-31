@@ -48,7 +48,7 @@
         transition: all 0.3s ease;
 
         &:hover {
-            background-color: color.adjust(#fe0009, $lightness: -10%);
+            background-color: color.adjust($color-primary, $lightness: -10%);
 
         }
     }

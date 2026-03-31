@@ -126,10 +126,12 @@ export function filterDealerVehicles(
         v.FuelType,
         v.SKU,
         v.Comments,
+        v.Location,
       ]
         .join(" ")
         .toLowerCase();
-      if (!hay.includes(q)) return false;
+      const tokens = q.split(/\s+/).filter(Boolean);
+      if (!tokens.every((t) => hay.includes(t))) return false;
     }
 
     return true;

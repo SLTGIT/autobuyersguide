@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: VehicleDetailPageProps) {
   const listing = dealerVehicleToListing(v);
   const image = v.Photos?.[0]?.PhotoUrl;
   return {
-    title: `${listing.title} | Auto Buyers Guide`,
+    title: `${listing.title} | Statewide Auto Group`,
     description: `${listing.condition} ${listing.year} ${listing.title}. ${
       listing.formatted_price ? `From ${listing.formatted_price}. ` : ""
     }View photos and details.`,

@@ -5,8 +5,8 @@ import type { WPPost, WPCategory } from '@/types/wordpress';
 import BlogCard from '@/components/blog/BlogCard';
 
 export const metadata: Metadata = {
-    title: 'Blog | WordPress Next.js',
-    description: 'Read our latest blog posts',
+    title: 'Blog | Statewide Auto Group',
+    description: 'Read our latest blog posts about used cars in Australia.',
 };
 
 interface BlogPageProps {

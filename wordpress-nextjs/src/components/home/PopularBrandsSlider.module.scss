@@ -173,3 +173,17 @@
         }
     }
 }
+
+.makeLogoFallback {
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    background: #eef1f4;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: -0.02em;
+}

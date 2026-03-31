@@ -23,9 +23,9 @@ interface SearchPageProps {
 }
 
 export const metadata = {
-  title: "Vehicle inventory | Auto Buyers Guide",
+  title: "Vehicle inventory | Statewide Auto Group",
   description:
-    "Browse new and used vehicles. Filter by make, price, and more.",
+    "Browse new and used cars for sale in Australia. Filter by make, price, and more.",
 };
 
 function ToolbarFallback() {

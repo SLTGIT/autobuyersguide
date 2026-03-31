@@ -2,8 +2,6 @@ import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { getSiteSettings } from '@/lib/wordpress';
 import HomeBanner from '@/components/home/HomeBanner';
-import SearchForm from '@/components/home/SearchForm';
-import CitySearchSlider from '@/components/home/CitySearchSlider';
 import PopularCarTypes from '@/components/home/PopularCarTypes';
 import PopularBrandsSlider from '@/components/home/PopularBrandsSlider';
 import InfoBlocks from '@/components/home/InfoBlocks';
@@ -12,8 +10,9 @@ import LatestBlogPosts from '@/components/home/LatestBlogPosts';
 export async function generateMetadata(): Promise<Metadata> {
     const siteSettings = await getSiteSettings();
     return {
-        title: siteSettings?.title || 'Home | Auto Buyers Guide',
-        description: siteSettings?.description || 'A modern Next.js application powered by WordPress',
+        // title: siteSettings?.title || 'Home | Statewide Auto Group',
+        title: 'Statewide Auto Group',
+        description: siteSettings?.description || 'Statewide Auto Group is a leading provider of used cars in Australia. We offer a wide range of used cars for sale in Australia.',
     };
 }
 
@@ -27,8 +26,8 @@ export default async function Home() {
             {/* <SearchForm /> */}
             {/* <CitySearchSlider /> */}
             <PopularCarTypes />
-            <LatestBlogPosts />
             <PopularBrandsSlider />
+            <LatestBlogPosts />
             <InfoBlocks />
         </main>
     );
