@@ -7,7 +7,8 @@ import {
   parseInventorySearchParams,
   serializeInventoryFilters,
 } from "@/lib/inventory/query";
-import { brandLogoPublicPath } from "@/lib/inventory/brand-logo";
+import { brandLogoPublicPathFromSlug } from "@/lib/inventory/brand-logo";
+import { mergeFeaturedBrandsWithApi } from "@/lib/inventory/featured-brands";
 import styles from "./PopularBrandsSlider.module.scss";
 
 type BrandRow = {
@@ -25,14 +26,14 @@ function makeBrandHref(makeLower: string): string {
   })}`;
 }
 
-function BrandLogo({ name }: { name: string }) {
+function BrandLogo({ logoSlug, label }: { logoSlug: string; label: string }) {
   const [failed, setFailed] = useState(false);
-  const src = brandLogoPublicPath(name);
+  const src = brandLogoPublicPathFromSlug(logoSlug);
 
   if (failed) {
     return (
       <div className={styles.makeLogoFallback} aria-hidden>
-        {name.trim().slice(0, 2).toUpperCase()}
+        {label.trim().slice(0, 2).toUpperCase()}
       </div>
     );
   }
@@ -41,7 +42,7 @@ function BrandLogo({ name }: { name: string }) {
     <Image
       src={src}
       alt=""
-      title={name}
+      title={label}
       width={100}
       height={100}
       onError={() => setFailed(true)}
@@ -66,12 +67,13 @@ export default function PopularBrandsSlider() {
         const res = await fetch("/api/inventory/makes");
         const data = (await res.json()) as { brands?: BrandRow[] };
         if (!cancelled) {
-          setBrands(Array.isArray(data.brands) ? data.brands : []);
+          const api = Array.isArray(data.brands) ? data.brands : [];
+          setBrands(mergeFeaturedBrandsWithApi(api));
           if (!res.ok) setLoadError(true);
         }
       } catch {
         if (!cancelled) {
-          setBrands([]);
+          setBrands(mergeFeaturedBrandsWithApi([]));
           setLoadError(true);
         }
       } finally {
@@ -160,20 +162,11 @@ export default function PopularBrandsSlider() {
           </p>
         )}
 
-        {!loading && loadError && brands.length === 0 && (
-          <p className="text-center text-muted py-4 mb-0">
-            Brands could not be loaded.{" "}
+        {!loading && loadError && (
+          <p className="text-center text-muted small mb-3 mb-lg-4" role="status">
+            Stock counts unavailable — links still work.{" "}
             <Link href="/search" className="text-decoration-underline">
               Browse all vehicles
-            </Link>
-          </p>
-        )}
-
-        {!loading && !loadError && brands.length === 0 && (
-          <p className="text-center text-muted py-4 mb-0">
-            No makes in inventory yet.{" "}
-            <Link href="/search" className="text-decoration-underline">
-              View search
             </Link>
           </p>
         )}
@@ -200,7 +193,7 @@ export default function PopularBrandsSlider() {
                     className={styles.makeGridItem}
                   >
                     <div className={styles.makeLogo}>
-                      <BrandLogo name={brand.name} />
+                      <BrandLogo logoSlug={brand.make} label={brand.name} />
                     </div>
                     <h3 className={styles.makeName}>{brand.name}</h3>
                   </Link>

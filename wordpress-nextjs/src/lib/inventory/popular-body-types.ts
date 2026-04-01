@@ -154,8 +154,12 @@ function buildSearchHref(
   return qs ? `/search?${qs}` : "/search";
 }
 
+/** Only show a body-type tile when at least this many used vehicles match. */
+const MIN_BODY_TYPE_TILE_COUNT = 10;
+
 /**
  * Body-type tiles for the home page: counts and /search links use the same rules as inventory search.
+ * Tiles with fewer than {@link MIN_BODY_TYPE_TILE_COUNT} matches are omitted.
  */
 export function getPopularCarTypeItems(
   vehicles: DealerVehicle[]
@@ -177,5 +181,5 @@ export function getPopularCarTypeItems(
       countLabel: `${count.toLocaleString("en-AU")} Car${count === 1 ? "" : "s"}`,
       href,
     };
-  });
+  }).filter((item) => item.count >= MIN_BODY_TYPE_TILE_COUNT);
 }

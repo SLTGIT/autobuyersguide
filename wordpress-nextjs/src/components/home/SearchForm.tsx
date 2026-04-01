@@ -72,7 +72,7 @@ export default function SearchForm({ embedded = false }: SearchFormProps) {
             New
           </button>
         </li> */}
-        <li className={styles["nav-item"]} role="presentation">
+        {/* <li className={styles["nav-item"]} role="presentation">
           <button
             className={`${styles["nav-link"]} ${activeTab === "used" ? styles.active : ""}`}
             onClick={() => setActiveTab("used")}
@@ -80,7 +80,7 @@ export default function SearchForm({ embedded = false }: SearchFormProps) {
           >
             Used
           </button>
-        </li>
+        </li> */}
         {/* Demo — hidden until inventory supports a distinct demo condition in the feed
         <li className={styles['nav-item']} role="presentation">
           <button type="button" className={styles['nav-link']}>Demo</button>

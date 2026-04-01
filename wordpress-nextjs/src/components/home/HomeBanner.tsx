@@ -23,11 +23,11 @@ export default function HomeBanner() {
           >
             <h1 className={styles["banner-heading"]}>
               Australia&apos;s{" "}
-              <span className={styles["banner-emphasis"]}>Trusted</span> Dealer
+              <span className={styles["banner-emphasis"]}>Trusted {" "}</span>
               Marketplace for Used Cars
             </h1>
             <p className={styles["banner-subtext"]}>
-              Search thousands of verified dealer listings across Australia .
+              Explore thousands of verified used car listings across Australia.
             </p>
           </div>
         </div>

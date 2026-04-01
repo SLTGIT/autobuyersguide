@@ -119,7 +119,7 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
     listing.body_type || null,
   ].filter(Boolean) as string[];
 
-  const dealerPhone = process.env.NEXT_PUBLIC_DEALER_PHONE || "07 3128 7333";
+  const dealerPhone = process.env.NEXT_PUBLIC_DEALER_PHONE || "0418 908 870";
   const telHref = `tel:${dealerPhone.replace(/\s/g, "")}`;
   const sharePath = `/cars/${canonicalSlug}`;
   let shareUrl = absoluteShareUrl(sharePath);

@@ -7,13 +7,13 @@ export default function Footer() {
 
   return (
     <footer className={styles["site-footer"]}>
-      <div className={styles["arc__upper"]}></div>
+      {/* <div className={styles["arc__upper"]}></div> */}
 
       <div className={styles["pre-footer"]}>
         <div className="container-mid">
           <div className="row">
             {/* Support Column */}
-            <div className="col-md-6 col-lg-3">
+            <div className="col-md-6 col-lg-4">
               <div className={styles["footer-menu-container"]}>
                 <div className={styles["footer-menu-title"]}>Support</div>
                 {/* <div className={styles["footer-menu-contact"]}>
@@ -45,7 +45,7 @@ export default function Footer() {
             </div>
 
             {/* Dealer Column */}
-            <div className="col-md-6 col-lg-3">
+            {/* <div className="col-md-6 col-lg-3">
               <div className={styles["footer-menu-container"]}>
                 <div className={styles["footer-menu-title"]}>Dealer</div>
                 <ul>
@@ -57,10 +57,10 @@ export default function Footer() {
                   </li>
                 </ul>
               </div>
-            </div>
+            </div> */}
 
             {/* Company Column */}
-            <div className="col-md-6 col-lg-3">
+            <div className="col-md-6 col-lg-4">
               <div className={styles["footer-menu-container"]}>
                 <div className={styles["footer-menu-title"]}>Company</div>
                 <ul className="list-unstyled">
@@ -78,13 +78,13 @@ export default function Footer() {
             </div>
 
             {/* Contact Us / Social Column */}
-            <div className="col-md-6 col-lg-3">
+            <div className="col-md-6 col-lg-4">
               <div className={styles["footer-menu-container"]}>
                 <div className={styles["footer-menu-title"]}>Contact Us</div>
                 <ul>
-                  <li>
+                  {/* <li>
                     <Link href="/advertise">Advertise With Us</Link>
-                  </li>
+                  </li> */}
                   <li>
                     <Link href="/search">Search for Cars</Link>
                   </li>
@@ -151,7 +151,7 @@ export default function Footer() {
             <div className={styles["footer-logo"]}>
               {/* Update path to match copied assets */}
               <Image
-                src="/assets/images/Statewide-Auto-Group_Logo.png"
+                src="/assets/images/Statewide-Auto-Group_logo white.webp"
                 className="img-fluid"
                 alt="Statewide Auto Group"
                 title="Statewide Auto Group"

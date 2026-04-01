@@ -13,6 +13,10 @@ export default async function PopularCarTypes() {
     // Env missing or feed error — keep zero counts; links still point to /search
   }
 
+  if (items.length === 0) {
+    return null;
+  }
+
   return (
     <section className={styles.popularCarType}>
       <div className="container-mid">
