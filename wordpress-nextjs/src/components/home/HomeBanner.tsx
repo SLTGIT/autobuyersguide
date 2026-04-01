@@ -7,7 +7,7 @@ export default function HomeBanner() {
     <section className={styles["home-banner"]} aria-label="Find a car">
       <div className={styles["home-banner__media"]}>
         <Image
-          src="/assets/images/home-banner-new.webp"
+          src="/assets/images/banner-1.webp"
           alt=""
           fill
           priority
