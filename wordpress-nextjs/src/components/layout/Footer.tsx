@@ -55,7 +55,7 @@ export default function Footer() {
                   <li>
                     <Link href="#">Dealer Help Centre</Link>
                   </li>
-                </ul>
+                </ul> 
               </div>
             </div> */}
 
