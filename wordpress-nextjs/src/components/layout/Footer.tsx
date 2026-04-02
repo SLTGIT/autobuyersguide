@@ -65,13 +65,13 @@ export default function Footer() {
                 <div className={styles["footer-menu-title"]}>Company</div>
                 <ul className="list-unstyled">
                   <li>
-                    <Link href="/about">About Us</Link>
+                    {/* <Link href="/about">About Us</Link> */}
                   </li>
                   <li>
                     <Link href="/contact">Contact Us</Link>
                   </li>
                   <li>
-                    <Link href="#">Locations</Link>
+                    {/* <Link href="#">Locations</Link> */}
                   </li>
                 </ul>
               </div>
