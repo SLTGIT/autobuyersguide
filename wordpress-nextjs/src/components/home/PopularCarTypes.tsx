@@ -52,7 +52,7 @@ export default async function PopularCarTypes() {
                     style={{ width: "auto", height: "auto" }}
                   />
                 </div>
-              </Link>
+              </Link> 
             </div>
           ))}
         </div>
