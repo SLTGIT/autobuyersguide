@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 import "@/styles/globals.scss";
 import { Manrope } from "next/font/google";
 import { Layout } from "@/components/layout";

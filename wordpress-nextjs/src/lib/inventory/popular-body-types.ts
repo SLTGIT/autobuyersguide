@@ -13,7 +13,7 @@ function norm(s: string | undefined | null): string {
 }
 
 /** Exact condition string from feed for used vehicles (matches search filter). */
-function dominantUsedCondition(vehicles: DealerVehicle[]): string {
+export function dominantUsedCondition(vehicles: DealerVehicle[]): string {
   const counts = new Map<string, number>();
   for (const v of vehicles) {
     const c = norm(v.Condition);

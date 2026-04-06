@@ -1,0 +1,68 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+// new styles for header
+
+.cs-header {
+  background: #fff;
+  border-bottom: 1px solid var(--cs-line);
+}
+
+.cs-topbar {
+  background: var(--cs-primary);
+  color: #fff;
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
+.cs-topbar a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.cs-topbar .container {
+  min-height: 34px;
+}
+
+.cs-search {
+  min-width: 420px;
+  max-width: 520px;
+  padding-left: 2.6rem;
+}
+
+.cs-search-wrap {
+  position: relative;
+}
+
+.cs-search-icon {
+  position: absolute;
+  left: 0.95rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--cs-muted);
+  pointer-events: none;
+}
+
+.cs-main-nav .nav-link {
+  white-space: nowrap;
+  font-size: 0.92rem;
+  padding-left: 0.55rem !important;
+  padding-right: 0.55rem !important;
+}
+
+.cs-brand-copy strong {
+  font-size: 0.95rem;
+  line-height: 1.1;
+}
+
+.cs-brand-copy small {
+  font-size: 0.75rem;
+  line-height: 1.1;
+}
+
+.cs-brand-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--cs-primary), var(--cs-accent));
+}

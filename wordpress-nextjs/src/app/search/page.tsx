@@ -1,3 +1,4 @@
+import "./search.css";
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -58,89 +59,114 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   if (filters.page > totalPages) {
     redirect(
-      `/search?${serializeInventoryFilters({ ...filters, page: totalPages })}`
+      `/search?${serializeInventoryFilters({ ...filters, page: totalPages })}`,
     );
   }
 
   const pageSlice = sorted.slice(
     (filters.page - 1) * PER_PAGE,
-    filters.page * PER_PAGE
+    filters.page * PER_PAGE,
   );
   const listings = pageSlice.map(dealerVehicleToListing);
 
   return (
-    <div className="vehicles-page inventory-srp">
-      <div className="vehicles-container inventory-srp-inner">
-        <nav className="inventory-breadcrumb" aria-label="Breadcrumb">
-          <Link href="/">Home</Link>
-          <span className="inventory-breadcrumb-sep" aria-hidden>
-            /
-          </span>
-          <span className="inventory-breadcrumb-current">Search</span>
-        </nav>
-
-        <header className="inventory-srp-header">
-          <h1 className="inventory-srp-title">Vehicles for sale</h1>
-          <p className="inventory-srp-lead">
-            Search new and used stock. Refine by make, price, and more —
-            filters update the page URL so you can share your search.
-          </p>
-        </header>
-
-        <div className="inventory-srp-layout">
-          <Suspense fallback={<SidebarFallback />}>
-            <InventoryFiltersSidebar facets={facets} bounds={bounds} />
-          </Suspense>
-
-          <div className="inventory-srp-main">
-            <Suspense fallback={<ToolbarFallback />}>
-              <InventoryToolbar
-                total={sorted.length}
-                sort={filters.sort}
-                view={filters.view}
-              />
-            </Suspense>
-
-            <Suspense fallback={null}>
-              <InventorySearchBar />
-            </Suspense>
-
-            {sorted.length === 0 ? (
-              <div className="inventory-empty">
-                {all.length === 0 ? (
-                  <>
-                    <p>
-                      No vehicles loaded. If you are the site owner, set{" "}
-                      <code>DEALER_SOLUTIONS_INVENTORY_URL</code>,{" "}
-                      <code>DEALER_SOLUTIONS_USER</code>, and{" "}
-                      <code>DEALER_SOLUTIONS_PASSWORD</code> in{" "}
-                      <code>.env</code>.
-                    </p>
-                  </>
-                ) : (
-                  <p>No vehicles match your filters. Try clearing some filters.</p>
-                )}
-                {all.length > 0 && (
-                  <Link
-                    className="inventory-empty-link"
-                    href="/search"
-                  >
-                    View all vehicles
-                  </Link>
-                )}
-              </div>
-            ) : (
-              <>
-                <VehicleGrid listings={listings} view={filters.view} />
-                <InventoryPagination
-                  filters={filters}
-                  totalPages={totalPages}
+    <>
+      <section className="cs-page-hero py-5 text-white">
+        <div className="container py-lg-4">
+          <div className="row g-4 align-items-center">
+            <div className="col-lg-7">
+              <span className="badge cs-hero-chip cs-pill px-3 py-2 mb-3">
+                Used Cars For Sale
+              </span>
+              <h1 className="display-5 fw-bold mb-3 cs-title-tight">
+                Browse Used Cars for Sale in Brisbane
+              </h1>
+              <p className="lead mb-0">
+                Explore used cars, 4x4s, SUVs, and work-ready vehicles with
+                finance-first options from our Ormiston hub.
+              </p>
+            </div>
+            <div className="col-lg-5">
+              <article className="card border-0 shadow-lg rounded-5 overflow-hidden">
+                <img
+                  src="https://d2s8i866417m9.cloudfront.net/photo/32428698/photo/thumb-232954f40d5f21bf8a4fa35d6daa7a7a.jpg"
+                  className="card-img-top"
+                  alt="Used cars for sale Brisbane hero image"
                 />
-              </>
-            )}
+                <div className="card-body p-4">
+                  <h2 className="h5 fw-bold mb-0 text-dark">
+                    Used Cars for Sale
+                  </h2>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div className="vehicles-page inventory-srp">
+        <div className="vehicles-container inventory-srp-inner">
+          <nav className="inventory-breadcrumb" aria-label="Breadcrumb">
+            <Link href="/">Home</Link>
+            <span className="inventory-breadcrumb-sep" aria-hidden>
+              /
+            </span>
+            <span className="inventory-breadcrumb-current">Search</span>
+          </nav>
+
+          <div className="inventory-srp-layout">
+            <Suspense fallback={<SidebarFallback />}>
+              <InventoryFiltersSidebar facets={facets} bounds={bounds} />
+            </Suspense>
+
+            <div className="inventory-srp-main">
+              <Suspense fallback={<ToolbarFallback />}>
+                <InventoryToolbar
+                  total={sorted.length}
+                  sort={filters.sort}
+                  view={filters.view}
+                />
+              </Suspense>
+
+              <Suspense fallback={null}>
+                <InventorySearchBar />
+              </Suspense>
+
+              {sorted.length === 0 ? (
+                <div className="inventory-empty">
+                  {all.length === 0 ? (
+                    <>
+                      <p>
+                        No vehicles loaded. If you are the site owner, set{" "}
+                        <code>DEALER_SOLUTIONS_INVENTORY_URL</code>,{" "}
+                        <code>DEALER_SOLUTIONS_USER</code>, and{" "}
+                        <code>DEALER_SOLUTIONS_PASSWORD</code> in{" "}
+                        <code>.env</code>.
+                      </p>
+                    </>
+                  ) : (
+                    <p>
+                      No vehicles match your filters. Try clearing some filters.
+                    </p>
+                  )}
+                  {all.length > 0 && (
+                    <Link className="inventory-empty-link" href="/search">
+                      View all vehicles
+                    </Link>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <VehicleGrid listings={listings} view={filters.view} />
+                  <InventoryPagination
+                    filters={filters}
+                    totalPages={totalPages}
+                  />
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -6,6 +6,8 @@ import PopularCarTypes from '@/components/home/PopularCarTypes';
 import PopularBrandsSlider from '@/components/home/PopularBrandsSlider';
 import InfoBlocks from '@/components/home/InfoBlocks';
 import LatestBlogPosts from '@/components/home/LatestBlogPosts';
+import PopularUsedCars from '@/components/home/PopularUsedCars';
+import VisitUs from '@/components/home/VisitUs';
 
 export async function generateMetadata(): Promise<Metadata> {
     const siteSettings = await getSiteSettings();
@@ -26,9 +28,11 @@ export default async function Home() {
             {/* <SearchForm /> */}
             {/* <CitySearchSlider /> */}
             <PopularCarTypes />
-            <PopularBrandsSlider />
+            {/* <PopularBrandsSlider /> */}
+            <PopularUsedCars />
             <LatestBlogPosts />
-            <InfoBlocks />
+            {/* <InfoBlocks /> */}
+            <VisitUs />
         </main>
     );
 }

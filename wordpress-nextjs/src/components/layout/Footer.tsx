@@ -6,169 +6,34 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className={styles["site-footer"]}>
-      {/* <div className={styles["arc__upper"]}></div> */}
-
-      <div className={styles["pre-footer"]}>
-        <div className="container-mid">
-          <div className="row">
-            {/* Support Column */}
-            <div className="col-md-6 col-lg-4">
-              <div className={styles["footer-menu-container"]}>
-                <div className={styles["footer-menu-title"]}>Support</div>
-                {/* <div className={styles["footer-menu-contact"]}>
-                  <div className={styles["footer-menu-contact-title"]}>
-                    Mail
-                  </div>
-                  <a href="mailto:hello@autobuyersguide.com.au">
-                    hello@autobuyersguide.com.au
-                  </a>
-                </div> */}
-                <div className={styles["footer-menu-contact"]}>
-                  <div className={styles["footer-menu-contact-title"]}>
-                    Phone
-                  </div>
-                  <a href="tel:0418 908 870">0418 908 870</a>
-                </div>
-                <div className={styles["footer-menu-contact"]}>
-                  <div className={styles["footer-menu-contact-title"]}>
-                    Address
-                  </div>
-                  <a
-                    target="_blank"
-                    href="https://maps.google.com/?cid=17898923161671494228"
-                  >
-                    56 Freeth St W Ormiston, QLD, 4160
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Dealer Column */}
-            {/* <div className="col-md-6 col-lg-3">
-              <div className={styles["footer-menu-container"]}>
-                <div className={styles["footer-menu-title"]}>Dealer</div>
-                <ul>
-                  <li>
-                    <Link href="#">Dealer Login</Link>
-                  </li>
-                  <li>
-                    <Link href="#">Dealer Help Centre</Link>
-                  </li>
-                </ul> 
-              </div>
-            </div> */}
-
-            {/* Company Column */}
-            <div className="col-md-6 col-lg-4">
-              <div className={styles["footer-menu-container"]}>
-                <div className={styles["footer-menu-title"]}>Company</div>
-                <ul className="list-unstyled">
-                  <li>
-                    {/* <Link href="/about">About Us</Link> */}
-                  </li>
-                  <li>
-                    <Link href="/contact">Contact Us</Link>
-                  </li>
-                  <li>
-                    {/* <Link href="#">Locations</Link> */}
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Contact Us / Social Column */}
-            <div className="col-md-6 col-lg-4">
-              <div className={styles["footer-menu-container"]}>
-                <div className={styles["footer-menu-title"]}>Contact Us</div>
-                <ul>
-                  {/* <li>
-                    <Link href="/advertise">Advertise With Us</Link>
-                  </li> */}
-                  <li>
-                    <Link href="/search">Search for Cars</Link>
-                  </li>
-                </ul>
-                <ul className="list-inline d-flex justify-content-start gap-2 mt-4 social-icons">
-                  <li className="list-inline-item me-3">
-                    <a
-                      href="#"
-                      className="social-icon facebook"
-                      aria-label="Facebook"
-                    >
-                      <div className="icon-box">
-                        <Image
-                          width={24}
-                          height={24}
-                          src="/assets/images/facebook.svg"
-                          alt="Facebook"
-                        />
-                      </div>
-                    </a>
-                  </li>
-                  <li className="list-inline-item me-3">
-                    <a
-                      href="#"
-                      className="social-icon twitter"
-                      aria-label="Twitter"
-                    >
-                      <div className="icon-box">
-                        <Image
-                          width={24}
-                          height={24}
-                          src="/assets/images/twitter.svg"
-                          alt="Twitter"
-                        />
-                      </div>
-                    </a>
-                  </li>
-                  <li className="list-inline-item me-3">
-                    <a
-                      href="#"
-                      className="social-icon instagram"
-                      aria-label="Instagram"
-                    >
-                      <div className="icon-box">
-                        <Image
-                          width={24}
-                          height={24}
-                          src="/assets/images/instagram.svg"
-                          alt="Instagram"
-                        />
-                      </div>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
+    <footer className="py-5 text-white" style={{ background: "#122033" }}>
+      <div className="container">
+        <div className="row g-4">
+          <div className="col-lg-4">
+            <h3 className="h5 fw-bold">Our Identity</h3>
+            <p className="text-white-50 mb-1">
+              Car Sales Brisbane is an online sales channel of Statewide Auto
+              Group. We specialize in vehicle sourcing, onsite finance, and
+              Queensland-wide delivery.
+            </p>
+            <p className="text-white-50 mb-0">QLD Dealer License: 4316086</p>
           </div>
-        </div>
-      </div>
-
-      <div className={styles["copyright-text"]}>
-        <div className="container-mid">
-          <div className={styles["copyright-text-container"]}>
-            <div className={styles["footer-logo"]}>
-              {/* Update path to match copied assets */}
-              <Image
-                src="/assets/images/Statewide-Auto-Group_logo white.webp"
-                className="img-fluid"
-                alt="Statewide Auto Group"
-                title="Statewide Auto Group"
-                width={130}
-                height={100}
-              />
-            </div>
-
-            <div className={styles["copyright-text-content"]}>
-              <p>
-                <Link href="/">Statewide Auto Group.</Link> Copyright ©{" "}
-                {currentYear}. All Rights Reserved |
-                <Link href="#"> Sitemap</Link> |
-                <Link href="#"> Terms of Use</Link> |
-                <Link href="#"> Privacy Policy</Link>
-              </p>
-            </div>
+          <div className="col-lg-4">
+            <h3 className="h5 fw-bold">Service Areas</h3>
+            <p className="text-white-50 mb-0">
+              Greater Brisbane, Ormiston, Capalaba, Gold Coast, Sunshine Coast,
+              Townsville, Cairns, Mackay, Rockhampton, Mt Isa.
+            </p>
+          </div>
+          <div className="col-lg-4">
+            <h3 className="h5 fw-bold">Site Links</h3>
+            <p className="text-white-50 mb-0">
+              <Link href="/privacy-policy">Privacy Policy</Link> |{" "}
+              <Link href="/terms-of-service">Terms of Service</Link> |{" "}
+              <Link href="/finance-disclaimer">Finance Disclaimer</Link> 
+              {/* |{" "}
+              <Link href="/sitemap">Sitemap</Link> */}
+            </p>
           </div>
         </div>
       </div>

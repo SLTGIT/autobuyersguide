@@ -26,6 +26,15 @@ $colors: (
     "success": #28a745
 );
 
+$cs-primary: #0078ff;
+$cs-primary-dark: #0057c2;
+$cs-ink: #1e2732;
+$cs-muted: #667281;
+$cs-bg: #f3f7fb;
+$cs-card: #ffffff;
+$cs-line: #dbe6f2;
+$cs-accent: #00a3ff;
+
 // Fallback variables for backward compatibility if needed
 $color-primary: map.get($colors, "primary");
 $color-primary-dark: color.adjust($color-primary, $lightness: -10%);
@@ -39,7 +48,12 @@ $color-light: map.get($colors, "light");
 // Generate Global CSS Variables
 // -----------------------------------------------------------------------------
 :root {
-    @each $name, $value in $colors {
-        --#{$name}-color: #{$value};
-    }
+  --cs-primary: #0078ff;
+  --cs-primary-dark: #0057c2;
+  --cs-ink: #1e2732;
+  --cs-muted: #667281;
+  --cs-bg: #f3f7fb;
+  --cs-card: #ffffff;
+  --cs-line: #dbe6f2;
+  --cs-accent: #00a3ff;
 }

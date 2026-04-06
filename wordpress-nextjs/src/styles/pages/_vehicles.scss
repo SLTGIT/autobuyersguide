@@ -206,11 +206,11 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 }
 
 .inventory-sidebar {
-    background: var(--white, #fff);
+    background: var(--cs-card, #{$cs-card});
     border-radius: 12px;
-    border: 1px solid var(--grey300, #e8e8e8);
+    border: 1px solid var(--cs-line, #{$cs-line});
     padding: 1.25rem 1.15rem;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 24px rgba($cs-ink, 0.07);
     position: sticky;
     top: 5rem;
     /* Scroll long filter lists inside the viewport */
@@ -221,23 +221,23 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     scrollbar-gutter: stable;
 
     scrollbar-width: thin;
-    scrollbar-color: rgba($color-primary, 0.45) #f0f0f0;
+    scrollbar-color: rgba($cs-primary, 0.42) #eef3f9;
 
     &::-webkit-scrollbar {
         width: 8px;
     }
 
     &::-webkit-scrollbar-track {
-        background: #f0f0f0;
+        background: #eef3f9;
         border-radius: 8px;
     }
 
     &::-webkit-scrollbar-thumb {
-        background: rgba($color-primary, 0.4);
+        background: rgba($cs-primary, 0.38);
         border-radius: 8px;
 
         &:hover {
-            background: rgba($color-primary, 0.65);
+            background: rgba($cs-primary, 0.58);
         }
     }
 }
@@ -598,13 +598,26 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 .inventory-card-fav {
     flex-shrink: 0;
     border: none;
-    background: none;
-    padding: 0.15rem;
+    background: transparent;
+    padding: 0.35rem;
+    border-radius: 50%;
     cursor: pointer;
-    color: var(--primary, $color-primary);
+    color: var(--cs-primary, #{$cs-primary});
     line-height: 0;
+    transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+
     &:hover {
-        opacity: 0.85;
+        color: var(--cs-primary-dark, #{$cs-primary-dark});
+        background: rgba($cs-primary, 0.1);
+    }
+
+    &:active {
+        transform: scale(0.94);
+    }
+
+    &:focus-visible {
+        outline: 2px solid rgba($cs-primary, 0.45);
+        outline-offset: 2px;
     }
 }
 
@@ -1226,12 +1239,14 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    border-radius: 6px;
+    border-radius: 999px;
+    border: 1px solid transparent;
 }
 
 .vdp-badge--used {
-    background: var(--primary, $color-primary);
+    background: var(--cs-primary, #{$cs-primary});
     color: #fff;
+    border-color: transparent;
 }
 
 .vdp-badge--new {
@@ -1240,9 +1255,9 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 }
 
 .vdp-badge--stock {
-    background: transparent;
-    color: #198754;
-    border: 1px solid rgba(25, 135, 84, 0.45);
+    background: rgba($cs-primary, 0.09);
+    color: var(--cs-primary-dark, #{$cs-primary-dark});
+    border: 1px solid rgba($cs-primary, 0.32);
     font-weight: 600;
     text-transform: none;
     letter-spacing: 0;
@@ -1379,13 +1394,13 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 }
 
 .vdp-cta--call {
-    background: var(--primary, $color-primary);
+    background: var(--cs-primary, #{$cs-primary});
     color: #fff;
-    border-color: var(--primary, $color-primary);
+    border-color: var(--cs-primary, #{$cs-primary});
 
     &:hover {
-        background: var(--primary-darkened, $vehicles-primary-dark);
-        border-color: var(--primary-darkened, $vehicles-primary-dark);
+        background: var(--cs-primary-dark, #{$cs-primary-dark});
+        border-color: var(--cs-primary-dark, #{$cs-primary-dark});
         color: #fff;
     }
 }
@@ -1607,7 +1622,7 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 }
 
 .vdp-similar-badge.is-used {
-    background: var(--primary, $color-primary);
+    background: var(--cs-primary, #{$cs-primary});
 }
 
 .vdp-similar-badge.is-new {

@@ -1,0 +1,23 @@
+.cs-page-hero {
+  background:
+    linear-gradient(135deg, rgba(16, 46, 87, 0.96), rgba(0, 120, 255, 0.84)),
+    linear-gradient(180deg, #0f3565, #0078ff);
+}
+
+.cs-pill {
+  border-radius: 999px;
+}
+
+.cs-hero-chip {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.cs-card img {
+  object-fit: cover;
+  height: 220px;
+}
+
+.cs-srp-card img {
+  height: 180px;
+}

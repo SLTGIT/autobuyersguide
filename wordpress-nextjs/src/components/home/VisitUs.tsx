@@ -1,43 +1,8 @@
-import type { Metadata } from "next";
-import ContactForm from "./ContactForm";
-import "./contact.css";
+import React from "react";
 
-export const metadata: Metadata = {
-  title: "Contact | Statewide Auto Group",
-  description: "Get in touch with us. We'd love to hear from you!",
-};
-
-export default function Contact() {
+const VisitUs = () => {
   return (
     <>
-      <section className="cs-page-hero py-5 text-white">
-        <div className="container py-lg-4">
-          <div className="row g-4 align-items-center">
-            <div className="col-lg-7">
-              <span className="badge cs-hero-chip cs-pill px-3 py-2 mb-3">
-                Contact Us
-              </span>
-              <h1 className="display-5 fw-bold mb-3 cs-title-tight">
-                Contact Us
-              </h1>
-              <p className="lead mb-0">
-                Get in touch with us. We'd love to hear from you!
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-5 bg-light border-top border-bottom border-light-subtle">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-lg-8 col-xl-7">
-              <ContactForm />
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="py-5 bg-white cs-visit-section">
         <div className="container">
           <article className="cs-business-card p-4 p-lg-5">
@@ -188,6 +153,126 @@ export default function Contact() {
           </article>
         </div>
       </section>
+
+      <section className="pb-5 bg-white">
+        <div className="container">
+          <article className="cs-card p-4 p-lg-5">
+            <div className="row g-4 align-items-center">
+              <div className="col-lg-8">
+                <p
+                  className="text-uppercase fw-semibold small mb-2"
+                  style={{ color: "var(--cs-primary)" }}
+                >
+                  Customer Review
+                </p>
+                <h2 className="display-6 fw-bold cs-title-tight mb-3">
+                  What Our Customers Say
+                </h2>
+                <p className="fs-3 fw-semibold mb-3">
+                  "Eden and the Statewide team made buying my new Ute
+                  effortless. Highly recommend for any Brisbane buyer."
+                </p>
+                <p className="text-secondary mb-0">Rylee D.</p>
+              </div>
+              <div className="col-lg-4">
+                <div className="p-4 rounded-4 cs-map-tone h-100">
+                  <p className="text-secondary mb-2">Review Source</p>
+                  <p className="fw-bold mb-4">
+                    Statewide Auto Group Google Business Profile
+                  </p>
+                  <div className="d-flex align-items-center gap-2 mb-2">
+                    <span className="cs-rating-star">
+                      <i className="bi bi-star-fill"></i>
+                    </span>
+                    <span className="cs-rating-star">
+                      <i className="bi bi-star-fill"></i>
+                    </span>
+                    <span className="cs-rating-star">
+                      <i className="bi bi-star-fill"></i>
+                    </span>
+                    <span className="cs-rating-star">
+                      <i className="bi bi-star-fill"></i>
+                    </span>
+                    <span className="cs-rating-star">
+                      <i className="bi bi-star-half"></i>
+                    </span>
+                  </div>
+                  <p className="fw-bold mb-0">4.8/5 Stars</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="about-us" className="py-5 bg-white">
+        <div className="container">
+          <div className="row mb-4 align-items-end">
+            <div className="col-lg-8">
+              <p
+                className="text-uppercase fw-semibold small mb-2"
+                style={{ color: "var(--cs-primary)" }}
+              >
+                Trust &amp; Scale
+              </p>
+              <h2 className="display-6 fw-bold cs-title-tight">
+                Why Choose the Car Sales Brisbane Network?
+              </h2>
+            </div>
+          </div>
+          <div className="row g-4">
+            <div className="col-md-6 col-xl-3">
+              <article className="cs-card h-100 p-4">
+                <span className="cs-trust-icon">
+                  <i className="bi bi-search"></i>
+                </span>
+                <h3 className="h5 fw-bold">Professional Sourcing</h3>
+                <p className="text-secondary mb-0">
+                  We aren't limited by yard space. If you don't see it, we find
+                  it.
+                </p>
+              </article>
+            </div>
+            <div className="col-md-6 col-xl-3">
+              <article className="cs-card h-100 p-4">
+                <span className="cs-trust-icon">
+                  <i className="bi bi-cash-stack"></i>
+                </span>
+                <h3 className="h5 fw-bold">Finance-First</h3>
+                <p className="text-secondary mb-0">
+                  Specialist ABN, Low-Doc, and No-Deposit loans for Brisbane
+                  tradies.
+                </p>
+              </article>
+            </div>
+            <div className="col-md-6 col-xl-3">
+              <article className="cs-card h-100 p-4">
+                <span className="cs-trust-icon">
+                  <i className="bi bi-patch-check"></i>
+                </span>
+                <h3 className="h5 fw-bold">Statewide Certified</h3>
+                <p className="text-secondary mb-0">
+                  Every vehicle is mechanically cleared by our Ormiston-based
+                  technicians.
+                </p>
+              </article>
+            </div>
+            <div className="col-md-6 col-xl-3">
+              <article className="cs-card h-100 p-4">
+                <span className="cs-trust-icon">
+                  <i className="bi bi-truck"></i>
+                </span>
+                <h3 className="h5 fw-bold">QLD-Wide Delivery</h3>
+                <p className="text-secondary mb-0">
+                  From our Brisbane hub to Townsville, Cairns, and Mt Isa.
+                </p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   );
-}
+};
+
+export default VisitUs;

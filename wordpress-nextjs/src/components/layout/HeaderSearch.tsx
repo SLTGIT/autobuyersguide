@@ -149,7 +149,7 @@ export default function HeaderSearch() {
         <input
           type="search"
           className={styles["header-search__input"]}
-          placeholder="Search by make, model..."
+          placeholder="Search Car..."
           value={q}
           onChange={(e) => setQ(e.target.value)}
           autoComplete="off"

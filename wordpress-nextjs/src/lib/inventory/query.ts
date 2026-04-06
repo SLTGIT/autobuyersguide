@@ -63,7 +63,7 @@ function norm(s: string | undefined | null): string {
   return (s ?? "").trim();
 }
 
-function priceNum(v: DealerVehicle): number {
+export function priceNum(v: DealerVehicle): number {
   const p =
     v.Pricing?.AdvertisedPrice?.trim() || v.Pricing?.DriveAwayPrice?.trim();
   if (!p) return 0;
