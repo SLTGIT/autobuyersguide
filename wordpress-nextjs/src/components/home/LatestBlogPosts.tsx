@@ -26,12 +26,12 @@ export default async function LatestBlogPosts() {
       <div className="container">
         <div className="row mb-4 align-items-end">
           <div className="col-lg-7">
-            <p
+            {/* <p
               className="text-uppercase fw-semibold small mb-2"
               style={{ color: "var(--cs-primary)" }}
             >
               Latest News
-            </p>
+            </p> */}
             <h2 className="display-6 fw-bold cs-title-tight">Latest News</h2>
           </div>
         </div>

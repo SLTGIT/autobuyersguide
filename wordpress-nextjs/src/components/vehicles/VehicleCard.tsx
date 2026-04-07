@@ -5,26 +5,42 @@ import Image from "next/image";
 interface VehicleCardProps {
   listing: VehicleListing;
   view?: "grid" | "list";
+  /** When true, only the stock-number pill is shown (e.g. home featured strip). */
+  stockPillOnly?: boolean;
+  /** Hide the odometer row (cleaner compact cards). */
+  hideOdometer?: boolean;
+  className?: string;
 }
 
 export default function VehicleCard({
   listing,
   view = "grid",
+  stockPillOnly = false,
+  hideOdometer = false,
+  className,
 }: VehicleCardProps) {
   const href = `/cars/${listing.slug}`;
   const conditionLabel =
     listing.condition?.trim() || "Used";
 
   const pills: string[] = [];
-  if (listing.body_type) pills.push(listing.body_type);
-  if (listing.transmission) pills.push(listing.transmission);
+  if (!stockPillOnly) {
+    if (listing.body_type) pills.push(listing.body_type);
+    if (listing.transmission) pills.push(listing.transmission);
+  }
   if (listing.stock_number)
     pills.push(`Stock No: ${listing.stock_number}`);
 
+  const articleClass = [
+    "inventory-vehicle-card",
+    view === "list" ? "is-list" : "is-grid",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <article
-      className={`inventory-vehicle-card ${view === "list" ? "is-list" : "is-grid"}`}
-    >
+    <article className={articleClass}>
       <Link href={href} className="inventory-card-media-link">
         <div className="inventory-card-image-wrap">
           {listing.featured_image ? (
@@ -50,7 +66,7 @@ export default function VehicleCard({
           <Link href={href} className="inventory-card-title-link">
             <h3 className="inventory-card-title">{listing.title}</h3>
           </Link>
-          <button
+          {/* <button
             type="button"
             className="inventory-card-fav"
             aria-label={`Save ${listing.title}`}
@@ -67,7 +83,7 @@ export default function VehicleCard({
             >
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
-          </button>
+          </button> */}
         </div>
 
         {pills.length > 0 && (
@@ -80,7 +96,9 @@ export default function VehicleCard({
           </ul>
         )}
 
-        {listing.odometer != null && listing.odometer > 0 && (
+        {!hideOdometer &&
+          listing.odometer != null &&
+          listing.odometer > 0 ? (
           <p className="inventory-card-odometer">
             <span className="inventory-card-odometer-icon" aria-hidden>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -89,7 +107,7 @@ export default function VehicleCard({
             </span>
             {listing.odometer.toLocaleString("en-AU")} km
           </p>
-        )}
+        ) : null}
 
         <div className="inventory-card-price-row">
           {listing.formatted_price ? (

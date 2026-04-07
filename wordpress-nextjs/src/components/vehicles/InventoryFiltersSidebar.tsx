@@ -254,7 +254,7 @@ export default function InventoryFiltersSidebar({
 
       <div className="inventory-filter-block">
         <label className="inventory-filter-label" htmlFor="inv-condition">
-          New &amp; used cars ({totalCondition.toLocaleString("en-AU")})
+          Used cars ({totalCondition.toLocaleString("en-AU")})
         </label>
         <select
           id="inv-condition"

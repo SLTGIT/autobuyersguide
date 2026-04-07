@@ -626,16 +626,102 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     }
 }
 
+// Home “Featured arrivals” — matches listing-style product cards (rounded, light border, stock pill + price)
+.inventory-vehicle-card--home-featured {
+    border-radius: 16px;
+    border-color: #e5e7eb;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.04),
+        0 4px 12px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+        border-color: #d1d5db;
+        box-shadow:
+            0 2px 4px rgba(0, 0, 0, 0.05),
+            0 8px 20px rgba(0, 0, 0, 0.07);
+    }
+
+    .inventory-card-body {
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+    }
+
+    .inventory-card-condition {
+        margin-bottom: 0.15rem;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: #6b7280;
+        text-transform: capitalize;
+    }
+
+    .inventory-card-title-row {
+        margin-bottom: 0.35rem;
+    }
+
+    .inventory-card-title {
+        font-size: 1.0625rem;
+        font-weight: 700;
+        color: #111827;
+        letter-spacing: -0.02em;
+    }
+
+    .inventory-card-pills {
+        margin-bottom: 0.65rem;
+    }
+
+    .inventory-pill {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+
+    .inventory-card-price-row {
+        margin-top: 0.35rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .inventory-card-price {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .inventory-card-location {
+        font-size: 0.8125rem;
+        color: #6b7280;
+    }
+}
+
 .inventory-card-media-link {
     display: block;
     text-decoration: none;
     color: inherit;
+
+    .inventory-card-image {
+        transition: transform 0.28s ease, filter 0.28s ease;
+    }
+
+    &:hover .inventory-card-image,
+    &:focus-visible .inventory-card-image {
+        transform: scale(1.045);
+        filter: brightness(1.04);
+    }
+
+    &:focus-visible {
+        outline: 2px solid rgba($cs-primary, 0.55);
+        outline-offset: 2px;
+    }
 }
 
 .inventory-card-image-wrap {
     position: relative;
     aspect-ratio: 4 / 3;
     background: #f0f0f0;
+    overflow: hidden;
 }
 
 .inventory-card-image {
@@ -678,6 +764,26 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     color: inherit;
     flex: 1;
     min-width: 0;
+    border-radius: 4px;
+    transition: color 0.18s ease;
+
+    .inventory-card-title {
+        transition: color 0.18s ease, text-decoration-color 0.18s ease;
+    }
+
+    &:hover .inventory-card-title,
+    &:focus-visible .inventory-card-title {
+        color: var(--cs-primary, #{$cs-primary});
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 0.2em;
+        text-decoration-color: rgba($cs-primary, 0.5);
+    }
+
+    &:focus-visible {
+        outline: 2px solid rgba($cs-primary, 0.45);
+        outline-offset: 2px;
+    }
 }
 
 .inventory-card-title {
@@ -759,6 +865,18 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     color: #2563eb;
     text-decoration: underline;
     text-underline-offset: 2px;
+    transition: color 0.15s ease, text-underline-offset 0.15s ease;
+
+    &:hover {
+        color: #1d4ed8;
+        text-underline-offset: 4px;
+    }
+
+    &:focus-visible {
+        outline: 2px solid rgba(37, 99, 235, 0.45);
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
 }
 
 .inventory-card-location {

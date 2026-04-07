@@ -78,12 +78,12 @@ export default async function PopularUsedCars() {
       <div className="container">
         <div className="row g-4 align-items-center">
           <div className="col-lg-8">
-            <p
+            {/* <p
               className="text-uppercase fw-semibold small mb-2"
               style={{ color: "var(--cs-primary)" }}
             >
               SRP Categories
-            </p>
+            </p> */}
             <h2 className="display-6 fw-bold cs-title-tight">
               Shop Popular Used Cars in Brisbane
             </h2>
@@ -113,7 +113,7 @@ export default async function PopularUsedCars() {
                       href={href}
                       className="btn btn-outline-primary cs-pill"
                     >
-                      Open Page
+                      Browse Cars
                     </Link>
                   </div>
                 </article>

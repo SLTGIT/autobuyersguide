@@ -17,12 +17,12 @@ const VisitUs = () => {
                 ></iframe>
               </div>
               <div className="col-lg-5">
-                <p
+                {/* <p
                   className="text-uppercase fw-semibold small mb-2"
                   style={{ color: "var(--cs-primary)", letterSpacing: "0.2em" }}
                 >
                   Visit Us
-                </p>
+                </p> */}
                 <h2 className="display-6 fw-bold cs-title-tight mb-4">
                   Statewide Auto Group
                 </h2>
@@ -209,12 +209,12 @@ const VisitUs = () => {
         <div className="container">
           <div className="row mb-4 align-items-end">
             <div className="col-lg-8">
-              <p
+              {/* <p
                 className="text-uppercase fw-semibold small mb-2"
                 style={{ color: "var(--cs-primary)" }}
               >
                 Trust &amp; Scale
-              </p>
+              </p> */}
               <h2 className="display-6 fw-bold cs-title-tight">
                 Why Choose the Car Sales Brisbane Network?
               </h2>

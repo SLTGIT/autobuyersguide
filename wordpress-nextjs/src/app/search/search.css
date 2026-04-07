@@ -4,6 +4,53 @@
     linear-gradient(180deg, #0f3565, #0078ff);
 }
 
+/* Compact SRP hero — short height, capped image (full-size img was driving section height) */
+.search-page-hero-title {
+  font-size: clamp(1.35rem, 3.2vw, 1.85rem);
+  line-height: 1.2;
+}
+
+.search-page-hero-lead {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.95;
+  max-width: 36rem;
+}
+
+@media (min-width: 992px) {
+  .search-page-hero-lead {
+    font-size: 1rem;
+  }
+}
+
+/* Hero card image — tall enough to match SRP mockup (ute / pickup framed in card) */
+.search-page-hero-media {
+  height: 200px;
+  background: #e8eef5;
+  overflow: hidden;
+}
+
+@media (min-width: 576px) {
+  .search-page-hero-media {
+    height: 220px;
+  }
+}
+
+@media (min-width: 992px) {
+  .search-page-hero-media {
+    height: 240px;
+  }
+}
+
+.search-page-hero-img {
+  object-fit: cover;
+  object-position: center 48%;
+}
+
+.search-page-hero-card-body {
+  padding: 1rem 1.25rem !important;
+}
+
 .cs-pill {
   border-radius: 999px;
 }

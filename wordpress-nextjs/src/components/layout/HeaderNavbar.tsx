@@ -61,7 +61,7 @@ export default function HeaderNavbar() {
             <li className="nav-item">
               <a
                 className="nav-link text-dark"
-                href="/contact"
+                href="/sell-my-car"
                 onClick={closeNav}
               >
                 Sell My Car

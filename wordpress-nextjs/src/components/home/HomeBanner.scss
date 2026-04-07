@@ -16,10 +16,37 @@
 }
 
 .cs-cta-strong {
-  padding: 1.15rem 2.25rem !important;
+  padding: 0.9rem 1.5rem !important;
+  font-size: 0.9rem !important;
   font-weight: 700;
   box-shadow: 0 10px 24px rgba(0, 120, 255, 0.22);
   border: 2px solid rgba(255, 255, 255, 0.55);
+}
+
+.cs-hero .cs-cta-strong {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 14px 32px rgba(0, 0, 0, 0.14),
+      0 10px 24px rgba(0, 120, 255, 0.28);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 8px 20px rgba(0, 120, 255, 0.2);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(255, 255, 255, 0.95);
+    outline-offset: 3px;
+  }
 }
 
 .cs-hero-chip {
@@ -123,7 +150,7 @@
 }
 
 .cs-business-link {
-  color: #0a8ea0;
+  color: var(--cs-primary);
   text-decoration: underline;
   text-underline-offset: 0.14em;
 }
@@ -142,7 +169,7 @@
   justify-content: center;
   border-radius: 999px;
   background: rgba(10, 142, 160, 0.1);
-  color: #0a8ea0;
+  color: var(--cs-primary);
   flex: 0 0 auto;
   font-size: 1.2rem;
 }

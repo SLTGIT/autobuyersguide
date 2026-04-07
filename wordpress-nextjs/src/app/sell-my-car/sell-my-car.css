@@ -1,0 +1,337 @@
+/* Statewide brand teal (wordmark) for this page; hero keeps site blue gradient */
+.smc-intro,
+.smc-form-section {
+  --color-primary: #00838f;
+}
+
+.cs-page-hero {
+  background:
+    linear-gradient(135deg, rgba(16, 46, 87, 0.96), rgba(0, 120, 255, 0.84)),
+    linear-gradient(180deg, #0f3565, #0078ff);
+}
+
+.cs-panel,
+.cs-card {
+  border: 1px solid var(--cs-line);
+  border-radius: 1.5rem;
+  background: var(--cs-card);
+}
+
+.cs-pill {
+  border-radius: 999px;
+}
+
+.cs-hero-chip {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.cs-card img {
+  object-fit: cover;
+  height: 220px;
+}
+
+.cs-srp-card img {
+  height: 180px;
+}
+
+.cs-vehicle-meta {
+  color: var(--cs-muted);
+  font-size: 0.95rem;
+}
+
+.cs-title-tight {
+  letter-spacing: -0.03em;
+}
+
+.cs-business-card {
+  border: 1px solid var(--cs-line);
+  border-radius: 2rem;
+  background: #fff;
+}
+
+.cs-business-link {
+  color: var(--cs-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.14em;
+}
+
+.cs-contact-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.cs-contact-icon {
+  width: 52px;
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(10, 142, 160, 0.1);
+  color: var(--cs-primary);
+  flex: 0 0 auto;
+  font-size: 1.2rem;
+}
+
+.cs-map-frame {
+  width: 100%;
+  min-height: 440px;
+  border: 0;
+  border-radius: 1.5rem;
+}
+
+.cs-visit-section h2.display-6 {
+  font-size: clamp(1.1rem, 1.6vw, 1.55rem);
+  line-height: 1.05;
+}
+
+.cs-visit-section .cs-business-link.fs-3,
+.cs-visit-section .cs-business-link.fs-2 {
+  font-size: 0.92rem !important;
+  line-height: 1.15;
+}
+
+.cs-visit-section .fw-bold.fs-4 {
+  font-size: 1rem !important;
+  line-height: 1.15;
+}
+
+/* --- Sell My Car: intro + features (theme-aligned) --- */
+.smc-intro-inner {
+  max-width: 52rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.smc-intro-heading {
+  font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  color: var(--cs-ink, #1e2732);
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .smc-intro-heading {
+    margin-bottom: 2.5rem;
+  }
+}
+
+.smc-intro-copy {
+  text-align: center;
+  color: var(--cs-ink, #1e2732);
+  font-size: 1.02rem;
+  line-height: 1.65;
+  margin-bottom: 3.5rem;
+}
+
+.smc-intro-copy p {
+  margin-bottom: 1.1rem;
+}
+
+.smc-intro-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.smc-link {
+  color: var(--cs-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1.5px;
+}
+
+.smc-link:hover {
+  color: color-mix(in srgb, var(--cs-primary) 78%, #000);
+}
+
+.smc-features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem 1.25rem;
+  max-width: 46rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .smc-features {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+.smc-feature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.85rem;
+}
+
+.smc-feature-icon {
+  width: 4.25rem;
+  height: 4.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--cs-ink, #1a1a1a);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--cs-primary);
+  flex-shrink: 0;
+}
+
+.smc-feature-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  color: var(--cs-ink, #1e2732);
+}
+
+.smc-visit-kicker {
+  color: var(--cs-primary);
+}
+
+/* --- Valuation form (multi-step) --- */
+.smc-form-section {
+  background: var(--cs-bg, #f3f7fb);
+}
+
+.smc-form-card {
+  background: #fff;
+  border: 1px solid var(--cs-line, #dbe6f2);
+  border-radius: 1rem;
+  padding: 1.75rem 1.5rem 2rem;
+  box-shadow: 0 4px 24px rgba(30, 39, 50, 0.06);
+}
+
+@media (min-width: 768px) {
+  .smc-form-card {
+    padding: 2rem 2.25rem 2.25rem;
+  }
+}
+
+.smc-form-card--done {
+  box-shadow: none;
+}
+
+.smc-form-progress-wrap {
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.65rem;
+}
+
+.smc-form-progress {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--cs-primary),
+    var(--cs-primary, #0078ff)
+  );
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.smc-form-title {
+  font-size: clamp(1.25rem, 3.5vw, 1.5rem);
+  font-weight: 700;
+  color: var(--cs-ink, #1e2732);
+  letter-spacing: -0.02em;
+}
+
+.smc-form-label {
+  display: block;
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+  color: #212529;
+}
+
+.smc-form-req {
+  color: #dc3545;
+  margin-left: 0.15em;
+}
+
+.smc-form-control {
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+  padding: 0.55rem 0.85rem;
+  font-size: 1rem;
+}
+
+.smc-form-control::placeholder {
+  color: #9ca3af;
+}
+
+.smc-form-control:focus {
+  border-color: var(--cs-primary);
+  box-shadow: 0 0 0 0.2rem rgba(0, 120, 255, 0.18);
+}
+
+.smc-form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.smc-form-btn {
+  --bs-btn-font-weight: 600;
+  min-width: 9rem;
+  background-color: var(--cs-primary);
+  border-color: var(--cs-primary);
+  color: #fff;
+  padding: 0.65rem 1.35rem;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+
+.smc-form-btn:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--cs-primary) 88%, #000);
+  border-color: color-mix(in srgb, var(--cs-primary) 88%, #000);
+  color: #fff;
+}
+
+.smc-form-btn:focus-visible {
+  box-shadow: 0 0 0 0.2rem rgba(0, 131, 143, 0.35);
+}
+
+.smc-form-back,
+.smc-form-back-inline {
+  color: var(--cs-muted, #667281);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.smc-form-back:hover,
+.smc-form-back-inline:hover {
+  color: var(--cs-primary);
+  text-decoration: underline;
+}
+
+.cs-rating-star {
+  color: #ffb400;
+}
+
+.cs-social-btn {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.cs-social-facebook {
+  background: #1877f2;
+}
+
+.cs-social-instagram {
+  background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af, #515bd4);
+}

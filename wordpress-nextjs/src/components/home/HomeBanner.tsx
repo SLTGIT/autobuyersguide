@@ -8,9 +8,9 @@ export default function HomeBanner() {
       <div className="container py-lg-4">
         <div className="row g-4 align-items-center">
           <div className="col-lg-7">
-            <span className="badge cs-hero-chip cs-pill px-3 py-2 mb-3">
+            {/* <span className="badge cs-hero-chip cs-pill px-3 py-2 mb-3">
               Car Sales Brisbane
-            </span>
+            </span> */}
             <h1 className="display-3 fw-bold mb-3 cs-title-tight">
               Quality Used Cars Brisbane | Expert Finance &amp; Sourcing
             </h1>

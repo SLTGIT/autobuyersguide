@@ -1,5 +1,6 @@
 import "./search.css";
 import { Suspense } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { fetchDealerInventory } from "@/lib/dealer-solutions/fetch-inventory";
@@ -71,29 +72,34 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   return (
     <>
-      <section className="cs-page-hero py-5 text-white">
-        <div className="container py-lg-4">
-          <div className="row g-4 align-items-center">
+      <section className="cs-page-hero search-page-hero py-3 py-md-4 text-white">
+        <div className="container py-lg-2">
+          <div className="row g-3 g-lg-4 align-items-center">
             <div className="col-lg-7">
-              <span className="badge cs-hero-chip cs-pill px-3 py-2 mb-3">
+              <span className="badge cs-hero-chip cs-pill px-3 py-1 mb-2">
                 Used Cars For Sale
               </span>
-              <h1 className="display-5 fw-bold mb-3 cs-title-tight">
+              <h1 className="search-page-hero-title fw-bold mb-2 cs-title-tight">
                 Browse Used Cars for Sale in Brisbane
               </h1>
-              <p className="lead mb-0">
+              <p className="search-page-hero-lead mb-0">
                 Explore used cars, 4x4s, SUVs, and work-ready vehicles with
                 finance-first options from our Ormiston hub.
               </p>
             </div>
             <div className="col-lg-5">
-              <article className="card border-0 shadow-lg rounded-5 overflow-hidden">
-                <img
-                  src="https://d2s8i866417m9.cloudfront.net/photo/32428698/photo/thumb-232954f40d5f21bf8a4fa35d6daa7a7a.jpg"
-                  className="card-img-top"
-                  alt="Used cars for sale Brisbane hero image"
-                />
-                <div className="card-body p-4">
+              <article className="search-page-hero-card card border-0 shadow-lg rounded-5 overflow-hidden">
+                <div className="search-page-hero-media position-relative">
+                  <Image
+                    src="https://d2s8i866417m9.cloudfront.net/photo/32428698/photo/thumb-232954f40d5f21bf8a4fa35d6daa7a7a.jpg"
+                    alt="White Ford Ranger used ute — browse used cars for sale Brisbane"
+                    fill
+                    className="search-page-hero-img"
+                    sizes="(max-width: 991px) 100vw, 480px"
+                    priority
+                  />
+                </div>
+                <div className="card-body search-page-hero-card-body">
                   <h2 className="h5 fw-bold mb-0 text-dark">
                     Used Cars for Sale
                   </h2>
