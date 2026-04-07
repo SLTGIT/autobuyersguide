@@ -1,14 +1,11 @@
-import Link from "next/link";
-import Image from "next/image";
-import MobileMenu from "./MobileMenu";
 import "./Header.scss";
-import HeaderSearch from "./HeaderSearch";
+import HeaderNavbar from "./HeaderNavbar";
 
 export default function Header() {
   return (
     <header className="sticky-top cs-header">
-      <div className="cs-topbar py-0">
-        <div className="container d-flex flex-wrap justify-content-center justify-content-lg-end align-items-center gap-3 gap-lg-4">
+      <div className="cs-topbar py-0 py-3 py-lg-0">
+        <div className="container d-flex flex-wrap justify-content-center justify-content-lg-end align-items-center gap-3 gap-lg-4 ">
           <span className="d-inline-flex align-items-center gap-2">
             <span className="cs-rating-star">
               <i className="bi bi-star-fill"></i>
@@ -57,60 +54,7 @@ export default function Header() {
           </span>
         </div>
       </div>
-      <nav className="navbar navbar-expand-lg">
-        <div className="container py-2">
-          <a className="navbar-brand d-flex align-items-center gap-3" href="/">
-            <span className="cs-brand-badge d-inline-flex align-items-center justify-content-center text-white fw-bold">
-              CSB
-            </span>
-            <span className="cs-brand-copy">
-              <strong className="d-block text-dark">Car Sales Brisbane</strong>
-              <small className="text-secondary d-block">
-                A Statewide Auto Group Digital Showroom
-              </small>
-            </span>
-          </a>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#mainNav"
-            aria-label="Open navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="mainNav">
-            <HeaderSearch />
-            <ul className="navbar-nav ms-auto align-items-lg-center cs-main-nav">
-              <li className="nav-item">
-                <a className="nav-link text-dark" href="/">
-                  Home
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link text-dark" href="/search">
-                  Used Cars for sale
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link text-dark" href="/contact">
-                  Sell My Car
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link text-dark" href="/finance-centre">
-                  Finance Pre-Approval
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link text-dark" href="/contact">
-                  Contact
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
+      <HeaderNavbar />
     </header>
   );
 }

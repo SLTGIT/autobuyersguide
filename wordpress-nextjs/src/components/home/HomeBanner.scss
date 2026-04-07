@@ -187,3 +187,12 @@
 .cs-visit-section .cs-contact-row {
   gap: 0.75rem;
 }
+
+
+// Responsive for mobile
+@media (max-width: 767px) {
+  .cs-cta-strong {
+    padding: 0.9rem 1.5rem !important;
+    font-size: 0.9rem !important;
+  }
+}

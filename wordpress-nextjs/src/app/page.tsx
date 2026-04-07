@@ -13,8 +13,8 @@ export async function generateMetadata(): Promise<Metadata> {
     const siteSettings = await getSiteSettings();
     return {
         // title: siteSettings?.title || 'Home | Statewide Auto Group',
-        title: 'Statewide Auto Group',
-        description: siteSettings?.description || 'Statewide Auto Group is a leading provider of used cars in Australia. We offer a wide range of used cars for sale in Australia.',
+        title: 'Home | Statewide Auto Group',
+        description: siteSettings?.description || 'Home | Statewide Auto Group',
     };
 }
 
@@ -23,7 +23,7 @@ export default async function Home() {
     // Use getPosts if you need to display blog posts in the future.
 
     return (
-        <main>
+        <>
             <HomeBanner />
             {/* <SearchForm /> */}
             {/* <CitySearchSlider /> */}
@@ -33,6 +33,6 @@ export default async function Home() {
             <LatestBlogPosts />
             {/* <InfoBlocks /> */}
             <VisitUs />
-        </main>
+        </>
     );
 }
