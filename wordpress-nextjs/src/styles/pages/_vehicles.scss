@@ -151,6 +151,24 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     }
 }
 
+/* Search (/search): tighter page chrome on small screens */
+.vehicles-page.inventory-srp {
+    @media (max-width: 991px) {
+        padding: 1.5rem 0;
+    }
+
+    @media (max-width: 575px) {
+        padding: 1rem 0;
+    }
+
+    .vehicles-container {
+        @media (max-width: 575px) {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+    }
+}
+
 .inventory-breadcrumb {
     font-size: 0.875rem;
     color: var(--secondary, #6c757d);
@@ -196,12 +214,14 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 
 .inventory-srp-layout {
     display: grid;
-    grid-template-columns: minmax(260px, 300px) 1fr;
+    grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
     gap: 1.75rem;
     align-items: start;
+    min-width: 0;
 
     @media (max-width: 991px) {
         grid-template-columns: 1fr;
+        gap: 1.25rem;
     }
 }
 
@@ -240,6 +260,15 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
             background: rgba($cs-primary, 0.58);
         }
     }
+
+    @media (max-width: 991px) {
+        position: static;
+        top: auto;
+        max-height: none;
+        overflow-y: visible;
+        overflow-x: hidden;
+        overscroll-behavior: auto;
+    }
 }
 
 .inventory-applied {
@@ -254,6 +283,8 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     justify-content: space-between;
     gap: 0.5rem;
     margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    row-gap: 0.35rem;
 }
 
 .inventory-applied-title {
@@ -297,6 +328,14 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     background: #f1f3f5;
     border-radius: 999px;
     font-size: 0.8125rem;
+    max-width: 100%;
+}
+
+.inventory-chip-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .inventory-chip-remove {
@@ -326,6 +365,8 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 
 .inventory-select {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     padding: 0.55rem 0.65rem;
     border: 1px solid var(--grey300, #dee2e6);
     border-radius: 8px;
@@ -405,6 +446,13 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     border: 1px solid var(--grey300, #e8e8e8);
     padding: 1.25rem 1.5rem 2rem;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+    min-width: 0;
+    max-width: 100%;
+
+    @media (max-width: 575px) {
+        padding: 1rem 1rem 1.5rem;
+        border-radius: 10px;
+    }
 }
 
 .inventory-toolbar {
@@ -416,14 +464,27 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     margin-bottom: 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--grey300, #eee);
+
+    @media (max-width: 640px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
 }
 
 .inventory-toolbar-count {
     margin: 0;
     font-size: 0.95rem;
     color: var(--search-listings-color, #222);
+    min-width: 0;
+    overflow-wrap: break-word;
+
     strong {
         font-weight: 700;
+    }
+
+    @media (max-width: 640px) {
+        font-size: 0.9rem;
     }
 }
 
@@ -431,9 +492,26 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     display: flex;
     align-items: center;
     gap: 0.75rem;
+
+    @media (max-width: 640px) {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+}
+
+.inventory-sort-wrap {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .inventory-sort-select {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
     padding: 0.45rem 2rem 0.45rem 0.65rem;
     border: 1px solid var(--grey300, #dee2e6);
     border-radius: 8px;
@@ -469,19 +547,29 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     border-radius: 10px;
     overflow: hidden;
     background: #fff;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .inventory-search-input {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
     border: none;
     padding: 0.85rem 1rem;
     font-size: 0.95rem;
     &:focus {
         outline: none;
     }
+
+    @media (max-width: 400px) {
+        padding: 0.7rem 0.75rem;
+        font-size: 0.875rem;
+    }
 }
 
 .inventory-search-submit {
+    flex-shrink: 0;
     padding: 0 1.1rem;
     border: none;
     background: #f8f9fa;
@@ -490,6 +578,10 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     border-left: 1px solid var(--grey300, #e0e0e0);
     &:hover {
         background: #eee;
+    }
+
+    @media (max-width: 400px) {
+        padding: 0 0.85rem;
     }
 }
 
@@ -686,6 +778,23 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     margin-top: 2rem;
     padding-top: 1rem;
     border-top: 1px solid #eee;
+    flex-wrap: wrap;
+
+    @media (max-width: 480px) {
+        flex-direction: column;
+        gap: 0.65rem;
+        margin-top: 1.5rem;
+
+        .inventory-pagination-link {
+            width: 100%;
+            max-width: 16rem;
+            text-align: center;
+        }
+
+        .inventory-pagination-status {
+            order: -1;
+        }
+    }
 }
 
 .inventory-pagination-link {
@@ -714,8 +823,11 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     padding: 2rem 1rem;
     text-align: center;
     color: var(--secondary, #555);
+    overflow-wrap: break-word;
+
     code {
         font-size: 0.8em;
+        overflow-wrap: anywhere;
     }
 }
 
@@ -1781,6 +1893,10 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 .range-slider {
     position: relative;
     padding: 0.5rem 0 0.25rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .range-slider-track {
