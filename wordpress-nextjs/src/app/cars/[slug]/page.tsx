@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: VehicleDetailPageProps) {
   const image = v.Photos?.[0]?.PhotoUrl;
   return {
     title: `${listing.title} | Car Sales Brisbane`,
-    description: `${listing.condition} ${listing.year} ${listing.title}. ${
+    description: `${listing.condition} ${listing.title}. ${
       listing.formatted_price ? `From ${listing.formatted_price}. ` : ""
     }View photos and details.`,
     openGraph: image
