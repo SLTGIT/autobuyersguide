@@ -32,7 +32,7 @@ export default async function LatestBlogPosts() {
             >
               Latest News
             </p> */}
-            <h2 className="display-6 fw-bold cs-title-tight">Latest News</h2>
+            <h2 className="display-6 fw-bold cs-title-tight">Latest Blog Posts</h2>
           </div>
         </div>
 
