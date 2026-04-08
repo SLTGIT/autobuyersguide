@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { WPPost } from "@/types/wordpress";
+import styles from "./BlogCard.module.scss";
 
 interface BlogCardProps {
   post: WPPost;
@@ -14,31 +16,31 @@ export default function BlogCard({ post }: BlogCardProps) {
     post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
   const href = `/blog/${post.slug}`;
   const plainTitle = stripTags(post.title.rendered);
-  const imgAlt = plainTitle
-    ? `${plainTitle} — article`
-    : "Blog article";
+  const plainExcerpt = stripTags(post.excerpt.rendered);
+  const imgAlt = plainTitle ? `${plainTitle} — article` : "Blog article";
 
   return (
-    <article className="cs-card overflow-hidden h-100">
+    <article className={styles.card}>
       {featuredImage ? (
-        <Link href={href} className="d-block">
-          <img
-            src={featuredImage}
-            className="w-100"
-            alt={imgAlt}
-          />
-        </Link>
+        <div className={styles.media}>
+          <Link href={href} className={styles.mediaLink}>
+            <Image
+              src={featuredImage}
+              alt={imgAlt}
+              fill
+              className={styles.mediaImg}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          </Link>
+        </div>
       ) : (
-        <Link
-          href={href}
-          className="d-block bg-light text-muted small text-center py-5 text-decoration-none"
-        >
+        <Link href={href} className={styles.placeholder}>
           No image
         </Link>
       )}
-      <div className="p-4">
-        <h3 className="h5 fw-bold mb-0">
-          <Link href={href} className="text-reset text-decoration-none">
+      <div className={styles.body}>
+        <h3 className={styles.title}>
+          <Link href={href}>
             <span
               dangerouslySetInnerHTML={{
                 __html: post.title.rendered,
@@ -46,6 +48,12 @@ export default function BlogCard({ post }: BlogCardProps) {
             />
           </Link>
         </h3>
+        {plainExcerpt ? (
+          <p className={styles.excerpt}>{plainExcerpt}</p>
+        ) : null}
+        <Link href={href} className={styles.readBtn}>
+          Read Article
+        </Link>
       </div>
     </article>
   );

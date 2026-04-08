@@ -1,0 +1,57 @@
+.cs-page-hero {
+  background:
+    linear-gradient(135deg, rgba(16, 46, 87, 0.96), rgba(0, 120, 255, 0.84)),
+    linear-gradient(180deg, #0f3565, #0078ff);
+}
+.cs-card {
+  border: 1px solid var(--cs-line);
+  border-radius: 1.5rem;
+  background: var(--cs-card);
+}
+.cs-pill {
+  border-radius: 999px;
+}
+.cs-hero-chip {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+.cs-title-tight {
+  letter-spacing: -0.03em;
+}
+.cs-rating-star {
+  color: #ffb400;
+}
+.cs-footer {
+  background: #122033;
+}
+.cs-feature-img {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 1.5rem;
+}
+.cs-prose h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-top: 1.8rem;
+  margin-bottom: 0.9rem;
+}
+.cs-prose p,
+.cs-prose li {
+  color: var(--cs-muted);
+  line-height: 1.75;
+}
+.cs-prose a {
+  color: var(--cs-primary-dark);
+  text-decoration: none;
+}
+.cs-answer-box,
+.cs-cta-box,
+.cs-faq-item {
+  border: 1px solid var(--cs-line);
+  border-radius: 1.25rem;
+  background: #f8fbff;
+}
+.cs-faq-item + .cs-faq-item {
+  margin-top: 1rem;
+}

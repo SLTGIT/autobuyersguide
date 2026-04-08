@@ -63,8 +63,8 @@ function renderBlock(block: DealerCommentBlock, key: number, paraIndex: number) 
     case "hashtags":
       return (
         <div key={key} className="dealer-comments__tags" aria-label="Related tags">
-          {block.tags.map((tag) => (
-            <span key={tag} className="dealer-comments__tag">
+          {block.tags.map((tag, t) => (
+            <span key={`${t}-${tag}`} className="dealer-comments__tag">
               #{tag}
             </span>
           ))}

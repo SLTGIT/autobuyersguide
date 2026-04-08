@@ -55,13 +55,15 @@ export default async function Blog({ searchParams }: BlogPageProps) {
           <div className="row g-4 align-items-center">
             <div className="col-lg-7">
               <span className="badge cs-hero-chip cs-pill px-3 py-2 mb-3">
-                Latest News
+                Car Sales Brisbane Blog
               </span>
               <h1 className="display-5 fw-bold mb-3 cs-title-tight">
-                Latest News
+                Used Car Guides for Brisbane Buyers
               </h1>
               <p className="lead mb-0">
-                Read the latest finance, SUV, and delivery guides.
+                Explore guides on car finance, used cars under $15000, cheap
+                cars for sale Brisbane buyers can compare, family SUVs, and the
+                best used 4x4s and utes for sale in Brisbane.
               </p>
             </div>
           </div>
@@ -82,7 +84,10 @@ export default async function Blog({ searchParams }: BlogPageProps) {
             <>
               <div className="row g-4">
                 {posts.map((post) => (
-                  <div key={post.id} className="col-12 col-md-6 col-lg-4">
+                  <div
+                    key={post.id}
+                    className="col-12 col-md-6 col-lg-4 d-flex"
+                  >
                     <BlogCard post={post} />
                   </div>
                 ))}

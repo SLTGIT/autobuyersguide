@@ -36,7 +36,6 @@ export default async function PopularCarTypes() {
               <div key={listing.id} className="col-md-6 col-xl-3">
                 <VehicleCard
                   listing={listing}
-                  stockPillOnly
                   className="inventory-vehicle-card--home-featured h-100"
                 />
               </div>

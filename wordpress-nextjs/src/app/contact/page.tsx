@@ -45,22 +45,22 @@ export default function Contact() {
               <div className="col-lg-7">
                 <iframe
                   className="cs-map-frame"
-                  src="https://maps.google.com/maps?q=56%20Freeth%20St%20W%2C%20Ormiston%20QLD%204160&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3538.2886675510936!2d153.2562743!3d-27.522489600000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b9166da002182eb%3A0xf865bfc87170ea54!2s56%20Freeth%20St%20W%2C%20Ormiston%20QLD%204160%2C%20Australia!5e0!3m2!1sen!2sin!4v1775640673378!5m2!1sen!2sin"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Statewide Auto Group map"
                 ></iframe>
               </div>
               <div className="col-lg-5">
-                <p
+                {/* <p
                   className="text-uppercase fw-semibold small mb-2"
                   style={{ color: "var(--cs-primary)", letterSpacing: "0.2em" }}
                 >
                   Visit Us
-                </p>
-                <h2 className="display-6 fw-bold cs-title-tight mb-4">
+                </p> */}
+                {/* <h2 className="display-6 fw-bold cs-title-tight mb-4">
                   Statewide Auto Group
-                </h2>
+                </h2> */}
                 <div className="vstack gap-4">
                   <div className="cs-contact-row">
                     <span className="cs-contact-icon">

@@ -44,6 +44,10 @@ export interface VehicleListing {
   id: number;
   slug: string;
   title: string;
+  /** Feed make — used for card headline "Make, Model". */
+  make: string;
+  /** Feed model — used for card headline. */
+  model: string;
   featured_image: string | null;
   condition: string;
   body_type: string;
@@ -54,6 +58,8 @@ export interface VehicleListing {
   odometer: number | null;
   stock_number: string;
   formatted_price: string;
+  /** EGC / list price when higher than advertised (strikethrough on cards). */
+  compare_at_price: string | null;
   drive_away_price: string | null;
   show_drive_away: boolean;
   location_short: string;

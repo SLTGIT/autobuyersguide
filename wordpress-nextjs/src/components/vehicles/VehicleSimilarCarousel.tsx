@@ -6,13 +6,25 @@ import { useRef } from "react";
 
 export interface SimilarCarItem {
   slug: string;
+  /** Full dealer title (fallback + image alt). */
   title: string;
+  make: string;
+  model: string;
   image: string | null;
   condition: string;
   price: string;
   odometer: string | null;
   location: string;
   tags: string[];
+}
+
+function similarCardHeadline(car: SimilarCarItem): string {
+  const mk = car.make?.trim();
+  const md = car.model?.trim();
+  if (mk && md) return `${mk}, ${md}`;
+  if (mk) return mk;
+  if (md) return md;
+  return car.title;
 }
 
 interface VehicleSimilarCarouselProps {
@@ -64,7 +76,7 @@ export default function VehicleSimilarCarousel({ items }: VehicleSimilarCarousel
                 {car.image ? (
                   <Image
                     src={car.image}
-                    alt=""
+                    alt={similarCardHeadline(car)}
                     width={320}
                     height={220}
                     className="vdp-similar-card-img"
@@ -80,11 +92,11 @@ export default function VehicleSimilarCarousel({ items }: VehicleSimilarCarousel
                   {car.condition}
                 </span>
               </div>
-              <h3 className="vdp-similar-card-title">{car.title}</h3>
+              <h3 className="vdp-similar-card-title">{similarCardHeadline(car)}</h3>
               {car.tags.length > 0 && (
                 <ul className="vdp-similar-card-tags">
-                  {car.tags.slice(0, 4).map((t) => (
-                    <li key={t}>{t}</li>
+                  {car.tags.slice(0, 4).map((t, ti) => (
+                    <li key={`${ti}-${t}`}>{t}</li>
                   ))}
                 </ul>
               )}

@@ -59,6 +59,8 @@ function toSimilarItem(v: DealerVehicle): SimilarCarItem {
   return {
     slug: l.slug,
     title: l.title.length > 72 ? `${l.title.slice(0, 69)}…` : l.title,
+    make: l.make,
+    model: l.model,
     image: l.featured_image,
     condition: l.condition,
     price: l.formatted_price || "—",
