@@ -30,11 +30,11 @@ export async function generateMetadata({ params }: VehicleDetailPageProps) {
   const { slug } = await params;
   const all = await fetchDealerInventory();
   const v = findVehicleByPublicSlug(all, slug);
-  if (!v) return { title: "Vehicle not found | Auto Buyers Guide" };
+  if (!v) return { title: "Vehicle not found | Car Sales Brisbane" };
   const listing = dealerVehicleToListing(v);
   const image = v.Photos?.[0]?.PhotoUrl;
   return {
-    title: `${listing.title} | Statewide Auto Group`,
+    title: `${listing.title} | Car Sales Brisbane`,
     description: `${listing.condition} ${listing.year} ${listing.title}. ${
       listing.formatted_price ? `From ${listing.formatted_price}. ` : ""
     }View photos and details.`,
