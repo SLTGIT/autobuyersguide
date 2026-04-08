@@ -42,9 +42,9 @@ export default function HomeBanner() {
                 alt="Used Cars Brisbane Statewide Auto Group featured vehicle"
               />
               <div className="card-body p-4">
-                <span className="badge text-bg-primary cs-pill mb-3">
+                {/* <span className="badge text-bg-primary cs-pill mb-3">
                   Statewide Auto Group
-                </span>
+                </span> */}
                 <h2 className="h4 fw-bold text-dark mb-2">
                   Brisbane based, finance ready, statewide delivery.
                 </h2>

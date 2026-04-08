@@ -6,8 +6,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteSettings = await getSiteSettings();
   return {
     // title: siteSettings?.title || 'Home | Statewide Auto Group',
-    title: "Finance Centre | Statewide Auto Group",
-    description: "Finance Centre | Statewide Auto Group",
+    title: "Finance Centre | Car Sales Brisbane",
+    description: "Finance Centre | Car Sales Brisbane",
   };
 }
 

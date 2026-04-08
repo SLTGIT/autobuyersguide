@@ -2,11 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, permanentRedirect } from "next/navigation";
 import { fetchDealerInventory } from "@/lib/dealer-solutions/fetch-inventory";
-import {
-  dealerVehicleToListing,
-  splitVehicleDescription,
-  typeCodeLabel,
-} from "@/lib/inventory/transform";
+import { dealerVehicleToListing, typeCodeLabel } from "@/lib/inventory/transform";
 import { buildVehicleSlug, findVehicleByPublicSlug } from "@/lib/inventory/slug";
 import { getSimilarVehicles } from "@/lib/inventory/similar";
 import VehicleGallery from "@/components/vehicles/VehicleGallery";
@@ -16,6 +12,7 @@ import VehicleSimilarCarousel, {
   type SimilarCarItem,
 } from "@/components/vehicles/VehicleSimilarCarousel";
 import VehicleVdpFaq from "@/components/vehicles/VehicleVdpFaq";
+import VehicleDealerComments from "@/components/vehicles/VehicleDealerComments";
 import type { VehicleImage } from "@/types/vehicle";
 import type { DealerVehicle } from "@/types/inventory";
 
@@ -227,18 +224,7 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
 
             <VehicleVdpDetailGrid rows={detailRows} />
 
-            {v.Comments?.trim() ? (
-              <section className="inventory-vdp-comments vdp-dealer-comments">
-                <h2 className="vdp-section-heading">Dealer comments</h2>
-                <div className="inventory-vdp-comments-body">
-                  {splitVehicleDescription(v.Comments).map((para, i) => (
-                    <p key={i} className="inventory-vdp-comment-para">
-                      {para}
-                    </p>
-                  ))}
-                </div>
-              </section>
-            ) : null}
+            {v.Comments?.trim() ? <VehicleDealerComments text={v.Comments} /> : null}
 
             <section className="vdp-disclaimer" aria-label="Disclaimer">
               <p>

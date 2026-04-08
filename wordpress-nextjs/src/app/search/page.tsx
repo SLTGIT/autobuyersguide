@@ -25,7 +25,7 @@ interface SearchPageProps {
 }
 
 export const metadata = {
-  title: "Vehicle inventory | Statewide Auto Group",
+  title: "Vehicle inventory | Car Sales Brisbane",
   description:
     "Browse new and used cars for sale in Australia. Filter by make, price, and more.",
 };

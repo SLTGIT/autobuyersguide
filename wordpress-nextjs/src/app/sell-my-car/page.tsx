@@ -4,9 +4,9 @@ import SellMyCarValuationForm from "./SellMyCarValuationForm";
 import "./sell-my-car.css";
 
 export const metadata: Metadata = {
-  title: "Sell My Car | Statewide Auto Group",
+  title: "Sell My Car | Car Sales Brisbane",
   description:
-    "Get an obligation-free car valuation at Statewide Auto Group. Competitive offers, no pressure.",
+    "Get an obligation-free car valuation at Car Sales Brisbane. Competitive offers, no pressure.",
 };
 
 const FEATURES = [

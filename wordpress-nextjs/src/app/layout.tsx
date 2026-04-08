@@ -9,11 +9,11 @@ import { ClientImports } from "@/components/ClientImports";
 const manrope = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Statewide Auto Group",
+  title: "Car Sales Brisbane",
   description:
-    "Statewide Auto Group is a leading provider of used cars in Australia. We offer a wide range of used cars for sale in Australia.",
+    "Car Sales Brisbane is a leading provider of used cars in Australia. We offer a wide range of used cars for sale in Australia.",
   icons: {
-    icon: "/assets/images/statewide-auto-group.png",
+    icon: "/assets/images/logo.png",
   },
 };
 

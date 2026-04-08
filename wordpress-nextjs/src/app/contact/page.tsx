@@ -3,7 +3,7 @@ import ContactForm from "./ContactForm";
 import "./contact.css";
 
 export const metadata: Metadata = {
-  title: "Contact | Statewide Auto Group",
+  title: "Contact | Car Sales Brisbane",
   description: "Get in touch with us. We'd love to hear from you!",
 };
 

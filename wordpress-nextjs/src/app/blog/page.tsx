@@ -6,7 +6,7 @@ import BlogCard from "@/components/blog/BlogCard";
 import "./blog.css";
 
 export const metadata: Metadata = {
-  title: "Blog | Statewide Auto Group",
+  title: "Blog | Car Sales Brisbane",
   description: "Read our latest blog posts about used cars in Australia.",
 };
 

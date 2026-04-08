@@ -5,8 +5,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteSettings = await getSiteSettings();
   return {
     // title: siteSettings?.title || 'Home | Statewide Auto Group',
-    title: "Privacy Policy | Statewide Auto Group",
-    description: "Privacy Policy | Statewide Auto Group",
+    title: "Privacy Policy | Car Sales Brisbane",
+    description: "Privacy Policy | Car Sales Brisbane",
   };
 }
 

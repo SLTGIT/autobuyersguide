@@ -13,8 +13,8 @@ export async function generateMetadata(): Promise<Metadata> {
     const siteSettings = await getSiteSettings();
     return {
         // title: siteSettings?.title || 'Home | Statewide Auto Group',
-        title: 'Home | Statewide Auto Group',
-        description: siteSettings?.description || 'Home | Statewide Auto Group',
+        title: 'Home | Car Sales Brisbane',
+        description: siteSettings?.description || 'Home | Car Sales Brisbane',
     };
 }
 
