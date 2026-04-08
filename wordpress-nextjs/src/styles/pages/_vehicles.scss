@@ -591,6 +591,8 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 
     &.is-grid {
         grid-template-columns: repeat(3, 1fr);
+        align-items: stretch;
+
         @media (max-width: 1100px) {
             grid-template-columns: repeat(2, 1fr);
         }
@@ -604,6 +606,18 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     }
 }
 
+/* Stretch cards to one row height; body flex pushes price + location to the bottom */
+.inventory-grid-item {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.inventory-grid-item > .inventory-vehicle-card.is-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
 .inventory-vehicle-card {
     background: #fff;
     border: 1px solid var(--grey300, #e8e8e8);
@@ -615,6 +629,27 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     &:hover {
         box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
         border-color: #ddd;
+    }
+
+    &.is-grid {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        .inventory-card-media-link {
+            flex-shrink: 0;
+        }
+
+        .inventory-card-body {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .inventory-card-price-row {
+            margin-top: auto;
+        }
     }
 
     &.is-list {
@@ -679,8 +714,8 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
         color: #4b5563;
     }
 
+    /* margin-top: auto comes from .is-grid; keep foot spacing */
     .inventory-card-price-row {
-        margin-top: 0.35rem;
         margin-bottom: 0.5rem;
     }
 

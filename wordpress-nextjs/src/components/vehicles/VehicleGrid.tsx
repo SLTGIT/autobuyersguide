@@ -16,7 +16,11 @@ export default function VehicleGrid({
       role="list"
     >
       {listings.map((listing) => (
-        <div key={listing.id} role="listitem">
+        <div
+          key={listing.id}
+          role="listitem"
+          className={view === "grid" ? "inventory-grid-item" : undefined}
+        >
           <VehicleCard listing={listing} view={view} />
         </div>
       ))}
