@@ -157,7 +157,7 @@ const VisitUs = () => {
       <section className="pb-5 bg-white">
         <div className="container">
           <article className="cs-card p-4 p-lg-5">
-            <div className="row g-4 align-items-center">
+            {/* <div className="row g-4 align-items-center">
               <div className="col-lg-8">
                 <p
                   className="text-uppercase fw-semibold small mb-2"
@@ -200,7 +200,11 @@ const VisitUs = () => {
                   <p className="fw-bold mb-0">4.8/5 Stars</p>
                 </div>
               </div>
-            </div>
+            </div> */}
+            <iframe
+              src="https://0b1c8744c75b4a8fa47935e8949db7a8.elf.site"
+              style={{ border: "none", width: "100%", height: "45vh" }}
+            ></iframe>
           </article>
         </div>
       </section>
