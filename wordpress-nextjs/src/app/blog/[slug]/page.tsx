@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getPostBySlug } from "@/lib/wordpress";
 import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
 import { getMetadata } from "@/lib/wordpress/seo";
+import { mergeSiteUrlMetadata } from "@/lib/site-url";
 import "./blog-details.css";
 
 interface BlogPostProps {
@@ -23,7 +24,7 @@ export async function generateMetadata({
     return { title: "Post Not Found" };
   }
 
-  return getMetadata(post);
+  return mergeSiteUrlMetadata(getMetadata(post), `/blog/${slug}`);
 }
 
 export default async function BlogPost({ params }: BlogPostProps) {

@@ -1,11 +1,23 @@
+import type { Metadata } from "next";
 import {
   getPosts,
   getPages,
   getSiteSettings,
   getMenuByLocation,
 } from "@/lib/wordpress";
+import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute("/diagnostics");
+  return {
+    title: "WordPress API Diagnostics | Car Sales Brisbane",
+    description:
+      "Internal diagnostics for WordPress REST API connectivity (posts, pages, settings, menus).",
+    ...siteUrlMetadataFields(currentUrl, currentRoute),
+  };
+}
 
 export default async function DiagnosticPage() {
   const diagnostics = {

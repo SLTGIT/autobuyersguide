@@ -1,10 +1,17 @@
 import React from "react";
 import { Metadata } from "next";
+import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
 import "./about.css";
-export const metadata: Metadata = {
-  title: "About Us",
-  description: "About Us",
-};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute("/about-us");
+  return {
+    title: "About Car Sales Brisbane and Statewide Auto Group",
+    description:
+      "Car Sales Brisbane is a digital showroom designed to connect Brisbane buyers with the used vehicle range, finance support, and local team behind Statewide Auto Group.",
+    ...siteUrlMetadataFields(currentUrl, currentRoute),
+  };
+}
 
 const page = () => {
   return (

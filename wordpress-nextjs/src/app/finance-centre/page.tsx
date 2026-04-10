@@ -1,13 +1,16 @@
 import { Metadata } from "next";
-import { getSiteSettings } from "@/lib/wordpress";
+import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
 import "./finance-centre.css";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const siteSettings = await getSiteSettings();
+  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute(
+    "/finance-centre"
+  );
   return {
-    // title: siteSettings?.title || 'Home | Statewide Auto Group',
-    title: "Finance Centre | Car Sales Brisbane",
-    description: "Finance Centre | Car Sales Brisbane",
+    title: "Finance Centre Car Sales Brisbane and Statewide Auto Group",
+    description:
+      "Finance-first support for Brisbane buyers, ABN holders, and low-doc applicants. Check finance eligibility, get pre-approval, and get delivery support from Car Sales Brisbane and Statewide Auto Group.",
+    ...siteUrlMetadataFields(currentUrl, currentRoute),
   };
 }
 

@@ -1,4 +1,6 @@
 import "./search.css";
+import type { Metadata } from "next";
+import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,11 +26,16 @@ interface SearchPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export const metadata = {
-  title: "Vehicle inventory | Car Sales Brisbane",
-  description:
-    "Browse new and used cars for sale in Australia. Filter by make, price, and more.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute("/search");
+  return {
+    title:
+      "Used Cars for Sale in Brisbane | Car Sales Brisbane and Statewide Auto Group",
+    description:
+      "Explore used cars, 4x4s, SUVs, and work-ready vehicles with finance-first options from our Ormiston hub.",
+    ...siteUrlMetadataFields(currentUrl, currentRoute),
+  };
+}
 
 function ToolbarFallback() {
   return (

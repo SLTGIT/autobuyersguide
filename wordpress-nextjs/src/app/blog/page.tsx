@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPosts, getCategories } from "@/lib/wordpress";
+import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
 import type { WPPost, WPCategory } from "@/types/wordpress";
 import BlogCard from "@/components/blog/BlogCard";
 import "./blog.css";
 
-export const metadata: Metadata = {
-  title: "Blog | Car Sales Brisbane",
-  description: "Read our latest blog posts about used cars in Australia.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute("/blog");
+  return {
+    title: "Used Car Guides for Brisbane Buyers | Car Sales Brisbane",
+    description:
+      "Read Brisbane used car guides covering car finance, used 4x4s, family SUVs, cheap cars, and first-time buyer tips from Car Sales Brisbane.",
+    ...siteUrlMetadataFields(currentUrl, currentRoute),
+  };
+}
 
 interface BlogPageProps {
   searchParams: Promise<{

@@ -1,5 +1,6 @@
 import { getPageBySlug } from '@/lib/wordpress';
 import { getMetadata } from '@/lib/wordpress/seo';
+import { mergeSiteUrlMetadata } from '@/lib/site-url';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
@@ -21,7 +22,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
         };
     }
 
-    return getMetadata(page);
+    return mergeSiteUrlMetadata(getMetadata(page), `/${params.slug}`);
 }
 
 export default async function DynamicPage(props: PageProps) {

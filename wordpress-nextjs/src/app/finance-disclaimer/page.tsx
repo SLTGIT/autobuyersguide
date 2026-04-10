@@ -1,12 +1,15 @@
 import { Metadata } from "next";
-import { getSiteSettings } from "@/lib/wordpress";
+import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const siteSettings = await getSiteSettings();
+  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute(
+    "/finance-disclaimer"
+  );
   return {
-    // title: siteSettings?.title || 'Home | Statewide Auto Group',
-    title: "Finance Disclaimer | Car Sales Brisbane",
-    description: "Finance Disclaimer | Car Sales Brisbane",
+    title: "Finance Disclaimer Car Sales Brisbane and Statewide Auto Group",
+    description:
+      "Weekly repayment figures are indicative examples only, generated to support UX and SEO intent around finance-first conversion. Actual approval outcomes, deposit requirements, and rates depend on lender assessment, applicant profile, and vehicle selection.",
+    ...siteUrlMetadataFields(currentUrl, currentRoute),
   };
 }
 

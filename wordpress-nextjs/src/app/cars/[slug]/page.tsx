@@ -15,6 +15,7 @@ import VehicleVdpFaq from "@/components/vehicles/VehicleVdpFaq";
 import VehicleDealerComments from "@/components/vehicles/VehicleDealerComments";
 import type { VehicleImage } from "@/types/vehicle";
 import type { DealerVehicle } from "@/types/inventory";
+import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
 
 interface VehicleDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -33,21 +34,22 @@ export async function generateMetadata({ params }: VehicleDetailPageProps) {
   if (!v) return { title: "Vehicle not found | Car Sales Brisbane" };
   const listing = dealerVehicleToListing(v);
   const image = v.Photos?.[0]?.PhotoUrl;
+  const canonicalPath = `/cars/${buildVehicleSlug(v)}`;
+  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute(canonicalPath);
   return {
     title: `${listing.title} | Car Sales Brisbane`,
     description: `${listing.condition} ${listing.title}. ${
       listing.formatted_price ? `From ${listing.formatted_price}. ` : ""
     }View photos and details.`,
+    ...siteUrlMetadataFields(currentUrl, currentRoute),
     openGraph: image
       ? {
           title: listing.title,
           description: listing.formatted_price || listing.title,
           images: [{ url: image }],
+          url: currentUrl,
         }
-      : undefined,
-    alternates: {
-      canonical: `/cars/${buildVehicleSlug(v)}`,
-    },
+      : { url: currentUrl },
   };
 }
 

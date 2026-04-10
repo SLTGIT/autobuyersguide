@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
 import SellMyCarValuationForm from "./SellMyCarValuationForm";
 import "./sell-my-car.css";
 
-export const metadata: Metadata = {
-  title: "Sell My Car | Car Sales Brisbane",
-  description:
-    "Get an obligation-free car valuation at Car Sales Brisbane. Competitive offers, no pressure.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute("/sell-my-car");
+  return {
+    title: "Sell My Car Car Sales Brisbane and Statewide Auto Group",
+    description:
+      "Get an obligation-free car valuation at Car Sales Brisbane and Statewide Auto Group. Competitive offers, no pressure. Sell your car today with no pressure and get a competitive offer.",
+    ...siteUrlMetadataFields(currentUrl, currentRoute),
+  };
+}
 
 const FEATURES = [
   { icon: "bi-wrench", label: "No Obligations" },

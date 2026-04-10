@@ -1,12 +1,15 @@
 import { Metadata } from "next";
-import { getSiteSettings } from "@/lib/wordpress";
+import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const siteSettings = await getSiteSettings();
+  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute(
+    "/terms-of-service"
+  );
   return {
-    // title: siteSettings?.title || 'Home | Statewide Auto Group',
-    title: "Terms of Service | Car Sales Brisbane",
-    description: "Terms of Service | Car Sales Brisbane",
+    title: "Terms of Service Car Sales Brisbane and Statewide Auto Group",
+    description:
+      "Vehicle price, specification, imagery, and finance information on this showroom is referenced from Car Sales Brisbane inventory and should be confirmed before purchase. Finance examples are indicative only and are not guaranteed offers.",
+    ...siteUrlMetadataFields(currentUrl, currentRoute),
   };
 }
 
