@@ -110,7 +110,7 @@ export default function TermsOfService() {
             All Trademarks displayed on this site are subject to the legal
             rights of Statewide Auto Group or the other Trademark owners and the
             unauthorised use of any Trademark displayed on this site is strictly
-            prohibited.
+            prohibited. 
           </p>
         </section>
 
