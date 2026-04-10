@@ -8,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Terms of Service Car Sales Brisbane and Statewide Auto Group",
     description:
-      "Vehicle price, specification, imagery, and finance information on this showroom is referenced from Car Sales Brisbane inventory and should be confirmed before purchase. Finance examples are indicative only and are not guaranteed offers.",
+    "This terms of service explains how we collect, use, and share your personal information when you visit our website or use our services.",
     ...siteUrlMetadataFields(currentUrl, currentRoute),
   };
 }

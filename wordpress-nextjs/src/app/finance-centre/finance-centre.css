@@ -35,4 +35,151 @@
   .cs-title-tight {
     letter-spacing: -0.03em;
   }
+
+  /* Apply for Finance — intro + checklist */
+  .fc-apply-subtitle {
+    line-height: 1.45;
+  }
+
+  .fc-apply-checklist {
+    padding-left: 0;
+  }
+
+  .fc-apply-check-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--cs-primary);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .fc-apply-check-label {
+    font-weight: 600;
+    color: var(--cs-ink, #1e2732);
+    line-height: 1.45;
+    padding-top: 0.2rem;
+  }
+
+  .fc-apply-body {
+    font-size: 1.02rem;
+    line-height: 1.65;
+    max-width: 100%;
+  }
+
+  .fc-apply-body p {
+    margin-bottom: 1.1rem;
+  }
+
+  .fc-apply-inline-link {
+    color: var(--cs-primary);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1.5px;
+  }
+
+  .fc-apply-inline-link:hover {
+    color: var(--cs-primary-dark, #0057c2);
+  }
+
+  /* Finance enquiry form + steps sidebar */
+  .fc-finance-form-section {
+    background: var(--cs-bg, #f3f7fb);
+  }
+
+  .fc-finance-enquiry.cs-contact-form {
+    max-width: none;
+    margin-inline: 0;
+    padding: 0;
+  }
+
+  .fc-budget-chip {
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding-inline: 0.65rem;
+    border-color: #ced4da;
+    color: var(--cs-ink, #1e2732);
+  }
+
+  .fc-budget-chip--active {
+    background: var(--cs-primary) !important;
+    border-color: var(--cs-primary) !important;
+    color: #fff !important;
+  }
+
+  .fc-budget-chip.btn-outline-secondary:hover {
+    border-color: var(--cs-primary);
+    color: var(--cs-primary);
+    background: rgba(20, 81, 181, 0.06);
+  }
+
+  .fc-dob-part {
+    max-width: 4.25rem;
+    text-align: center;
+  }
+
+  .fc-dob-year {
+    max-width: 5.5rem;
+    text-align: center;
+  }
+
+  .fc-dob-sep {
+    user-select: none;
+    font-weight: 500;
+  }
+
+  .fc-finance-steps {
+    border: 1px solid var(--cs-line, #dbe6f2);
+    border-radius: 1.5rem;
+    background: #fff;
+    padding: 1.5rem 1.35rem;
+  }
+
+  @media (min-width: 992px) {
+    .fc-finance-steps {
+      padding: 1.75rem 1.5rem;
+      position: sticky;
+      top: 1.25rem;
+    }
+  }
+
+  .fc-finance-steps__kicker {
+    color: var(--cs-primary);
+    letter-spacing: 0.12em;
+  }
+
+  .fc-finance-step__icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #6a769a1f;
+    color: var(--cs-primary);
+    font-size: 1.05rem;
+  }
+
+  .fc-finance-step__label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cs-primary);
+  }
+
+  .fc-finance-step p {
+    font-size: 0.98rem;
+    line-height: 1.45;
+    color: var(--cs-ink, #1e2732);
+    font-weight: 500;
+  }
   

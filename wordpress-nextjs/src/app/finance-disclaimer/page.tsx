@@ -8,7 +8,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Finance Disclaimer Car Sales Brisbane and Statewide Auto Group",
     description:
-      "Weekly repayment figures are indicative examples only, generated to support UX and SEO intent around finance-first conversion. Actual approval outcomes, deposit requirements, and rates depend on lender assessment, applicant profile, and vehicle selection.",
+      // not more than 152 characters
+      "This finance disclaimer explains how we collect, use, and share your personal information when you visit our website or use our services.",
     ...siteUrlMetadataFields(currentUrl, currentRoute),
   };
 }

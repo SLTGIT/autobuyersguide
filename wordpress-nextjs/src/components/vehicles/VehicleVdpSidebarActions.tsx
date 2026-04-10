@@ -36,7 +36,7 @@ export default function VehicleVdpSidebarActions({
 
   return (
     <div className="vdp-sidebar-actions" role="group" aria-label="Save and share">
-      <button
+      {/* <button
         type="button"
         className={`vdp-icon-btn ${saved ? "is-active" : ""}`}
         onClick={() => setSaved((s) => !s)}
@@ -47,7 +47,7 @@ export default function VehicleVdpSidebarActions({
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
         </svg>
-      </button>
+      </button> */}
       {mailto ? (
         <a className="vdp-icon-btn" href={mailto} aria-label="Email about this vehicle" title="Email">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>

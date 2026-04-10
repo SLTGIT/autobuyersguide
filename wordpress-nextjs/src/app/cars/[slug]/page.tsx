@@ -8,6 +8,7 @@ import { getSimilarVehicles } from "@/lib/inventory/similar";
 import VehicleGallery from "@/components/vehicles/VehicleGallery";
 import VehicleVdpDetailGrid from "@/components/vehicles/VehicleVdpDetailGrid";
 import VehicleVdpSidebarActions from "@/components/vehicles/VehicleVdpSidebarActions";
+import VehicleEnquiryModal from "@/components/vehicles/VehicleEnquiryModal";
 import VehicleSimilarCarousel, {
   type SimilarCarItem,
 } from "@/components/vehicles/VehicleSimilarCarousel";
@@ -25,6 +26,22 @@ function absoluteShareUrl(path: string): string {
   const base = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
   if (base) return `${base}${path}`;
   return path;
+}
+
+function absoluteAssetUrl(url: string, pageUrl: string): string {
+  const u = url.trim();
+  if (!u) return "";
+  if (/^https?:\/\//i.test(u)) return u;
+  let base = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "";
+  if (!base) {
+    try {
+      base = new URL(pageUrl).origin;
+    } catch {
+      return u;
+    }
+  }
+  if (u.startsWith("/")) return `${base}${u}`;
+  return `${base}/${u}`;
 }
 
 export async function generateMetadata({ params }: VehicleDetailPageProps) {
@@ -130,14 +147,25 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
     const proto = hdrs.get("x-forwarded-proto") ?? "http";
     shareUrl = `${proto}://${host}${sharePath}`;
   }
-  const enquireHref = `/contact?subject=${encodeURIComponent(
-    `Enquiry: ${headline} (Stock ${listing.stock_number || "—"})`
-  )}`;
-  const testDriveHref = `/contact?subject=${encodeURIComponent(
-    `Test drive: ${headline} (Stock ${listing.stock_number || "—"})`
-  )}`;
+
+  const enquiryItemImage = absoluteAssetUrl(featured, shareUrl);
+  const enquiryItem = {
+    image: enquiryItemImage,
+    make: v.Make?.trim() || "",
+    model: v.Model?.trim() || "",
+    year: String(listing.year),
+    stock: listing.stock_number || String(v.ItemID),
+    rego: "",
+    status: "In stock",
+    tag: "Auto Buyers Guide",
+    url: shareUrl,
+  };
+  // const getFianceHref = `/contact?subject=${encodeURIComponent(
+  //   `Test drive: ${headline} (Stock ${listing.stock_number || "—"})`
+  // )}`;
+  const getFianceHref = `/finance-centre`;
   const mailto = listing.stock_number
-    ? `mailto:${process.env.NEXT_PUBLIC_DEALER_EMAIL || "sales@example.com"}?subject=${encodeURIComponent(
+    ? `mailto:${process.env.NEXT_PUBLIC_DEALER_EMAIL || "sales@statewideautogroup.com.au"}?subject=${encodeURIComponent(
         `Vehicle enquiry — Stock ${listing.stock_number}`
       )}`
     : undefined;
@@ -343,23 +371,15 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
                   </span>
                   Call {dealerPhone}
                 </a>
-                {/* <Link className="vdp-cta vdp-cta--outline" href={testDriveHref}>
+                <Link className="vdp-cta vdp-cta--outline" href={getFianceHref}>
                   <span className="vdp-cta-icon" aria-hidden>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M5 17h14v-5l-2-4H7l-2 4v5zM7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2" />
                     </svg>
                   </span>
-                  Book a test drive
+                  Get Finance
                 </Link>
-                <Link className="vdp-cta vdp-cta--outline" href={enquireHref}>
-                  <span className="vdp-cta-icon" aria-hidden>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                      <polyline points="22,6 12,13 2,6" />
-                    </svg>
-                  </span>
-                  Enquire now
-                </Link> */}
+                <VehicleEnquiryModal item={enquiryItem} />
               </div>
             </div>
           </aside>

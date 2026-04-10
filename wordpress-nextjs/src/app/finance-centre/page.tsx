@@ -1,15 +1,18 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import FinanceEnquiryForm from "./FinanceEnquiryForm";
+import "../contact/contact.css";
 import "./finance-centre.css";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute(
-    "/finance-centre"
-  );
+  const { currentUrl, currentRoute } =
+    await getCurrentUrlAndRoute("/finance-centre");
   return {
     title: "Finance Centre Car Sales Brisbane and Statewide Auto Group",
     description:
-      "Finance-first support for Brisbane buyers, ABN holders, and low-doc applicants. Check finance eligibility, get pre-approval, and get delivery support from Car Sales Brisbane and Statewide Auto Group.",
+      // not more than 152 characters
+      "Check finance eligibility, get pre-approval, and get delivery support from Car Sales Brisbane and Statewide Auto Group.",
     ...siteUrlMetadataFields(currentUrl, currentRoute),
   };
 }
@@ -62,6 +65,79 @@ export default function FinanceCentre() {
           </div>
         </div>
       </section>
+
+      <section
+        className="py-5 bg-white border-bottom border-light-subtle"
+        aria-labelledby="fc-apply-heading"
+      >
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-lg-10 col-xl-9">
+              <h2
+                id="fc-apply-heading"
+                className="display-6 fw-bold mb-3 cs-title-tight text-dark"
+              >
+                Apply for Finance
+              </h2>
+              <p className="fc-apply-subtitle text-secondary fs-5 mb-4 mb-lg-5">
+                Provider of car finance in Brisbane QLD
+              </p>
+              <ul className="list-unstyled row g-4 fc-apply-checklist mb-4 mb-lg-5">
+                <li className="col-md-6">
+                  <div className="d-flex gap-3 align-items-start">
+                    <span className="fc-apply-check-icon" aria-hidden>
+                      <i className="bi bi-check-lg" />
+                    </span>
+                    <span className="fc-apply-check-label">
+                      Simple, quick, and easy.
+                    </span>
+                  </div>
+                </li>
+                <li className="col-md-6">
+                  <div className="d-flex gap-3 align-items-start">
+                    <span className="fc-apply-check-icon" aria-hidden>
+                      <i className="bi bi-check-lg" />
+                    </span>
+                    <span className="fc-apply-check-label">
+                      Fast approvals and settlements.
+                    </span>
+                  </div>
+                </li>
+              </ul>
+              <div className="fc-apply-body text-secondary">
+                <p>
+                  You&apos;ve found your perfect vehicle — drive it home sooner
+                  with our range of tailored finance solutions.
+                </p>
+                <p>
+                  Statewide Auto Group are here to help you find the right
+                  vehicle finance solution for your next car. Our team are
+                  experts when it comes to helping our customers find the best
+                  finance solution for their budget. Try our used car loans
+                  calculator to compare loans and calculate monthly repayments
+                  depending on interest rates.
+                </p>
+                <p className="mb-0">
+                  At Statewide Auto Group, our car loans Brisbane department are
+                  passionate about getting you behind the wheel sooner. For more
+                  information about any of our finance solutions,{" "}
+                  <Link href="/contact" className="fc-apply-inline-link">
+                    Contact
+                  </Link>{" "}
+                  a friendly member of our team for an obligation-free chat.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-5 border-bottom border-light-subtle fc-finance-form-section">
+        <div className="container">
+          <FinanceEnquiryForm />
+        </div>
+      </section>
+
       <section className="py-5">
         <div className="container">
           <div className="row g-4">

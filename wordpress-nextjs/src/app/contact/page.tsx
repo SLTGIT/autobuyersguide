@@ -8,7 +8,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Contact Car Sales Brisbane and Statewide Auto Group",
     description:
-      "Contact Car Sales Brisbane and the Statewide Auto Group team at Ormiston for used cars, finance pre-approval, sell-my-car enquiries, and Brisbane delivery support.",
+      // not more than 152 characters
+      "Contact Car Sales Brisbane team at Ormiston for used cars, finance pre-approval, sell-my-car enquiries, and Brisbane delivery support.",
     ...siteUrlMetadataFields(currentUrl, currentRoute),
   };
 }

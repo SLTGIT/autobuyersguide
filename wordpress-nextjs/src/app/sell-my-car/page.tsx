@@ -5,11 +5,12 @@ import SellMyCarValuationForm from "./SellMyCarValuationForm";
 import "./sell-my-car.css";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute("/sell-my-car");
+  const { currentUrl, currentRoute } =
+    await getCurrentUrlAndRoute("/sell-my-car");
   return {
     title: "Sell My Car Car Sales Brisbane and Statewide Auto Group",
     description:
-      "Get an obligation-free car valuation at Car Sales Brisbane and Statewide Auto Group. Competitive offers, no pressure. Sell your car today with no pressure and get a competitive offer.",
+      "Sell your car today with no pressure and get a competitive offer. Get an obligation-free car valuation at Car Sales Brisbane and Statewide Auto Group.",
     ...siteUrlMetadataFields(currentUrl, currentRoute),
   };
 }

@@ -1,265 +1,396 @@
 "use client";
 
-import { useActionState, useState, type FormEvent } from "react";
-import type { SellMyCarFormState } from "./actions";
-import { submitSellMyCarValuation } from "./actions";
+import { getAPIUrl } from "@/lib/wordpress";
+import "@/app/contact/contact.css";
+import { useCallback, useState, ChangeEvent, FormEvent } from "react";
 
-const initialState: SellMyCarFormState = {};
+const FORM_TYPE = "Sell My Car Enquiry";
+
+type FormFields = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  vehicleYear: string;
+  vehicleMake: string;
+  vehicleModel: string;
+  odometer: string;
+  rego: string;
+  comments: string;
+};
+
+const emptyForm: FormFields = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  vehicleYear: "",
+  vehicleMake: "",
+  vehicleModel: "",
+  odometer: "",
+  rego: "",
+  comments: "",
+};
+
+function digitsOnly(value: string): string {
+  return value.replace(/\D/g, "");
+}
+
+function buildMessage(values: FormFields): string {
+  const y = values.vehicleYear.trim();
+  const mk = values.vehicleMake.trim();
+  const md = values.vehicleModel.trim();
+  const odo = values.odometer.trim();
+  const rego = values.rego.trim();
+  const comments = values.comments.trim();
+
+  const parts = [
+    "Sell My Car — obligation-free valuation",
+    `Vehicle: ${y} ${mk} ${md}`,
+    odo ? `Odometer: ${odo} km` : null,
+    rego ? `Registration: ${rego}` : null,
+    comments ? `Comments: ${comments}` : null,
+  ].filter(Boolean) as string[];
+
+  return parts.join("\n");
+}
 
 export default function SellMyCarValuationForm() {
-  const [step, setStep] = useState<1 | 2>(1);
-  const [state, formAction, pending] = useActionState(
-    submitSellMyCarValuation,
-    initialState,
-  );
+  const [formData, setFormData] = useState<FormFields>(emptyForm);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [statusMessage, setStatusMessage] = useState("");
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [mobile, setMobile] = useState("");
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    if (status !== "idle") {
+      setStatus("idle");
+      setStatusMessage("");
+    }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  function continueToVehicle(e: FormEvent<HTMLFormElement>) {
+  const dismissSuccess = useCallback(() => {
+    setStatus("idle");
+    setStatusMessage("");
+  }, []);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.currentTarget as HTMLFormElement;
-    if (!form.checkValidity()) {
-      form.reportValidity();
+    setStatus("idle");
+    setStatusMessage("");
+
+    const phoneDigits = digitsOnly(formData.phone);
+    if (phoneDigits.length !== 10) {
+      setStatus("error");
+      setStatusMessage(
+        "Please enter a valid 10-digit Australian mobile number (no country code).",
+      );
       return;
     }
-    setStep(2);
-  }
 
-  if (state?.ok) {
-    return (
-      <div
-        className="smc-form-card smc-form-card--done"
-        role="status"
-      >
-        <div className="alert alert-success mb-0">{state.message}</div>
-      </div>
-    );
-  }
+    const y = formData.vehicleYear.trim();
+    const mk = formData.vehicleMake.trim();
+    const md = formData.vehicleModel.trim();
+    if (!y || !mk || !md) {
+      setStatus("error");
+      setStatusMessage("Please complete year, make, and model.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const body = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        phone: phoneDigits,
+        email: formData.email.trim(),
+        message: buildMessage(formData),
+        form_type: FORM_TYPE,
+        budget: "",
+        dob: "",
+        driverLicence: "",
+        address: "",
+        item: {
+          tag: "Auto Buyers Guide",
+          make: formData.vehicleMake,
+          model: formData.vehicleModel,
+          year: formData.vehicleYear,
+        },
+      };
+
+      const res = await fetch(getAPIUrl("/custom/v1/submit-lead"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setStatus("success");
+        setStatusMessage(
+          "Thank you — your enquiry was sent successfully. We will get back to you soon.",
+        );
+        setFormData(emptyForm);
+      } else {
+        setStatus("error");
+        setStatusMessage(
+          typeof data.message === "string" && data.message
+            ? data.message
+            : "Something went wrong. Please try again in a moment.",
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus("error");
+      setStatusMessage(
+        "We could not send your enquiry. Check your connection and try again.",
+      );
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="smc-form-card">
-      <div className="smc-form-progress-wrap">
-        <div
-          className="smc-form-progress"
-          style={{ width: step === 1 ? "50%" : "100%" }}
-          aria-hidden
-        />
+      <div className="visually-hidden" aria-live="polite" aria-atomic="true">
+        {status === "success" && statusMessage}
+        {status === "error" && statusMessage}
       </div>
-      <p className="smc-form-step-label text-end text-secondary small mb-3 mb-md-4">
-        Step {step} of 2
-      </p>
 
-      {state?.message && !state.ok ? (
-        <div className="alert alert-danger mb-4" role="alert">
-          {state.message}
+      {status === "success" && (
+        <div
+          className="cs-contact-form__alert cs-contact-form__alert--success mb-4"
+          role="status"
+        >
+          <i className="bi bi-check-circle-fill" aria-hidden />
+          <div className="flex-grow-1">
+            <strong className="d-block mb-1">Enquiry received</strong>
+            <span>{statusMessage}</span>
+            <button
+              type="button"
+              className="btn btn-link p-0 mt-2 d-block text-decoration-none fw-semibold"
+              style={{ color: "var(--cs-primary)" }}
+              onClick={dismissSuccess}
+            >
+              Dismiss
+            </button>
+          </div>
         </div>
-      ) : null}
-
-      {step === 1 ? (
-        <form onSubmit={continueToVehicle} noValidate>
-          <h2 className="smc-form-title mb-4">
-            Enquire now for your vehicle price.
-          </h2>
-          <div className="row g-3 mb-3">
-            <div className="col-md-6">
-              <label className="smc-form-label" htmlFor="smc-firstName">
-                First Name<span className="smc-form-req">*</span>
-              </label>
-              <input
-                id="smc-firstName"
-                name="firstNameDraft"
-                type="text"
-                className="form-control smc-form-control"
-                placeholder="First Name"
-                required
-                autoComplete="given-name"
-                value={firstName}
-                onChange={(ev) => setFirstName(ev.target.value)}
-              />
-            </div>
-            <div className="col-md-6">
-              <label className="smc-form-label" htmlFor="smc-lastName">
-                Last Name<span className="smc-form-req">*</span>
-              </label>
-              <input
-                id="smc-lastName"
-                name="lastNameDraft"
-                type="text"
-                className="form-control smc-form-control"
-                placeholder="Last Name"
-                required
-                autoComplete="family-name"
-                value={lastName}
-                onChange={(ev) => setLastName(ev.target.value)}
-              />
-            </div>
-          </div>
-          <div className="mb-3">
-            <label className="smc-form-label" htmlFor="smc-email">
-              Email Address<span className="smc-form-req">*</span>
-            </label>
-            <input
-              id="smc-email"
-              name="emailDraft"
-              type="email"
-              className="form-control smc-form-control"
-              placeholder="Email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(ev) => setEmail(ev.target.value)}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="smc-form-label" htmlFor="smc-mobile">
-              Mobile Number<span className="smc-form-req">*</span>
-            </label>
-            <input
-              id="smc-mobile"
-              name="mobileDraft"
-              type="tel"
-              className="form-control smc-form-control"
-              placeholder="Mobile"
-              required
-              autoComplete="tel"
-              value={mobile}
-              onChange={(ev) => setMobile(ev.target.value)}
-            />
-          </div>
-          <div className="d-flex justify-content-end">
-            <button type="submit" className="btn smc-form-btn">
-              Continue
-            </button>
-          </div>
-        </form>
-      ) : (
-        <form action={formAction}>
-          <input type="hidden" name="firstName" value={firstName} />
-          <input type="hidden" name="lastName" value={lastName} />
-          <input type="hidden" name="email" value={email} />
-          <input type="hidden" name="mobile" value={mobile} />
-
-          <h2 className="smc-form-title mb-4">
-            Tell us about your vehicle
-          </h2>
-          <p className="text-secondary small mb-4">
-            {firstName} {lastName} · {email} · {mobile}
-            <button
-              type="button"
-              className="btn btn-link btn-sm p-0 ms-2 smc-form-back-inline"
-              onClick={() => setStep(1)}
-            >
-              Edit
-            </button>
-          </p>
-
-          <div className="row g-3 mb-3">
-            <div className="col-md-4">
-              <label className="smc-form-label" htmlFor="smc-year">
-                Year<span className="smc-form-req">*</span>
-              </label>
-              <input
-                id="smc-year"
-                name="vehicleYear"
-                type="text"
-                inputMode="numeric"
-                className="form-control smc-form-control"
-                placeholder="e.g. 2018"
-                required
-                autoComplete="off"
-              />
-            </div>
-            <div className="col-md-4">
-              <label className="smc-form-label" htmlFor="smc-make">
-                Make<span className="smc-form-req">*</span>
-              </label>
-              <input
-                id="smc-make"
-                name="vehicleMake"
-                type="text"
-                className="form-control smc-form-control"
-                placeholder="Make"
-                required
-                autoComplete="off"
-              />
-            </div>
-            <div className="col-md-4">
-              <label className="smc-form-label" htmlFor="smc-model">
-                Model<span className="smc-form-req">*</span>
-              </label>
-              <input
-                id="smc-model"
-                name="vehicleModel"
-                type="text"
-                className="form-control smc-form-control"
-                placeholder="Model"
-                required
-                autoComplete="off"
-              />
-            </div>
-          </div>
-          <div className="row g-3 mb-3">
-            <div className="col-md-6">
-              <label className="smc-form-label" htmlFor="smc-odo">
-                Odometer (km)
-              </label>
-              <input
-                id="smc-odo"
-                name="odometer"
-                type="text"
-                inputMode="numeric"
-                className="form-control smc-form-control"
-                placeholder="Optional"
-                autoComplete="off"
-              />
-            </div>
-            <div className="col-md-6">
-              <label className="smc-form-label" htmlFor="smc-rego">
-                Registration
-              </label>
-              <input
-                id="smc-rego"
-                name="rego"
-                type="text"
-                className="form-control smc-form-control"
-                placeholder="Optional"
-                autoComplete="off"
-              />
-            </div>
-          </div>
-          <div className="mb-4">
-            <label className="smc-form-label" htmlFor="smc-extra">
-              Anything else we should know?
-            </label>
-            <textarea
-              id="smc-extra"
-              name="extraComments"
-              className="form-control smc-form-control smc-form-textarea"
-              rows={3}
-              placeholder="Optional"
-            />
-          </div>
-          <div className="d-flex flex-wrap justify-content-between gap-2 align-items-center">
-            <button
-              type="button"
-              className="btn btn-link smc-form-back px-0"
-              onClick={() => setStep(1)}
-            >
-              ← Back
-            </button>
-            <button
-              type="submit"
-              className="btn smc-form-btn"
-              disabled={pending}
-            >
-              {pending ? "Sending…" : "Enquire now"}
-            </button>
-          </div>
-        </form>
       )}
+
+      {status === "error" && (
+        <div
+          className="cs-contact-form__alert cs-contact-form__alert--error mb-4"
+          role="alert"
+        >
+          <i className="bi bi-exclamation-triangle-fill" aria-hidden />
+          <div>
+            <strong className="d-block mb-1">Could not submit</strong>
+            <span>{statusMessage}</span>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} noValidate>
+        <h2 className="smc-form-title mb-4">
+          Enquire now for your vehicle price.
+        </h2>
+
+        <div className="row g-3 mb-3">
+          <div className="col-md-6">
+            <label className="smc-form-label" htmlFor="smc-firstName">
+              First name<span className="smc-form-req">*</span>
+            </label>
+            <input
+              id="smc-firstName"
+              name="firstName"
+              type="text"
+              className="form-control smc-form-control"
+              placeholder="First name"
+              required
+              autoComplete="given-name"
+              value={formData.firstName}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="col-md-6">
+            <label className="smc-form-label" htmlFor="smc-lastName">
+              Last name<span className="smc-form-req">*</span>
+            </label>
+            <input
+              id="smc-lastName"
+              name="lastName"
+              type="text"
+              className="form-control smc-form-control"
+              placeholder="Last name"
+              required
+              autoComplete="family-name"
+              value={formData.lastName}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        <div className="mb-3">
+          <label className="smc-form-label" htmlFor="smc-email">
+            Email address<span className="smc-form-req">*</span>
+          </label>
+          <input
+            id="smc-email"
+            name="email"
+            type="email"
+            className="form-control smc-form-control"
+            placeholder="Email"
+            required
+            autoComplete="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="smc-form-label" htmlFor="smc-phone">
+            Mobile number<span className="smc-form-req">*</span>
+          </label>
+          <input
+            id="smc-phone"
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            className="form-control smc-form-control"
+            placeholder="0412 345 678"
+            required
+            autoComplete="tel"
+            value={formData.phone}
+            onChange={handleChange}
+          />
+          <p className="form-text text-muted small mb-0 mt-1">
+            Australian mobile: 10 digits only.
+          </p>
+        </div>
+
+        <div className="row g-3 mb-3">
+          <div className="col-md-4">
+            <label className="smc-form-label" htmlFor="smc-year">
+              Year<span className="smc-form-req">*</span>
+            </label>
+            <input
+              id="smc-year"
+              name="vehicleYear"
+              type="text"
+              inputMode="numeric"
+              className="form-control smc-form-control"
+              placeholder="e.g. 2018"
+              required
+              autoComplete="off"
+              value={formData.vehicleYear}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="col-md-4">
+            <label className="smc-form-label" htmlFor="smc-make">
+              Make<span className="smc-form-req">*</span>
+            </label>
+            <input
+              id="smc-make"
+              name="vehicleMake"
+              type="text"
+              className="form-control smc-form-control"
+              placeholder="Make"
+              required
+              autoComplete="off"
+              value={formData.vehicleMake}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="col-md-4">
+            <label className="smc-form-label" htmlFor="smc-model">
+              Model<span className="smc-form-req">*</span>
+            </label>
+            <input
+              id="smc-model"
+              name="vehicleModel"
+              type="text"
+              className="form-control smc-form-control"
+              placeholder="Model"
+              required
+              autoComplete="off"
+              value={formData.vehicleModel}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        {/* <div className="row g-3 mb-3">
+          <div className="col-md-6">
+            <label className="smc-form-label" htmlFor="smc-odo">
+              Odometer (km)
+            </label>
+            <input
+              id="smc-odo"
+              name="odometer"
+              type="text"
+              inputMode="numeric"
+              className="form-control smc-form-control"
+              placeholder="Optional"
+              autoComplete="off"
+              value={formData.odometer}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="col-md-6">
+            <label className="smc-form-label" htmlFor="smc-rego">
+              Registration
+            </label>
+            <input
+              id="smc-rego"
+              name="rego"
+              type="text"
+              className="form-control smc-form-control"
+              placeholder="Optional"
+              autoComplete="off"
+              value={formData.rego}
+              onChange={handleChange}
+            />
+          </div>
+        </div> */}
+
+        <div className="mb-4">
+          <label className="smc-form-label" htmlFor="smc-comments">
+            Comments
+          </label>
+          <textarea
+            id="smc-comments"
+            name="comments"
+            className="form-control smc-form-control smc-form-textarea"
+            rows={3}
+            placeholder="Optional"
+            autoComplete="off"
+            value={formData.comments}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="d-flex justify-content-end">
+          <button type="submit" className="btn smc-form-btn" disabled={loading}>
+            {loading ? (
+              <>
+                <span
+                  className="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden
+                />
+                Sending…
+              </>
+            ) : (
+              "Enquire now"
+            )}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

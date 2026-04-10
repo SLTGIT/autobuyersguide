@@ -70,6 +70,7 @@ export default function ContactForm() {
           email: formData.email,
           message: formData.message,
           form_type: formData.enquiryType,
+          budget: "",
           item: {
             tag: "Auto Buyers Guide",
           },
@@ -165,7 +166,10 @@ export default function ContactForm() {
         <form onSubmit={handleSubmit}>
           <div className="row g-3 mb-3">
             <div className="col-md-6">
-              <label className="cs-contact-form__label" htmlFor="contact-firstName">
+              <label
+                className="cs-contact-form__label"
+                htmlFor="contact-firstName"
+              >
                 First name
                 <span className="cs-contact-form__req" aria-hidden>
                   *
@@ -184,7 +188,10 @@ export default function ContactForm() {
             </div>
 
             <div className="col-md-6">
-              <label className="cs-contact-form__label" htmlFor="contact-lastName">
+              <label
+                className="cs-contact-form__label"
+                htmlFor="contact-lastName"
+              >
                 Last name
                 <span className="cs-contact-form__req" aria-hidden>
                   *
@@ -277,7 +284,7 @@ export default function ContactForm() {
 
           <div className="mb-4">
             <label className="cs-contact-form__label" htmlFor="contact-message">
-              Message
+              Comments
               <span className="cs-contact-form__req" aria-hidden>
                 *
               </span>
