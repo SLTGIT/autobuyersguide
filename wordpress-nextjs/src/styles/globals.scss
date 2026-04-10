@@ -26,8 +26,8 @@
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
-  color: var(--white-color);
+  background-color: var(--cs-primary);
+  color: var(--cs-card);
   padding: 0.75rem 1.5rem;
   border-radius: var(--border-radius, 0.25rem);
   font-weight: 600;
@@ -36,7 +36,20 @@
   cursor: pointer;
 
   &:hover {
-    background-color: color-mix(in srgb, var(--primary-color), #000 14%);
+    background-color: color-mix(in srgb, var(--cs-primary), #000 14%);
+  }
+}
+
+.text-primary {
+  color: var(--cs-primary) !important;
+}
+
+.btn-outline-primary {
+  border-color: var(--cs-primary) !important;
+  color: var(--cs-primary) !important;
+  &:hover {
+    background-color: var(--cs-primary) !important;
+    color: var(--cs-card) !important;
   }
 }
 

@@ -1,11 +1,14 @@
 import type { VehicleListing } from "@/types/inventory";
 import {
-  vehicleCardHeadline,
-  vehicleCardSubtitle,
+  vehicleCardHeadlineYearMakeModelTrim,
+  vehicleCardListPrimaryHeadline,
+  vehicleCardListSubtitleLine,
+  vehicleCardFeatureTags,
   vehicleCardOdometerLabel,
 } from "@/lib/inventory/card-display";
 import Link from "next/link";
 import Image from "next/image";
+import VehicleCardSave from "./VehicleCardSave";
 
 interface VehicleCardProps {
   listing: VehicleListing;
@@ -22,13 +25,13 @@ export default function VehicleCard({
   className,
 }: VehicleCardProps) {
   const href = `/cars/${listing.slug}`;
-  const headline = vehicleCardHeadline(listing);
-  const subtitle = vehicleCardSubtitle(listing);
-  const odoLabel =
-    hideOdometer ? null : vehicleCardOdometerLabel(listing);
-  const odoSpec = hideOdometer ? "—" : odoLabel ?? "—";
+  const imageAlt = vehicleCardHeadlineYearMakeModelTrim(listing);
+  const isUsed = listing.condition.trim().toLowerCase() === "used";
+  const odoLabel = hideOdometer ? null : vehicleCardOdometerLabel(listing);
+  const odoSpec = hideOdometer ? "—" : (odoLabel ?? "—");
   const fuelSpec = listing.fuel_type?.trim() || "—";
   const transSpec = listing.transmission?.trim() || "—";
+  const featureTags = vehicleCardFeatureTags(listing);
 
   const articleClass = [
     "inventory-vehicle-card",
@@ -38,53 +41,182 @@ export default function VehicleCard({
     .filter(Boolean)
     .join(" ");
 
+  const imageWrap = (
+    <div className="inventory-card-image-wrap">
+      {isUsed ? <span className="inventory-card-used-badge">Used</span> : null}
+      <Link href={href} className="inventory-card-media-link">
+        {listing.featured_image ? (
+          <Image
+            src={listing.featured_image}
+            alt={imageAlt}
+            width={400}
+            height={260}
+            className="inventory-card-image"
+            sizes={
+              view === "list"
+                ? "(max-width: 600px) 100vw, 320px"
+                : "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            }
+          />
+        ) : (
+          <div className="inventory-card-image inventory-card-image--placeholder">
+            <span>No image</span>
+          </div>
+        )}
+      </Link>
+    </div>
+  );
+
+  if (view === "list") {
+    const primary = vehicleCardListPrimaryHeadline(listing);
+    const subtitle = vehicleCardListSubtitleLine(listing);
+
+    return (
+      <article className={articleClass}>
+        {imageWrap}
+        <div className="inventory-card-list-main">
+          <div className="inventory-card-title-block inventory-card-title-block--list">
+            <Link
+              href={href}
+              className="inventory-card-headline-link inventory-card-headline-link--list"
+            >
+              <h3 className="inventory-card-headline inventory-card-headline--list">
+                {primary}
+              </h3>
+              {subtitle ? (
+                <p className="inventory-card-subtitle inventory-card-subtitle--list">
+                  {subtitle}
+                </p>
+              ) : null}
+            </Link>
+          </div>
+
+          <div
+            className="inventory-card-specs inventory-card-specs--list"
+            aria-label="Key specifications"
+          >
+            <div className="inventory-card-spec inventory-card-spec--list">
+              <div className="d-flex align-items-center gap-2">
+                <i
+                  className="bi bi-speedometer2 inventory-card-spec-icon inventory-card-spec-icon--list"
+                  aria-hidden
+                />
+                <span className="inventory-card-spec-label">Mileage</span>
+              </div>
+              <span className="inventory-card-spec-value">{odoSpec}</span>
+            </div>
+            <div className="inventory-card-spec inventory-card-spec--list">
+              <div className="d-flex align-items-center gap-2">
+              <i
+                className="bi bi-fuel-pump inventory-card-spec-icon inventory-card-spec-icon--list"
+                aria-hidden
+              />
+              <span className="inventory-card-spec-label">Fuel type</span>
+              </div>
+              <span className="inventory-card-spec-value">{fuelSpec}</span>
+            </div>
+            <div className="inventory-card-spec inventory-card-spec--list">
+              <div className="d-flex align-items-center gap-2">
+              <i
+                className="bi bi-gear-wide-connected inventory-card-spec-icon inventory-card-spec-icon--list"
+                aria-hidden
+              />
+              <span className="inventory-card-spec-label">Transmission</span>
+              </div>
+              <span className="inventory-card-spec-value">{transSpec}</span>
+            </div>
+          </div>
+
+          {featureTags.length > 0 ? (
+            <ul className="inventory-card-tags" aria-label="Highlights">
+              {featureTags.map((tag) => (
+                <li key={tag} className="inventory-card-tag fs-6 px-3 py-1">
+                  {tag}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+
+        <aside
+          className="inventory-card-list-aside"
+          aria-label="Price and actions"
+        >
+          {/* <VehicleCardSave listingId={listing.id} /> */}
+          <div className="inventory-card-aside-prices">
+            {listing.compare_at_price ? (
+              <span className="inventory-card-price-was inventory-card-price-was--aside">
+                {listing.compare_at_price}
+              </span>
+            ) : null}
+            {listing.formatted_price ? (
+              <span className="inventory-card-price inventory-card-price--aside">
+                {listing.formatted_price}
+              </span>
+            ) : (
+              <span className="inventory-card-price-muted inventory-card-price-muted--aside">
+                Price on request
+              </span>
+            )}
+            {listing.show_drive_away && listing.drive_away_price ? (
+              <span className="inventory-card-driveaway-note inventory-card-driveaway-note--aside">
+                {listing.drive_away_price} drive away
+              </span>
+            ) : null}
+          </div>
+          <Link href="/finance-centre" className="inventory-card-finance-link">
+            Calculate financing
+          </Link>
+          <Link
+            href={href}
+            className="inventory-card-detail-btn inventory-card-detail-btn--outline"
+          >
+            View details
+            <i
+              className="bi bi-arrow-up-right inventory-card-detail-arrow"
+              aria-hidden
+            />
+          </Link>
+        </aside>
+      </article>
+    );
+  }
+
+  const headline = imageAlt;
+
   return (
     <article className={articleClass}>
-      <div className="inventory-card-image-wrap">
-        <Link href={href} className="inventory-card-media-link">
-          {listing.featured_image ? (
-            <Image
-              src={listing.featured_image}
-              alt={headline}
-              width={400}
-              height={260}
-              className="inventory-card-image"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-          ) : (
-            <div className="inventory-card-image inventory-card-image--placeholder">
-              <span>No image</span>
-            </div>
-          )}
-        </Link>
-      </div>
-
+      {imageWrap}
       <div className="inventory-card-body">
         <div className="inventory-card-main">
           <div className="inventory-card-title-block">
             <Link href={href} className="inventory-card-headline-link">
               <h3 className="inventory-card-headline">{headline}</h3>
             </Link>
-            {/* {subtitle ? (
-              <p className="inventory-card-subtitle" title={subtitle}>
-                {subtitle}
-              </p>
-            ) : null} */}
           </div>
 
           <hr className="inventory-card-rule" />
 
           <div className="inventory-card-specs" aria-label="Key specifications">
             <div className="inventory-card-spec">
-              <i className="bi bi-speedometer2 inventory-card-spec-icon" aria-hidden />
+              <i
+                className="bi bi-speedometer2 inventory-card-spec-icon"
+                aria-hidden
+              />
               <span className="inventory-card-spec-text">{odoSpec}</span>
             </div>
             <div className="inventory-card-spec">
-              <i className="bi bi-fuel-pump inventory-card-spec-icon" aria-hidden />
+              <i
+                className="bi bi-fuel-pump inventory-card-spec-icon"
+                aria-hidden
+              />
               <span className="inventory-card-spec-text">{fuelSpec}</span>
             </div>
             <div className="inventory-card-spec">
-              <i className="bi bi-gear-wide-connected inventory-card-spec-icon" aria-hidden />
+              <i
+                className="bi bi-gear-wide-connected inventory-card-spec-icon"
+                aria-hidden
+              />
               <span className="inventory-card-spec-text">{transSpec}</span>
             </div>
           </div>
@@ -101,9 +233,13 @@ export default function VehicleCard({
                 </span>
               ) : null}
               {listing.formatted_price ? (
-                <span className="inventory-card-price">{listing.formatted_price}</span>
+                <span className="inventory-card-price">
+                  {listing.formatted_price}
+                </span>
               ) : (
-                <span className="inventory-card-price-muted">Price on request</span>
+                <span className="inventory-card-price-muted">
+                  Price on request
+                </span>
               )}
               {listing.show_drive_away && listing.drive_away_price ? (
                 <span className="inventory-card-driveaway-note">
@@ -111,22 +247,14 @@ export default function VehicleCard({
                 </span>
               ) : null}
             </div>
-            <Link href={href} className="inventory-card-detail-link">
-              View Details
-              <i className="bi bi-arrow-up-right inventory-card-detail-arrow" aria-hidden />
+            <Link href={href} className="inventory-card-detail-btn">
+              View details
+              <i
+                className="bi bi-arrow-up-right inventory-card-detail-arrow"
+                aria-hidden
+              />
             </Link>
           </div>
-
-          {listing.location_short ? (
-            <p className="inventory-card-location">
-              <span className="inventory-card-location-icon" aria-hidden>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                </svg>
-              </span>
-              {listing.location_short}
-            </p>
-          ) : null}
         </div>
       </div>
     </article>

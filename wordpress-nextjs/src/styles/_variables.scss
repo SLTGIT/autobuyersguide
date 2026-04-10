@@ -14,7 +14,7 @@ $screen-xl-min: 1200px !default;
 // -----------------------------------------------------------------------------
 // Statewide Auto Group — teal (pin + “auto group”) + near-black wordmark
 $colors: (
-    "primary": #00838f,
+    "primary": rgb(20, 81, 181),
     "secondary": #1a1a1a,
     "light": #f9f9f9,
     "white": #ffffff,
@@ -26,7 +26,7 @@ $colors: (
     "success": #28a745
 );
 
-$cs-primary: #0078ff;
+$cs-primary: rgb(20, 81, 181);
 $cs-primary-dark: #0057c2;
 $cs-ink: #1e2732;
 $cs-muted: #667281;
@@ -48,7 +48,7 @@ $color-light: map.get($colors, "light");
 // Generate Global CSS Variables
 // -----------------------------------------------------------------------------
 :root {
-  --cs-primary: #0078ff;
+  --cs-primary: rgb(20, 81, 181);
   --cs-primary-dark: #0057c2;
   --cs-ink: #1e2732;
   --cs-muted: #667281;

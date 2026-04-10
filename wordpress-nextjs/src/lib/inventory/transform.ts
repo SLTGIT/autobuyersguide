@@ -63,6 +63,7 @@ export function dealerVehicleToListing(v: DealerVehicle): VehicleListing {
     show_drive_away: isDriveAway,
     location_short: shortenLocation(v.Location || ""),
     year: v.ManufactureYear,
+    trim_colour: v.TrimColour?.trim() || "",
   };
 }
 

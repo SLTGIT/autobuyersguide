@@ -16,9 +16,9 @@ export function vehicleCardHeadline(listing: VehicleListing): string {
 }
 
 /**
- * Secondary line: trim / variant text without repeating year + make + model at the start.
+ * Trim / variant text from the listing title with year, make, and model stripped.
  */
-export function vehicleCardSubtitle(listing: VehicleListing): string {
+export function vehicleCardTrimFromTitle(listing: VehicleListing): string {
   const title = listing.title?.trim() || "";
   const year = listing.year;
   const make = listing.make?.trim() || "";
@@ -42,15 +42,97 @@ export function vehicleCardSubtitle(listing: VehicleListing): string {
     if (next.length < s.length) s = next;
   }
 
-  s = s.replace(/\s+/g, " ").trim();
+  return s.replace(/\s+/g, " ").trim();
+}
 
-  if (!s) {
-    const parts = [year ? String(year) : "", listing.body_type?.trim() || ""].filter(
-      Boolean,
-    );
-    return parts.join(" · ");
+/** Card headline: "YEAR Make Model Trim" plus trim colour when present. */
+export function vehicleCardHeadlineYearMakeModelTrim(
+  listing: VehicleListing,
+): string {
+  const year =
+    listing.year != null && listing.year > 0 ? String(listing.year) : "";
+  const make = listing.make?.trim() || "";
+  const model = listing.model?.trim() || "";
+  const trim = vehicleCardTrimFromTitle(listing);
+  const trimColour = listing.trim_colour?.trim() || "";
+  const parts = [year, make, model].filter(Boolean);
+  if (parts.length) return parts.join(" ");
+  return vehicleCardHeadline(listing);
+}
+
+/** List row primary title: "New Make, Model" / "Used Make, Model". */
+export function vehicleCardListPrimaryHeadline(listing: VehicleListing): string {
+  const raw = listing.condition?.trim() || "";
+  const cond =
+    raw.length > 0
+      ? raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase()
+      : "";
+      const year = listing.year != null && listing.year > 0 ? String(listing.year) : "";
+  const make = listing.make?.trim() || "";
+  const model = listing.model?.trim() || "";
+  const mm =
+    make && model ? `${make}, ${model}` : make || model || "";
+  const lead = [year, mm].filter(Boolean).join(" ");
+  if (lead) return lead;
+  return vehicleCardHeadline(listing);
+}
+
+/** List row subtitle: year + variant / trim line (screenshot-style). */
+export function vehicleCardListSubtitleLine(listing: VehicleListing): string {
+  const year =
+    listing.year != null && listing.year > 0 ? String(listing.year) : "";
+  const trim = vehicleCardTrimFromTitle(listing);
+  const tc = listing.trim_colour?.trim() || "";
+  const tail: string[] = [];
+  if (trim) tail.push(trim);
+  if (tc && !trim.toLowerCase().includes(tc.toLowerCase())) {
+    tail.push(tc);
   }
-  return s;
+  if (year && tail.length) {
+    return `${year} ${tail.join(" ")}`.trim();
+  }
+  if (year && !tail.length) {
+    const bt = listing.body_type?.trim();
+    return bt ? `${year} ${bt}` : year;
+  }
+  if (tail.length) return tail.join(" ");
+  const t = listing.title?.trim();
+  return t || "";
+}
+
+/** Short feature pills for list cards (feed has no equipment list). */
+export function vehicleCardFeatureTags(
+  listing: VehicleListing,
+  max = 3,
+): string[] {
+  const candidates = [
+    listing.body_type?.trim(),
+    listing.drive_type?.trim(),
+    listing.fuel_type?.trim(),
+  ].filter(Boolean) as string[];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const c of candidates) {
+    const key = c.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(c);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+/**
+ * Secondary line: trim / variant text without repeating year + make + model at the start.
+ */
+export function vehicleCardSubtitle(listing: VehicleListing): string {
+  const s = vehicleCardTrimFromTitle(listing);
+  if (s) return s;
+  const parts = [
+    listing.year ? String(listing.year) : "",
+    listing.body_type?.trim() || "",
+  ].filter(Boolean);
+  return parts.join(" · ");
 }
 
 export function vehicleCardOdometerLabel(listing: VehicleListing): string | null {

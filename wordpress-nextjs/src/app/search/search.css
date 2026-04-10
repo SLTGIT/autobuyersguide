@@ -1,7 +1,5 @@
 .cs-page-hero {
-  background:
-    linear-gradient(135deg, rgba(16, 46, 87, 0.96), rgba(0, 120, 255, 0.84)),
-    linear-gradient(180deg, #0f3565, #0078ff);
+  background: rgb(12, 49, 109);
 }
 
 /* Compact SRP hero — short height, capped image (full-size img was driving section height) */

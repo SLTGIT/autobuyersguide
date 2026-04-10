@@ -21,14 +21,14 @@ export default function HomeBanner() {
             </p>
             <div className="d-flex flex-wrap gap-3">
               <a
-                className="btn btn-light btn-lg cs-pill fw-semibold cs-cta-strong"
+                className="btn btn-primary btn-lg cs-pill fw-semibold cs-cta-strong"
                 href="/search"
               >
                 Browse All Vehicles
               </a>
               <a
                 className="btn btn-light btn-lg cs-pill cs-cta-strong text-primary"
-                href="#finance-centre"
+                href="/finance-centre"
               >
                 Check Finance Eligibility
               </a>

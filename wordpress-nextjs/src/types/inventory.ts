@@ -21,6 +21,8 @@ export interface DealerVehicle {
   BodyType: string;
   FuelType: string;
   BodyColour: string;
+  /** Interior / trim colour when provided by the feed. */
+  TrimColour?: string;
   DriveType: string;
   TransmissionType: string;
   Type: string;
@@ -64,6 +66,8 @@ export interface VehicleListing {
   show_drive_away: boolean;
   location_short: string;
   year: number;
+  /** Feed TrimColour — shown in card headline after trim when present. */
+  trim_colour: string;
 }
 
 export interface FilterOptionCount {
