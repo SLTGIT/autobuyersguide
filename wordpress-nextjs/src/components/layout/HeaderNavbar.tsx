@@ -50,6 +50,11 @@ export default function HeaderNavbar() {
               </a>
             </li>
             <li className="nav-item">
+              <a className="nav-link text-dark" href="/" onClick={closeNav}>
+                About Us
+              </a>
+            </li>
+            <li className="nav-item">
               <a
                 className="nav-link text-dark"
                 href="/search"
