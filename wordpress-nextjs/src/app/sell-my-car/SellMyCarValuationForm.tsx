@@ -114,7 +114,7 @@ export default function SellMyCarValuationForm() {
         driverLicence: "",
         address: "",
         item: {
-          tag: "Auto Buyers Guide",
+          tag: "Car Sales Brisbane",
           make: formData.vehicleMake,
           model: formData.vehicleModel,
           year: formData.vehicleYear,

@@ -160,7 +160,7 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
     stock: listing.stock_number || String(v.ItemID),
     rego: "",
     status: "In stock",
-    tag: "Auto Buyers Guide",
+    tag: "Car Sales Brisbane",
     url: shareUrl,
   };
   // const getFianceHref = `/contact?subject=${encodeURIComponent(

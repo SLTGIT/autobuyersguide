@@ -72,7 +72,7 @@ export default function ContactForm() {
           form_type: formData.enquiryType,
           budget: "",
           item: {
-            tag: "Auto Buyers Guide",
+            tag: "Car Sales Brisbane",
           },
         }),
       });
@@ -250,9 +250,7 @@ export default function ContactForm() {
               value={formData.phone}
               onChange={handleChange}
             />
-            <p className="form-text text-muted small mb-0 mt-1">
-              Australian mobile or landline: 10 digits only.
-            </p>
+            <p className="form-text text-muted small mb-0 mt-1"></p>
           </div>
 
           <div className="mb-3">
