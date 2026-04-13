@@ -106,9 +106,9 @@ export default function HeaderNavbar() {
                     About Us
                   </a>
                 </li>
-                <li className="nav-item">
+                <li>
                   <a
-                    className="nav-link text-dark"
+                    className="dropdown-item"
                     href="/contact"
                     onClick={closeNav}
                   >
