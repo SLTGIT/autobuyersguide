@@ -246,7 +246,7 @@ export default function ContactForm() {
               pattern="[0-9]{10}"
               maxLength={10}
               autoComplete="tel"
-              placeholder="10 digits, no spaces"
+              placeholder=""
               value={formData.phone}
               onChange={handleChange}
             />

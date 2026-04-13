@@ -341,7 +341,7 @@ export default function FinanceEnquiryForm() {
                   className="form-control cs-contact-form__control"
                   required
                   autoComplete="tel"
-                  placeholder="0412 345 678"
+                  placeholder=""
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />

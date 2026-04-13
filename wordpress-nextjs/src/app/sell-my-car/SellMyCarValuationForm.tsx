@@ -261,14 +261,14 @@ export default function SellMyCarValuationForm() {
             type="tel"
             inputMode="tel"
             className="form-control smc-form-control"
-            placeholder="0412 345 678"
+            placeholder=""
             required
             autoComplete="tel"
             value={formData.phone}
             onChange={handleChange}
           />
           <p className="form-text text-muted small mb-0 mt-1">
-            Australian mobile: 10 digits only.
+            
           </p>
         </div>
 

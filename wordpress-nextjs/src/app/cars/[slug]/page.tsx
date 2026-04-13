@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { notFound, permanentRedirect } from "next/navigation";
 import { fetchDealerInventory } from "@/lib/dealer-solutions/fetch-inventory";
 import { dealerVehicleToListing, typeCodeLabel } from "@/lib/inventory/transform";
@@ -16,7 +15,12 @@ import VehicleVdpFaq from "@/components/vehicles/VehicleVdpFaq";
 import VehicleDealerComments from "@/components/vehicles/VehicleDealerComments";
 import type { VehicleImage } from "@/types/vehicle";
 import type { DealerVehicle } from "@/types/inventory";
-import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import {
+  getCurrentUrlAndRoute,
+  normalizePublicSiteBase,
+  resolvePublicOriginFromRequest,
+  siteUrlMetadataFields,
+} from "@/lib/site-url";
 
 interface VehicleDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -24,7 +28,7 @@ interface VehicleDetailPageProps {
 
 function absoluteShareUrl(path: string): string {
   const base = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
-  if (base) return `${base}${path}`;
+  if (base) return `${normalizePublicSiteBase(base)}${path}`;
   return path;
 }
 
@@ -32,7 +36,9 @@ function absoluteAssetUrl(url: string, pageUrl: string): string {
   const u = url.trim();
   if (!u) return "";
   if (/^https?:\/\//i.test(u)) return u;
-  let base = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "";
+  let base = "";
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+  if (raw) base = normalizePublicSiteBase(raw);
   if (!base) {
     try {
       base = new URL(pageUrl).origin;
@@ -142,10 +148,7 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
   const sharePath = `/cars/${canonicalSlug}`;
   let shareUrl = absoluteShareUrl(sharePath);
   if (!shareUrl.startsWith("http")) {
-    const hdrs = await headers();
-    const host = hdrs.get("x-forwarded-host") ?? hdrs.get("host") ?? "localhost:3000";
-    const proto = hdrs.get("x-forwarded-proto") ?? "http";
-    shareUrl = `${proto}://${host}${sharePath}`;
+    shareUrl = `${await resolvePublicOriginFromRequest()}${sharePath}`;
   }
 
   const enquiryItemImage = absoluteAssetUrl(featured, shareUrl);

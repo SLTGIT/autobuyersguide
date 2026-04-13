@@ -362,7 +362,7 @@ export default function VehicleEnquiryModal({ item }: VehicleEnquiryModalProps) 
                     className="form-control cs-contact-form__control"
                     required
                     autoComplete="tel"
-                    placeholder="0412 345 678"
+                    placeholder=""
                     value={phone}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setPhone(e.target.value)
