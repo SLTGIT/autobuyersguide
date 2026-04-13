@@ -133,7 +133,7 @@ export default function VehicleEnquiryModal({ item }: VehicleEnquiryModalProps) 
         phone: phoneDigits,
         email: email.trim(),
         message,
-        form_type: "used vehicle",
+        form_type: "Used Vehicle Enquiry",
         budget: "",
         dob: "",
         driverLicence: "",

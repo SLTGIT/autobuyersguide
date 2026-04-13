@@ -50,17 +50,21 @@ export default function HeaderNavbar() {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link text-dark" href="/" onClick={closeNav}>
-                About Us
-              </a>
-            </li>
-            <li className="nav-item">
               <a
                 className="nav-link text-dark"
                 href="/search"
                 onClick={closeNav}
               >
                 Used Cars for sale
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                className="nav-link text-dark"
+                href="/search?driveType=4WD&driveType=4x4"
+                onClick={closeNav}
+              >
+                Used 4x4s For Sale
               </a>
             </li>
             <li className="nav-item">
@@ -81,14 +85,64 @@ export default function HeaderNavbar() {
                 Finance Pre-Approval
               </a>
             </li>
-            <li className="nav-item">
+            <li className="nav-item dropdown">
               <a
-                className="nav-link text-dark"
-                href="/contact"
-                onClick={closeNav}
+                className="nav-link dropdown-toggle text-dark"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                onClick={(e) => e.preventDefault()}
               >
-                Contact
+                Company
               </a>
+              <ul className="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a
+                    className="dropdown-item"
+                    href="/about-us"
+                    onClick={closeNav}
+                  >
+                    About Us
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    className="nav-link text-dark"
+                    href="/contact"
+                    onClick={closeNav}
+                  >
+                    Contact
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="dropdown-item"
+                    href="/terms-of-service"
+                    onClick={closeNav}
+                  >
+                    Terms of Service
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="dropdown-item"
+                    href="/privacy-policy"
+                    onClick={closeNav}
+                  >
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="dropdown-item"
+                    href="/finance-disclaimer"
+                    onClick={closeNav}
+                  >
+                    Finance Disclaimer
+                  </a>
+                </li>
+              </ul>
             </li>
           </ul>
         </div>

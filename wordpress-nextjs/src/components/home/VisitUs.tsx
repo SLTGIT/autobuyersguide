@@ -67,7 +67,7 @@ const VisitUs = () => {
                       </a>
                     </div>
                   </div>
-                  <hr className="my-0" />
+                  {/* <hr className="my-0" />
                   <div className="cs-contact-row">
                     <span className="cs-contact-icon">
                       <i className="bi bi-star-fill"></i>
@@ -98,7 +98,7 @@ const VisitUs = () => {
                       </div>
                       <div className="fw-bold fs-4">4.8/5 Stars</div>
                     </div>
-                  </div>
+                  </div> */}
                   <hr className="my-0" />
                   <div className="cs-contact-row">
                     <span className="cs-contact-icon">
@@ -114,7 +114,7 @@ const VisitUs = () => {
                       <div className="d-flex gap-3">
                         <a
                           className="cs-social-btn cs-social-facebook"
-                          href="#"
+                          href="https://www.facebook.com/share/1DREXJCBhb/?mibextid=wwXIfr"
                           aria-label="Facebook"
                         >
                           <img
@@ -130,7 +130,7 @@ const VisitUs = () => {
                         </a>
                         <a
                           className="cs-social-btn cs-social-instagram"
-                          href="#"
+                          href="https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr"
                           aria-label="Instagram"
                         >
                           <img

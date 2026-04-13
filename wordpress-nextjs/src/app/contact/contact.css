@@ -236,3 +236,22 @@
   border-color: rgba(220, 53, 69, 0.35);
   color: #842029;
 }
+
+.cs-social-btn {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.cs-social-facebook {
+  background: #1877f2;
+}
+
+.cs-social-instagram {
+  background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af, #515bd4);
+}
