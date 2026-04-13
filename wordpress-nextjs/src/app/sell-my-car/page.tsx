@@ -219,6 +219,7 @@ export default function SellMyCarPage() {
                         <a
                           className="cs-social-btn cs-social-facebook"
                           href="https://www.facebook.com/share/1DREXJCBhb/?mibextid=wwXIfr"
+                          target="_blank"
                           aria-label="Facebook"
                         >
                           <img
@@ -235,6 +236,7 @@ export default function SellMyCarPage() {
                         <a
                           className="cs-social-btn cs-social-instagram"
                           href="https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr"
+                          target="_blank"
                           aria-label="Instagram"
                         >
                           <img

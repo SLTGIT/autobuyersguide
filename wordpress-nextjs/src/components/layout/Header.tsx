@@ -42,10 +42,10 @@ export default function Header() {
             <a href="https://www.facebook.com/share/1DREXJCBhb/?mibextid=wwXIfr" target="_blank" aria-label="Facebook">
               <i className="bi bi-facebook"></i>
             </a>
-            <a href="https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr" aria-label="Instagram">
+            <a href="https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr" target="_blank" aria-label="Instagram">
               <i className="bi bi-instagram"></i>
             </a>
-            <a href="https://www.tiktok.com/@carsalesbrisbane?_r=1&_t=ZS-95OLtLR1kfQ" aria-label="TikTok">
+            <a href="https://www.tiktok.com/@carsalesbrisbane?_r=1&_t=ZS-95OLtLR1kfQ" target="_blank" aria-label="TikTok">
               <i className="bi bi-tiktok"></i>
             </a>
             {/* <a href="#" aria-label="YouTube">

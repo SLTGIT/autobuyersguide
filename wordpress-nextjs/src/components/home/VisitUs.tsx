@@ -116,6 +116,7 @@ const VisitUs = () => {
                           className="cs-social-btn cs-social-facebook"
                           href="https://www.facebook.com/share/1DREXJCBhb/?mibextid=wwXIfr"
                           aria-label="Facebook"
+                          target="_blank"
                         >
                           <img
                             alt="Facebook"
@@ -132,6 +133,7 @@ const VisitUs = () => {
                           className="cs-social-btn cs-social-instagram"
                           href="https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr"
                           aria-label="Instagram"
+                          target="_blank"
                         >
                           <img
                             alt="Instagram"
