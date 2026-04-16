@@ -109,6 +109,15 @@ export default function HeaderNavbar() {
                 <li>
                   <a
                     className="dropdown-item"
+                    href="/blog"
+                    onClick={closeNav}
+                  >
+                    Blog
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="dropdown-item"
                     href="/contact"
                     onClick={closeNav}
                   >
@@ -131,15 +140,6 @@ export default function HeaderNavbar() {
                     onClick={closeNav}
                   >
                     Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="dropdown-item"
-                    href="/finance-disclaimer"
-                    onClick={closeNav}
-                  >
-                    Finance Disclaimer
                   </a>
                 </li>
               </ul>
