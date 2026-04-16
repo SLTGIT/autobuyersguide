@@ -1,5 +1,5 @@
 .cs-page-hero {
-  background: rgb(12, 49, 109);
+  background: var(--cs-primary);
 }
 .cs-panel,
 .cs-card {

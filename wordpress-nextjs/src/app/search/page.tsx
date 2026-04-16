@@ -83,9 +83,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <div className="container py-lg-2">
           <div className="row g-3 g-lg-4 align-items-center">
             <div className="col-lg-7">
-              <span className="badge cs-hero-chip cs-pill px-3 py-1 mb-2">
+              {/* <span className="badge cs-hero-chip cs-pill px-3 py-1 mb-2">
                 Used Cars For Sale
-              </span>
+              </span> */}
               <h1 className="search-page-hero-title fw-bold mb-2 cs-title-tight">
                 Browse Used Cars for Sale in Brisbane
               </h1>

@@ -1455,8 +1455,8 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
         pointer-events: none;
     }
     &:not(.is-disabled):hover {
-        border-color: var(--primary, $color-primary);
-        color: var(--primary, $color-primary);
+        border-color: var(--cs-primary);
+        color: rgb(2, 2, 2);
     }
 }
 

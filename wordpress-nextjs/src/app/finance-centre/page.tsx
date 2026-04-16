@@ -24,9 +24,9 @@ export default function FinanceCentre() {
         <div className="container py-lg-4">
           <div className="row g-4 align-items-center">
             <div className="col-lg-7">
-              <span className="badge cs-hero-chip cs-pill px-3 py-2 mb-3">
+              {/* <span className="badge cs-hero-chip cs-pill px-3 py-2 mb-3">
                 Finance Pre-Approval
-              </span>
+              </span> */}
               <h1 className="display-5 fw-bold mb-3 cs-title-tight">
                 Check Finance Eligibility
               </h1>

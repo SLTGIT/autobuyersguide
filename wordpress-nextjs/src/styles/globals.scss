@@ -36,7 +36,7 @@
   cursor: pointer;
 
   &:hover {
-    background-color: color-mix(in srgb, var(--cs-primary), #000 14%);
+    background-color: #23898f !important;
   }
 }
 
@@ -51,6 +51,10 @@
     background-color: var(--cs-primary) !important;
     color: var(--cs-card) !important;
   }
+}
+
+.btn:hover{
+  border-color: rgb(176, 216, 195) !important;
 }
 
 // Pages will be migrated similarly
