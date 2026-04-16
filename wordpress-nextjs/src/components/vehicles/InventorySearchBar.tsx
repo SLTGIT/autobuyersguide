@@ -30,7 +30,7 @@ export default function InventorySearchBar() {
       <input
         type="search"
         className="inventory-search-input"
-        placeholder="Keyword search eg. EV, SUV, Toyota"
+        placeholder="Keyword search eg. Sedan, Toyota"
         value={q}
         onChange={(e) => setQ(e.target.value)}
         aria-label="Search inventory"
