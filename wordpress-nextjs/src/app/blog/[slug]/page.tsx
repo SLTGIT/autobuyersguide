@@ -1,10 +1,17 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import type { Metadata } from "next";
 import { getPostBySlug } from "@/lib/wordpress";
 import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
 import { getMetadata } from "@/lib/wordpress/seo";
-import { mergeSiteUrlMetadata } from "@/lib/site-url";
+import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from "@/lib/site-url";
+import JsonLd from "@/components/JsonLd";
+import {
+  breadcrumbJsonLd,
+  jsonLdGraph,
+  organizationJsonLd,
+  stripHtml,
+  webSiteJsonLd,
+} from "@/lib/json-ld";
 import "./blog-details.css";
 
 interface BlogPostProps {
@@ -37,17 +44,64 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
   const featuredImage = post._embedded?.["wp:featuredmedia"]?.[0];
   const author = post._embedded?.author?.[0];
-  const postCategories = post._embedded?.["wp:term"]?.[0] || [];
-  const primaryCategory = postCategories[0];
 
-  const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const [{ currentUrl: articleUrl }, { currentUrl: blogCanonicalUrl }] =
+    await Promise.all([
+      getCurrentUrlAndRoute(`/blog/${slug}`),
+      getCurrentUrlAndRoute("/blog"),
+    ]);
+  const origin = new URL(articleUrl).origin;
+  const blogEntityId = `${blogCanonicalUrl}#blog`;
+  const headline = stripHtml(post.title.rendered);
+  const excerpt = stripHtml(post.excerpt.rendered);
+  const imageUrl = featuredImage?.source_url as string | undefined;
+  const authorName = author?.name as string | undefined;
+
+  const blogPosting: Record<string, unknown> = {
+    "@type": "BlogPosting",
+    "@id": `${articleUrl}#article`,
+    headline,
+    url: articleUrl,
+    datePublished: post.date,
+    dateModified: post.modified,
+    publisher: { "@id": `${origin}/#organization` },
+    isPartOf: { "@id": blogEntityId },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${articleUrl}#webpage`,
+    },
+  };
+  if (imageUrl) blogPosting.image = [imageUrl];
+  if (authorName) {
+    blogPosting.author = { "@type": "Person", name: authorName };
+  }
+  if (excerpt) blogPosting.description = excerpt;
+
+  const jsonLd = jsonLdGraph(
+    organizationJsonLd(origin),
+    webSiteJsonLd(origin),
+    {
+      "@type": "Blog",
+      "@id": blogEntityId,
+      name: "Used Car Guides for Brisbane Buyers",
+      url: blogCanonicalUrl,
+      publisher: { "@id": `${origin}/#organization` },
+      isPartOf: { "@id": `${origin}/#website` },
+    },
+    blogPosting,
+    breadcrumbJsonLd(articleUrl, [
+      { name: "Home", item: `${origin}/` },
+      { name: "Blog", item: blogCanonicalUrl },
+      {
+        name: headline.length > 90 ? `${headline.slice(0, 87)}…` : headline,
+        item: articleUrl,
+      },
+    ]),
+  );
 
   return (
     <div className="bg-white min-vh-100">
+      <JsonLd data={jsonLd} />
       {/* <div className="container pt-4">
         Back Link
         <Link

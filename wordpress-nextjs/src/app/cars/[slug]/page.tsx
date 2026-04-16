@@ -21,6 +21,15 @@ import {
   resolvePublicOriginFromRequest,
   siteUrlMetadataFields,
 } from "@/lib/site-url";
+import JsonLd from "@/components/JsonLd";
+import {
+  breadcrumbJsonLd,
+  jsonLdGraph,
+  organizationJsonLd,
+  vehicleJsonLdFromInventory,
+  webPageJsonLd,
+  webSiteJsonLd,
+} from "@/lib/json-ld";
 
 interface VehicleDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -228,8 +237,40 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
   const condLower = (listing.condition || "used").toLowerCase();
   const isNew = condLower === "new";
 
+  const { currentUrl: pageUrl } = await getCurrentUrlAndRoute(sharePath);
+  const origin = new URL(pageUrl).origin;
+  const vehicleNode = vehicleJsonLdFromInventory(origin, v, listing);
+  vehicleNode["@id"] = `${pageUrl}#vehicle`;
+  vehicleNode.url = pageUrl;
+  const offers = vehicleNode.offers;
+  if (offers && typeof offers === "object") {
+    (offers as Record<string, unknown>).url = pageUrl;
+  }
+  const vdpDescription = `${listing.condition} ${listing.title}. ${
+    listing.formatted_price ? `From ${listing.formatted_price}. ` : ""
+  }View photos and details.`;
+  const jsonLd = jsonLdGraph(
+    organizationJsonLd(origin),
+    webSiteJsonLd(origin),
+    webPageJsonLd({
+      pageUrl,
+      name: `${listing.title} | Car Sales Brisbane`,
+      description: vdpDescription,
+    }),
+    vehicleNode,
+    breadcrumbJsonLd(pageUrl, [
+      { name: "Home", item: `${origin}/` },
+      { name: "Search", item: `${origin}/search` },
+      {
+        name: headline.length > 70 ? `${headline.slice(0, 67)}…` : headline,
+        item: pageUrl,
+      },
+    ]),
+  );
+
   return (
     <div className="vehicles-page vehicle-detail-page inventory-vdp inventory-vdp--design">
+      <JsonLd data={jsonLd} />
       <div className="vehicles-container inventory-vdp-container">
         <nav className="inventory-breadcrumb vdp-breadcrumb" aria-label="Breadcrumb">
           <Link href="/">Home</Link>

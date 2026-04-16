@@ -8,7 +8,7 @@ function formatAudPrice(raw: string | undefined): string {
   return `$${Math.round(n).toLocaleString("en-AU")}`;
 }
 
-function priceNumber(raw: string | undefined): number | null {
+export function priceNumber(raw: string | undefined): number | null {
   if (raw === undefined || raw === null || String(raw).trim() === "") return null;
   const n = Number(String(raw).replace(/[^\d.]/g, ""));
   return Number.isNaN(n) ? null : n;

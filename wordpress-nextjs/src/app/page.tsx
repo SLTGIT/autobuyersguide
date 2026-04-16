@@ -2,6 +2,14 @@ import { Metadata } from "next";
 export const dynamic = "force-dynamic";
 import { getSiteSettings } from "@/lib/wordpress";
 import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import JsonLd from "@/components/JsonLd";
+import {
+  autoDealerJsonLd,
+  jsonLdGraph,
+  organizationJsonLd,
+  webPageJsonLd,
+  webSiteJsonLd,
+} from "@/lib/json-ld";
 import HomeBanner from "@/components/home/HomeBanner";
 import PopularCarTypes from "@/components/home/PopularCarTypes";
 import PopularBrandsSlider from "@/components/home/PopularBrandsSlider";
@@ -26,11 +34,24 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  // Note: Previous recentPosts fetch removed as it's not part of the new design.
-  // Use getPosts if you need to display blog posts in the future.
+  const { currentUrl } = await getCurrentUrlAndRoute(HOME_PATH);
+  const origin = new URL(currentUrl).origin;
+  const homeDescription =
+    "Access 60+ premium 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.";
+  const jsonLd = jsonLdGraph(
+    organizationJsonLd(origin),
+    webSiteJsonLd(origin, { includeSearchAction: true }),
+    autoDealerJsonLd(origin),
+    webPageJsonLd({
+      pageUrl: currentUrl,
+      name: "Quality Used Cars Brisbane | Expert Finance & Sourcing",
+      description: homeDescription,
+    }),
+  );
 
   return (
     <>
+      <JsonLd data={jsonLd} />
       <HomeBanner />
       {/* <SearchForm /> */}
       {/* <CitySearchSlider /> */}

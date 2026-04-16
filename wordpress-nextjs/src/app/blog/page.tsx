@@ -4,7 +4,25 @@ import { getPosts, getCategories } from "@/lib/wordpress";
 import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
 import type { WPPost, WPCategory } from "@/types/wordpress";
 import BlogCard from "@/components/blog/BlogCard";
+import JsonLd from "@/components/JsonLd";
+import {
+  jsonLdGraph,
+  organizationJsonLd,
+  stripHtml,
+  webSiteJsonLd,
+} from "@/lib/json-ld";
 import "./blog.css";
+
+function blogListingPath(
+  page: number,
+  categoryId: number | undefined
+): string {
+  const sp = new URLSearchParams();
+  if (page > 1) sp.set("page", String(page));
+  if (categoryId) sp.set("category", String(categoryId));
+  const q = sp.toString();
+  return q ? `/blog?${q}` : "/blog";
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const { currentUrl, currentRoute } = await getCurrentUrlAndRoute("/blog");
@@ -54,8 +72,113 @@ export default async function Blog({ searchParams }: BlogPageProps) {
   const hasNextPage = posts.length === postsPerPage;
   const hasPrevPage = currentPage > 1;
 
+  const listingPath = blogListingPath(currentPage, categoryFilter);
+  const [{ currentUrl: listingPageUrl }, { currentUrl: blogCanonicalUrl }] =
+    await Promise.all([
+      getCurrentUrlAndRoute(listingPath),
+      getCurrentUrlAndRoute("/blog"),
+    ]);
+  const origin = new URL(listingPageUrl).origin;
+  const blogEntityId = `${blogCanonicalUrl}#blog`;
+
+  const pageTitle =
+    "Used Car Guides for Brisbane Buyers | Car Sales Brisbane";
+  const pageDescription =
+    "Read Brisbane used car guides covering car finance, used 4x4s, family SUVs, cheap cars, and first-time buyer tips from Car Sales Brisbane.";
+
+  const blogPostingSchemas: Record<string, unknown>[] = posts.map((post) => {
+    const headline = stripHtml(post.title.rendered);
+    const imageUrl = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url as
+      | string
+      | undefined;
+    const authorName = post._embedded?.author?.[0]?.name as string | undefined;
+    const excerpt = stripHtml(post.excerpt.rendered);
+    const articleUrl = `${origin}/blog/${post.slug}`;
+    const blogPosting: Record<string, unknown> = {
+      "@type": "BlogPosting",
+      "@id": `${articleUrl}#article`,
+      headline,
+      url: articleUrl,
+      datePublished: post.date,
+      dateModified: post.modified,
+      publisher: { "@id": `${origin}/#organization` },
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": `${articleUrl}#webpage`,
+      },
+      isPartOf: { "@id": blogEntityId },
+    };
+    if (imageUrl) blogPosting.image = [imageUrl];
+    if (authorName) {
+      blogPosting.author = {
+        "@type": "Person",
+        name: authorName,
+      };
+    }
+    if (excerpt) blogPosting.description = excerpt;
+    return blogPosting;
+  });
+
+  const itemListElements = blogPostingSchemas.map((bp, index) => ({
+    "@type": "ListItem",
+    position: (currentPage - 1) * postsPerPage + index + 1,
+    item: { "@id": bp["@id"] as string },
+  }));
+
+  const jsonLd = jsonLdGraph(
+      organizationJsonLd(origin),
+      webSiteJsonLd(origin),
+      {
+        "@type": "Blog",
+        "@id": blogEntityId,
+        name: "Used Car Guides for Brisbane Buyers",
+        description: pageDescription,
+        url: blogCanonicalUrl,
+        publisher: { "@id": `${origin}/#organization` },
+        isPartOf: { "@id": `${origin}/#website` },
+      },
+      {
+        "@type": "CollectionPage",
+        "@id": `${listingPageUrl}#webpage`,
+        name: pageTitle,
+        description: pageDescription,
+        url: listingPageUrl,
+        isPartOf: { "@id": `${origin}/#website` },
+        publisher: { "@id": `${origin}/#organization` },
+        ...(itemListElements.length > 0
+          ? {
+              mainEntity: {
+                "@type": "ItemList",
+                numberOfItems: posts.length,
+                itemListElement: itemListElements,
+              },
+            }
+          : {}),
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${listingPageUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: `${origin}/`,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Blog",
+            item: listingPageUrl,
+          },
+        ],
+      },
+      ...blogPostingSchemas,
+  );
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <section className="cs-page-hero py-5 text-white">
         <div className="container py-lg-4">
           <div className="row g-4 align-items-center">

@@ -1,6 +1,14 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import JsonLd from "@/components/JsonLd";
+import {
+  breadcrumbJsonLd,
+  jsonLdGraph,
+  organizationJsonLd,
+  webPageJsonLd,
+  webSiteJsonLd,
+} from "@/lib/json-ld";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { currentUrl, currentRoute } =
@@ -13,9 +21,27 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function PrivacyPolicy() {
+export default async function PrivacyPolicy() {
+  const { currentUrl } = await getCurrentUrlAndRoute("/privacy-policy");
+  const origin = new URL(currentUrl).origin;
+  const jsonLd = jsonLdGraph(
+    organizationJsonLd(origin),
+    webSiteJsonLd(origin),
+    webPageJsonLd({
+      pageUrl: currentUrl,
+      name: "Privacy Policy Car Sales Brisbane and Statewide Auto Group",
+      description:
+        "How Car Sales Brisbane and Statewide Auto Group collect, use, disclose, and protect your personal information under the Australian Privacy Principles.",
+    }),
+    breadcrumbJsonLd(currentUrl, [
+      { name: "Home", item: `${origin}/` },
+      { name: "Privacy policy", item: currentUrl },
+    ]),
+  );
+
   return (
     <div className="p-4">
+      <JsonLd data={jsonLd} />
       <article className="max-w-3xl space-y-6">
         <h1>Used Car Sales Brisbane Privacy Policy</h1>
 

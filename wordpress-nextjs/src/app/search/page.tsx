@@ -14,6 +14,15 @@ import {
   PER_PAGE,
   serializeInventoryFilters,
 } from "@/lib/inventory/query";
+import JsonLd from "@/components/JsonLd";
+import {
+  breadcrumbJsonLd,
+  jsonLdGraph,
+  organizationJsonLd,
+  vehicleJsonLdFromInventory,
+  webPageJsonLd,
+  webSiteJsonLd,
+} from "@/lib/json-ld";
 import { dealerVehicleToListing } from "@/lib/inventory/transform";
 import { buildInventoryFacets } from "@/lib/inventory/facets";
 import InventoryFiltersSidebar from "@/components/vehicles/InventoryFiltersSidebar";
@@ -77,8 +86,64 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   );
   const listings = pageSlice.map(dealerVehicleToListing);
 
+  const searchQs = serializeInventoryFilters(filters);
+  const searchPath = searchQs ? `/search?${searchQs}` : "/search";
+  const { currentUrl } = await getCurrentUrlAndRoute(searchPath);
+  const origin = new URL(currentUrl).origin;
+
+  const listTitle =
+    "Used Cars for Sale in Brisbane | Car Sales Brisbane and Statewide Auto Group";
+  const listDescription =
+    "Explore used cars, 4x4s, SUVs, and work-ready vehicles with finance-first options from our Ormiston hub.";
+
+  const itemListElement =
+    pageSlice.length > 0
+      ? pageSlice.map((vehicle, index) => ({
+          "@type": "ListItem",
+          position: (filters.page - 1) * PER_PAGE + index + 1,
+          item: vehicleJsonLdFromInventory(
+            origin,
+            vehicle,
+            listings[index],
+          ),
+        }))
+      : [];
+
+  const jsonLd = jsonLdGraph(
+    organizationJsonLd(origin),
+    webSiteJsonLd(origin),
+    webPageJsonLd({
+      pageUrl: currentUrl,
+      name: listTitle,
+      description: listDescription,
+    }),
+    {
+      "@type": "CollectionPage",
+      "@id": `${currentUrl}#collection`,
+      name: listTitle,
+      description: listDescription,
+      url: currentUrl,
+      isPartOf: { "@id": `${origin}/#website` },
+      publisher: { "@id": `${origin}/#organization` },
+      ...(itemListElement.length > 0
+        ? {
+            mainEntity: {
+              "@type": "ItemList",
+              numberOfItems: listings.length,
+              itemListElement,
+            },
+          }
+        : {}),
+    },
+    breadcrumbJsonLd(currentUrl, [
+      { name: "Home", item: `${origin}/` },
+      { name: "Search", item: currentUrl },
+    ]),
+  );
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <section className="cs-page-hero search-page-hero py-3 py-md-4 text-white">
         <div className="container py-lg-2">
           <div className="row g-3 g-lg-4 align-items-center">

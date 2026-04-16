@@ -6,6 +6,13 @@ import {
   getMenuByLocation,
 } from "@/lib/wordpress";
 import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import JsonLd from "@/components/JsonLd";
+import {
+  jsonLdGraph,
+  organizationJsonLd,
+  webPageJsonLd,
+  webSiteJsonLd,
+} from "@/lib/json-ld";
 
 export const dynamic = "force-dynamic";
 
@@ -88,8 +95,22 @@ export default async function DiagnosticPage() {
     process.env.WORDPRESS_API_URL ||
     "NOT SET";
 
+  const { currentUrl } = await getCurrentUrlAndRoute("/diagnostics");
+  const origin = new URL(currentUrl).origin;
+  const jsonLd = jsonLdGraph(
+    organizationJsonLd(origin),
+    webSiteJsonLd(origin),
+    webPageJsonLd({
+      pageUrl: currentUrl,
+      name: "WordPress API Diagnostics | Car Sales Brisbane",
+      description:
+        "Internal diagnostics for WordPress REST API connectivity (posts, pages, settings, menus).",
+    }),
+  );
+
   return (
     <div className="container mx-auto py-12 px-4">
+      <JsonLd data={jsonLd} />
       <h1 className="text-4xl font-bold mb-8 text-gray-800">
         WordPress API Diagnostics
       </h1>

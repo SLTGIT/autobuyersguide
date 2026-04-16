@@ -60,3 +60,7 @@
 // Pages will be migrated similarly
 // @import "pages/blog"; 
 // ...
+
+.dropdown-item.active, .dropdown-item:active {
+  background-color: var(--cs-primary) !important;
+}

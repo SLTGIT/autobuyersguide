@@ -1,6 +1,14 @@
 import React from "react";
 import { Metadata } from "next";
 import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import JsonLd from "@/components/JsonLd";
+import {
+  breadcrumbJsonLd,
+  jsonLdGraph,
+  organizationJsonLd,
+  webPageJsonLd,
+  webSiteJsonLd,
+} from "@/lib/json-ld";
 import "./about.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -13,9 +21,28 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const page = () => {
+const page = async () => {
+  const { currentUrl } = await getCurrentUrlAndRoute("/about-us");
+  const origin = new URL(currentUrl).origin;
+  const jsonLd = jsonLdGraph(
+    organizationJsonLd(origin),
+    webSiteJsonLd(origin),
+    webPageJsonLd({
+      pageUrl: currentUrl,
+      name: "About Car Sales Brisbane and Statewide Auto Group",
+      description:
+        "Car Sales Brisbane is a digital showroom designed to connect Brisbane buyers with the used vehicle range, finance support, and local team behind Statewide Auto Group.",
+      types: ["AboutPage"],
+    }),
+    breadcrumbJsonLd(currentUrl, [
+      { name: "Home", item: `${origin}/` },
+      { name: "About us", item: currentUrl },
+    ]),
+  );
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <section className="cs-page-hero py-5 text-white">
         <div className="container py-lg-4">
           <div className="row g-4 align-items-center">

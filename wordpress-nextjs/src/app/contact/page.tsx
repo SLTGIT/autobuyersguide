@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
 import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import JsonLd from "@/components/JsonLd";
+import {
+  breadcrumbJsonLd,
+  jsonLdGraph,
+  organizationJsonLd,
+  webPageJsonLd,
+  webSiteJsonLd,
+} from "@/lib/json-ld";
 import ContactForm from "./ContactForm";
 import "./contact.css";
 
@@ -14,9 +22,28 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function Contact() {
+export default async function Contact() {
+  const { currentUrl } = await getCurrentUrlAndRoute("/contact");
+  const origin = new URL(currentUrl).origin;
+  const jsonLd = jsonLdGraph(
+    organizationJsonLd(origin),
+    webSiteJsonLd(origin),
+    webPageJsonLd({
+      pageUrl: currentUrl,
+      name: "Contact Car Sales Brisbane and Statewide Auto Group",
+      description:
+        "Contact Car Sales Brisbane team at Ormiston for used cars, finance pre-approval, sell-my-car enquiries, and Brisbane delivery support.",
+      types: ["ContactPage"],
+    }),
+    breadcrumbJsonLd(currentUrl, [
+      { name: "Home", item: `${origin}/` },
+      { name: "Contact", item: currentUrl },
+    ]),
+  );
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <section className="cs-page-hero py-5 text-white">
         <div className="container py-lg-4">
           <div className="row g-4 align-items-center">

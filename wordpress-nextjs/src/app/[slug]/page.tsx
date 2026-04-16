@@ -1,8 +1,17 @@
 import { getPageBySlug } from '@/lib/wordpress';
 import { getMetadata } from '@/lib/wordpress/seo';
-import { mergeSiteUrlMetadata } from '@/lib/site-url';
+import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from '@/lib/site-url';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import JsonLd from '@/components/JsonLd';
+import {
+    breadcrumbJsonLd,
+    jsonLdGraph,
+    organizationJsonLd,
+    stripHtml,
+    webPageJsonLd,
+    webSiteJsonLd,
+} from '@/lib/json-ld';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,8 +42,52 @@ export default async function DynamicPage(props: PageProps) {
         notFound();
     }
 
+    const path = `/${params.slug}`;
+    const { currentUrl } = await getCurrentUrlAndRoute(path);
+    const origin = new URL(currentUrl).origin;
+    const headline = stripHtml(page.title.rendered);
+    const excerpt = stripHtml(page.excerpt?.rendered || '');
+    const featuredUrl = page._embedded?.['wp:featuredmedia']?.[0]?.source_url as
+        | string
+        | undefined;
+
+    const article: Record<string, unknown> = {
+        '@type': 'Article',
+        '@id': `${currentUrl}#article`,
+        headline,
+        url: currentUrl,
+        datePublished: page.date,
+        dateModified: page.modified,
+        publisher: { '@id': `${origin}/#organization` },
+        mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': `${currentUrl}#webpage`,
+        },
+    };
+    if (featuredUrl) article.image = [featuredUrl];
+    if (excerpt) article.description = excerpt;
+
+    const jsonLd = jsonLdGraph(
+        organizationJsonLd(origin),
+        webSiteJsonLd(origin),
+        webPageJsonLd({
+            pageUrl: currentUrl,
+            name: headline,
+            description: excerpt || headline,
+        }),
+        article,
+        breadcrumbJsonLd(currentUrl, [
+            { name: 'Home', item: `${origin}/` },
+            {
+                name: headline.length > 90 ? `${headline.slice(0, 87)}…` : headline,
+                item: currentUrl,
+            },
+        ]),
+    );
+
     return (
         <div className="cms-page">
+            <JsonLd data={jsonLd} />
             <article className="cms-page__article">
                 {/* Header */}
                 <header className="cms-page__header">

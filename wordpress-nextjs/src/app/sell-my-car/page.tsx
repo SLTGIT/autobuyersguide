@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import JsonLd from "@/components/JsonLd";
+import {
+  breadcrumbJsonLd,
+  jsonLdGraph,
+  organizationJsonLd,
+  webPageJsonLd,
+  webSiteJsonLd,
+} from "@/lib/json-ld";
 import SellMyCarValuationForm from "./SellMyCarValuationForm";
 import "./sell-my-car.css";
 
@@ -22,9 +30,36 @@ const FEATURES = [
   { icon: "bi-car-front-fill", label: "Sell Your Vehicle Today" },
 ] as const;
 
-export default function SellMyCarPage() {
+export default async function SellMyCarPage() {
+  const { currentUrl } = await getCurrentUrlAndRoute("/sell-my-car");
+  const origin = new URL(currentUrl).origin;
+  const jsonLd = jsonLdGraph(
+    organizationJsonLd(origin),
+    webSiteJsonLd(origin),
+    webPageJsonLd({
+      pageUrl: currentUrl,
+      name: "Sell My Car Car Sales Brisbane and Statewide Auto Group",
+      description:
+        "Sell your car today with no pressure and get a competitive offer. Get an obligation-free car valuation at Car Sales Brisbane and Statewide Auto Group.",
+    }),
+    {
+      "@type": "Service",
+      "@id": `${currentUrl}#valuation-service`,
+      name: "Obligation-free vehicle valuation",
+      serviceType: "Used vehicle purchase and trade-in valuation",
+      provider: { "@id": `${origin}/#organization` },
+      areaServed: { "@type": "AdministrativeArea", name: "Queensland" },
+      url: currentUrl,
+    },
+    breadcrumbJsonLd(currentUrl, [
+      { name: "Home", item: `${origin}/` },
+      { name: "Sell my car", item: currentUrl },
+    ]),
+  );
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <section className="cs-page-hero py-5 text-white">
         <div className="container py-lg-4">
           <div className="row g-4 align-items-center">

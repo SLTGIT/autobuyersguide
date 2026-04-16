@@ -1,5 +1,13 @@
 import { Metadata } from "next";
 import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import JsonLd from "@/components/JsonLd";
+import {
+  breadcrumbJsonLd,
+  jsonLdGraph,
+  organizationJsonLd,
+  webPageJsonLd,
+  webSiteJsonLd,
+} from "@/lib/json-ld";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { currentUrl, currentRoute } = await getCurrentUrlAndRoute(
@@ -13,9 +21,27 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function TermsOfService() {
+export default async function TermsOfService() {
+  const { currentUrl } = await getCurrentUrlAndRoute("/terms-of-service");
+  const origin = new URL(currentUrl).origin;
+  const jsonLd = jsonLdGraph(
+    organizationJsonLd(origin),
+    webSiteJsonLd(origin),
+    webPageJsonLd({
+      pageUrl: currentUrl,
+      name: "Terms of Service Car Sales Brisbane and Statewide Auto Group",
+      description:
+        "Terms of use for the Statewide Auto Group website, including disclaimers, vehicle information, copyright, and acceptable use.",
+    }),
+    breadcrumbJsonLd(currentUrl, [
+      { name: "Home", item: `${origin}/` },
+      { name: "Terms of service", item: currentUrl },
+    ]),
+  );
+
   return (
     <div className="p-4">
+      <JsonLd data={jsonLd} />
       <article className="max-w-3xl space-y-6">
         <h1>Used Car Sales Brisbane Terms of Service</h1>
 

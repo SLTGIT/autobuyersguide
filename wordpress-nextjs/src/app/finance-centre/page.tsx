@@ -1,6 +1,14 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import JsonLd from "@/components/JsonLd";
+import {
+  breadcrumbJsonLd,
+  jsonLdGraph,
+  organizationJsonLd,
+  webPageJsonLd,
+  webSiteJsonLd,
+} from "@/lib/json-ld";
 import FinanceEnquiryForm from "./FinanceEnquiryForm";
 import "../contact/contact.css";
 import "./finance-centre.css";
@@ -17,9 +25,35 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function FinanceCentre() {
+export default async function FinanceCentre() {
+  const { currentUrl } = await getCurrentUrlAndRoute("/finance-centre");
+  const origin = new URL(currentUrl).origin;
+  const jsonLd = jsonLdGraph(
+    organizationJsonLd(origin),
+    webSiteJsonLd(origin),
+    webPageJsonLd({
+      pageUrl: currentUrl,
+      name: "Finance Centre Car Sales Brisbane and Statewide Auto Group",
+      description:
+        "Check finance eligibility, get pre-approval, and get delivery support from Car Sales Brisbane and Statewide Auto Group.",
+    }),
+    {
+      "@type": "FinancialService",
+      "@id": `${currentUrl}#financial-service`,
+      name: "Vehicle finance — Car Sales Brisbane",
+      url: currentUrl,
+      provider: { "@id": `${origin}/#organization` },
+      areaServed: { "@type": "AdministrativeArea", name: "Queensland" },
+    },
+    breadcrumbJsonLd(currentUrl, [
+      { name: "Home", item: `${origin}/` },
+      { name: "Finance centre", item: currentUrl },
+    ]),
+  );
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <section className="cs-page-hero py-5 text-white">
         <div className="container py-lg-4">
           <div className="row g-4 align-items-center">
