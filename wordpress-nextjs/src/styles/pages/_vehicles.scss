@@ -2299,12 +2299,12 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 .vdp-cta--outline {
     background: #fff;
     color: #222;
-    border-color: var(--primary, $color-primary);
+    border-color: var(--cs-primary);
     color: #111;
 
     &:hover {
-        background: rgba($color-primary, 0.06);
-        color: var(--primary, $color-primary);
+        background: rgba(var(--cs-primary), 0.06);
+        color: var(--cs-primary);
     }
 }
 
