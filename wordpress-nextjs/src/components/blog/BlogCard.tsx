@@ -13,11 +13,8 @@ function stripTags(html: string): string {
 
 export default function BlogCard({ post }: BlogCardProps) {
 
-  console.log("post", post);
   const featuredImage =
     post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
-  console.log("post._embedded", post._embedded);
-  console.log("featuredImage", featuredImage);
   const href = `/blog/${post.slug}`;
   const plainTitle = stripTags(post.title.rendered);
   const plainExcerpt = stripTags(post.excerpt.rendered);

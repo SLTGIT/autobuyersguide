@@ -26,10 +26,11 @@ export default function Header() {
           </span> */}
           <a
             className="d-inline-flex align-items-center gap-2"
-            href="https://maps.google.com/?q=56+Freeth+St+W,+Ormiston,+QLD+4160"
+            target="_blank"
+            href="https://www.google.com/maps/place/Car+Sales+Brisbane/@-27.5224896,153.2562743,17z/data=!3m1!4b1!4m6!3m5!1s0x6b91678932e7fccd:0x6a000d7f9589579b!8m2!3d-27.5224896!4d153.2562743!16s%2Fg%2F11vqstz67d?entry=ttu&g_ep=EgoyMDI2MDQwNi4wIKXMDSoASAFQAw%3D%3D"
           >
             <i className="bi bi-geo-alt-fill"></i>
-            <span>56 Freeth St W, Ormiston</span>
+            <span>Car Sales Brisbane</span>
           </a>
           <a
             className="d-inline-flex align-items-center gap-2"
