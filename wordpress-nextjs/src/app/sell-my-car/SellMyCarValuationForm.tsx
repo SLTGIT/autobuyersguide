@@ -113,6 +113,7 @@ export default function SellMyCarValuationForm() {
         dob: "",
         driverLicence: "",
         address: "",
+        date: new Date().toISOString(),
         item: {
           tag: "Car Sales Brisbane",
           make: formData.vehicleMake,

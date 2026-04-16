@@ -141,6 +141,7 @@ export default function FinanceEnquiryForm() {
         dob,
         driverLicence: driverLicence.trim(),
         address: address.trim(),
+        date: new Date().toISOString(),
         subscribe,
         item: {
           tag: "Car Sales Brisbane",

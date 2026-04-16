@@ -71,6 +71,7 @@ export default function ContactForm() {
           message: formData.message,
           form_type: formData.enquiryType,
           budget: "",
+          date: new Date().toISOString(),
           item: {
             tag: "Car Sales Brisbane",
           },

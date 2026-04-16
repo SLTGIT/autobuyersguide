@@ -138,6 +138,7 @@ export default function VehicleEnquiryModal({ item }: VehicleEnquiryModalProps) 
         dob: "",
         driverLicence: "",
         address: "",
+        date: new Date().toISOString(),
         item: {
           image: item.image,
           make: item.make,
