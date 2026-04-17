@@ -8,6 +8,83 @@
   background: var(--cs-primary);
 }
 
+.smc-hero-cta {
+  border-radius: 0.65rem;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+}
+
+.smc-hero-cta:hover {
+  background: #f8fafc;
+  color: var(--cs-primary, #0d6efd);
+}
+
+#sell-my-car-form {
+  scroll-margin-top: 5.5rem;
+}
+
+.smc-steps-progress__meta {
+  letter-spacing: 0.02em;
+}
+
+.smc-steps-progress__track {
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.smc-steps-progress__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--cs-primary, #0d6efd);
+  transition: width 0.35s ease;
+}
+
+.smc-steps-progress__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.65rem;
+  gap: 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.smc-steps-progress__labels > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.smc-steps-progress__labels > span.is-active {
+  color: var(--cs-primary, #0d6efd);
+}
+
+.smc-steps-progress__labels > span.is-complete {
+  color: #334155;
+}
+
+.smc-steps-progress__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.45;
+  flex-shrink: 0;
+}
+
+.smc-steps-progress__labels > span.is-active .smc-steps-progress__dot,
+.smc-steps-progress__labels > span.is-complete .smc-steps-progress__dot {
+  opacity: 1;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cs-primary, #0d6efd) 28%, transparent);
+}
+
+.smc-steps-progress__labels > span.is-complete .smc-steps-progress__dot {
+  box-shadow: none;
+  background: var(--cs-primary, #0d6efd);
+}
+
 .cs-panel,
 .cs-card {
   border: 1px solid var(--cs-line);

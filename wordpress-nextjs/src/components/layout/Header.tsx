@@ -6,7 +6,7 @@ export default function Header() {
     <header className="sticky-top cs-header">
       <div className="cs-topbar py-0 py-3 py-lg-0">
         <div className="container d-flex flex-wrap justify-content-center justify-content-lg-end align-items-center gap-3 gap-lg-4 ">
-          {/* <span className="d-inline-flex align-items-center gap-2">
+          <span className="d-inline-flex align-items-center gap-2">
             <span className="cs-rating-star">
               <i className="bi bi-star-fill"></i>
             </span>
@@ -23,7 +23,7 @@ export default function Header() {
               <i className="bi bi-star-half"></i>
             </span>
             <span>4.8 RATING OUT OF 240 REVIEWS</span>
-          </span> */}
+          </span>
           <a
             className="d-inline-flex align-items-center gap-2"
             target="_blank"

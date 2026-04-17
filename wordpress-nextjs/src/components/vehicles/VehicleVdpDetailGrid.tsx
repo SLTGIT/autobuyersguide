@@ -7,6 +7,16 @@ interface VehicleVdpDetailGridProps {
   rows: DetailRow[];
 }
 
+function hasMeaningfulValue(value: string): boolean {
+  const t = value.trim();
+  if (!t) return false;
+  const lower = t.toLowerCase();
+  if (t === "—" || t === "-" || lower === "n/a" || lower === "na") {
+    return false;
+  }
+  return true;
+}
+
 function CellIcon({ label }: { label: string }) {
   const key = label.toLowerCase();
   const common = { width: 22, height: 22, viewBox: "0 0 24 24" as const, fill: "none", stroke: "currentColor", strokeWidth: 1.75 };
@@ -86,13 +96,16 @@ function CellIcon({ label }: { label: string }) {
 }
 
 export default function VehicleVdpDetailGrid({ rows }: VehicleVdpDetailGridProps) {
+  const visibleRows = rows.filter((row) => hasMeaningfulValue(row.value));
+  if (visibleRows.length === 0) return null;
+
   return (
     <section className="vdp-car-details" aria-labelledby="vdp-car-details-heading">
       <h2 id="vdp-car-details-heading" className="vdp-section-heading">
         Car details
       </h2>
       <div className="vdp-detail-grid">
-        {rows.map((row) => (
+        {visibleRows.map((row) => (
           <div key={row.label} className="vdp-detail-cell">
             <span className="vdp-detail-icon" aria-hidden>
               <CellIcon label={row.label} />

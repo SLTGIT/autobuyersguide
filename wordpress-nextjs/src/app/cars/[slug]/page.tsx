@@ -1,8 +1,14 @@
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { fetchDealerInventory } from "@/lib/dealer-solutions/fetch-inventory";
-import { dealerVehicleToListing, typeCodeLabel } from "@/lib/inventory/transform";
-import { buildVehicleSlug, findVehicleByPublicSlug } from "@/lib/inventory/slug";
+import {
+  dealerVehicleToListing,
+  typeCodeLabel,
+} from "@/lib/inventory/transform";
+import {
+  buildVehicleSlug,
+  findVehicleByPublicSlug,
+} from "@/lib/inventory/slug";
 import { getSimilarVehicles } from "@/lib/inventory/similar";
 import VehicleGallery from "@/components/vehicles/VehicleGallery";
 import VehicleVdpDetailGrid from "@/components/vehicles/VehicleVdpDetailGrid";
@@ -67,7 +73,8 @@ export async function generateMetadata({ params }: VehicleDetailPageProps) {
   const listing = dealerVehicleToListing(v);
   const image = v.Photos?.[0]?.PhotoUrl;
   const canonicalPath = `/cars/${buildVehicleSlug(v)}`;
-  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute(canonicalPath);
+  const { currentUrl, currentRoute } =
+    await getCurrentUrlAndRoute(canonicalPath);
   return {
     title: `${listing.title} | Car Sales Brisbane`,
     description: `${listing.condition} ${listing.title}. ${
@@ -87,12 +94,13 @@ export async function generateMetadata({ params }: VehicleDetailPageProps) {
 
 function toSimilarItem(v: DealerVehicle): SimilarCarItem {
   const l = dealerVehicleToListing(v);
-  const tags = [String(l.year), l.body_type, l.transmission, l.fuel_type].filter(
-    Boolean
+  const tags = [l.body_type, l.transmission, l.fuel_type].filter(
+    Boolean,
   ) as string[];
   return {
     slug: l.slug,
     title: l.title.length > 72 ? `${l.title.slice(0, 69)}…` : l.title,
+    year: l.year,
     make: l.make,
     model: l.model,
     image: l.featured_image,
@@ -107,7 +115,9 @@ function toSimilarItem(v: DealerVehicle): SimilarCarItem {
   };
 }
 
-export default async function VehicleDetailPage({ params }: VehicleDetailPageProps) {
+export default async function VehicleDetailPage({
+  params,
+}: VehicleDetailPageProps) {
   const { slug } = await params;
   const trimmed = slug.trim();
 
@@ -129,14 +139,16 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
 
   const listing = dealerVehicleToListing(v);
   const featured = v.Photos?.[0]?.PhotoUrl ?? listing.featured_image ?? "";
-  const galleryImages: VehicleImage[] = (v.Photos ?? []).slice(1).map((p, i) => ({
-    id: i,
-    url: p.PhotoUrl,
-    thumbnail: p.PhotoUrl,
-    medium: p.PhotoUrl,
-    large: p.PhotoUrl,
-    alt: listing.title,
-  }));
+  const galleryImages: VehicleImage[] = (v.Photos ?? [])
+    .slice(1)
+    .map((p, i) => ({
+      id: i,
+      url: p.PhotoUrl,
+      thumbnail: p.PhotoUrl,
+      medium: p.PhotoUrl,
+      large: p.PhotoUrl,
+      alt: listing.title,
+    }));
 
   const advertised = v.Pricing?.AdvertisedPrice?.trim();
   const driveAway = v.Pricing?.DriveAwayPrice?.trim();
@@ -178,7 +190,7 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
   const getFianceHref = `/finance-centre`;
   const mailto = listing.stock_number
     ? `mailto:${process.env.NEXT_PUBLIC_DEALER_EMAIL || "sales@statewideautogroup.com.au"}?subject=${encodeURIComponent(
-        `Vehicle enquiry — Stock ${listing.stock_number}`
+        `Vehicle enquiry — Stock ${listing.stock_number}`,
       )}`
     : undefined;
 
@@ -197,7 +209,10 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
     { label: "Engine size", value: "—" },
     { label: "Stock no.", value: listing.stock_number || "—" },
     { label: "Build year", value: String(listing.year) },
-    { label: "Location", value: listing.location_short || v.Location?.trim() || "—" },
+    {
+      label: "Location",
+      value: listing.location_short || v.Location?.trim() || "—",
+    },
     { label: "Colour", value: colour },
     { label: "Drive type", value: listing.drive_type || "—" },
     { label: "Seats", value: "—" },
@@ -210,14 +225,14 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
 
   const similar = getSimilarVehicles(all, v, 6).map(toSimilarItem);
 
-  const usedCount = all.filter(
-    (x) => (x.Condition || "").toLowerCase().includes("used")
+  const usedCount = all.filter((x) =>
+    (x.Condition || "").toLowerCase().includes("used"),
   ).length;
   const suvCount = all.filter((x) =>
-    (x.BodyType || "").toLowerCase().includes("suv")
+    (x.BodyType || "").toLowerCase().includes("suv"),
   ).length;
   const dieselCount = all.filter((x) =>
-    (x.FuelType || "").toLowerCase().includes("diesel")
+    (x.FuelType || "").toLowerCase().includes("diesel"),
   ).length;
 
   const moreCars = [
@@ -228,7 +243,7 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
     {
       label: `${v.Make || "Make"}`,
       count: all.filter(
-        (x) => x.Make.trim().toLowerCase() === v.Make.trim().toLowerCase()
+        (x) => x.Make.trim().toLowerCase() === v.Make.trim().toLowerCase(),
       ).length,
       href: `/search?make=${encodeURIComponent(v.Make.trim().toLowerCase())}`,
     },
@@ -272,7 +287,10 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
     <div className="vehicles-page vehicle-detail-page inventory-vdp inventory-vdp--design">
       <JsonLd data={jsonLd} />
       <div className="vehicles-container inventory-vdp-container">
-        <nav className="inventory-breadcrumb vdp-breadcrumb" aria-label="Breadcrumb">
+        <nav
+          className="inventory-breadcrumb vdp-breadcrumb"
+          aria-label="Breadcrumb"
+        >
           <Link href="/">Home</Link>
           <span className="inventory-breadcrumb-sep" aria-hidden>
             /
@@ -294,20 +312,35 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
                   title={listing.title}
                 />
               ) : (
-                <div className="inventory-vdp-no-image">No photos available</div>
+                <div className="inventory-vdp-no-image">
+                  No photos available
+                </div>
               )}
             </div>
 
             <VehicleVdpDetailGrid rows={detailRows} />
 
-            {v.Comments?.trim() ? <VehicleDealerComments text={v.Comments} /> : null}
+            {v.Comments?.trim() ? (
+              <VehicleDealerComments text={v.Comments} />
+            ) : null}
 
             <section className="vdp-disclaimer" aria-label="Disclaimer">
               <p>
-                Information on this page is supplied by the seller and may include
-                third-party data. We do not warrant the accuracy of descriptions,
-                pricing, or images — please confirm details with the dealer before
-                purchase.
+                Information on this page is supplied by the seller and may
+                include third-party data. We do not warrant the accuracy of
+                descriptions, pricing, or images — please confirm details with
+                the dealer before purchase.
+              </p>
+            </section>
+
+            <section className="vdp-disclaimer" aria-label="Disclaimer">
+              <h4 style={{fontSize: "1.15rem", color: "#111"}} className="vdp-disclaimer-title fw-bold mb-2">Disclaimer</h4>
+              <p>
+                Please confirm price, specifications and features with Car Sales
+                Brisbane. The vehicles actual pricing may vary from the price
+                published. We do not warrant the accuracy or completeness of
+                this data. Use of this website indicates your acceptance of our
+                <a style={{textDecoration: "underline"}} className="text-primary" href="/terms-of-service">Terms and services</a>.
               </p>
             </section>
 
@@ -327,17 +360,25 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
               </div>
             </section> */}
 
-            <VehicleVdpFaq />
+            {/* <VehicleVdpFaq /> */}
           </div>
 
           <aside className="inventory-vdp-aside vdp-sidebar">
             <div className="inventory-vdp-price-card vdp-sidebar-card">
               <div className="vdp-badge-row">
-                <span className={`vdp-badge vdp-badge--${isNew ? "new" : "used"}`}>
+                <span
+                  className={`vdp-badge vdp-badge--${isNew ? "new" : "used"}`}
+                >
                   {isNew ? "New" : "Used"}
                 </span>
                 <span className="vdp-badge vdp-badge--stock">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden
+                  >
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                   </svg>
                   In stock
@@ -380,14 +421,23 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
               </div>
 
               <div className="vdp-sidebar-actions-row">
-                <VehicleVdpSidebarActions title={headline} shareUrl={shareUrl} mailto={mailto} />
+                <VehicleVdpSidebarActions
+                  title={headline}
+                  shareUrl={shareUrl}
+                  mailto={mailto}
+                />
               </div>
 
               <div className="vdp-sidebar-meta">
                 {listing.location_short || v.Location?.trim() ? (
                   <p className="vdp-meta-line">
                     <span className="vdp-meta-icon" aria-hidden>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                       </svg>
                     </span>
@@ -397,7 +447,12 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
                 {listing.odometer != null && listing.odometer > 0 ? (
                   <p className="vdp-meta-line">
                     <span className="vdp-meta-icon" aria-hidden>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z" />
                       </svg>
                     </span>
@@ -409,7 +464,12 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
               <div className="vdp-cta-stack">
                 <a className="vdp-cta vdp-cta--call" href={telHref}>
                   <span className="vdp-cta-icon" aria-hidden>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
                       <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
                     </svg>
                   </span>
@@ -417,7 +477,14 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
                 </a>
                 <Link className="vdp-cta vdp-cta--outline" href={getFianceHref}>
                   <span className="vdp-cta-icon" aria-hidden>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
                       <path d="M5 17h14v-5l-2-4H7l-2 4v5zM7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2" />
                     </svg>
                   </span>

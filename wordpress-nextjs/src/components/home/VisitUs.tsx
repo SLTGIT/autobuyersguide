@@ -40,10 +40,9 @@ const VisitUs = () => {
                       </div>
                       <a
                         className="cs-business-link fs-3 d-inline-block"
-                        href="https://maps.google.com/?q=56+Freeth+St+W,+Ormiston,+QLD+4160"
+                        href="https://www.google.com/maps/place/Car+Sales+Brisbane/@-27.5224896,153.2562743,17z/data=!3m1!4b1!4m6!3m5!1s0x6b91678932e7fccd:0x6a000d7f9589579b!8m2!3d-27.5224896!4d153.2562743!16s%2Fg%2F11vqstz67d?entry=ttu&g_ep=EgoyMDI2MDQwNi4wIKXMDSoASAFQAw%3D%3D"
                       >
-                        56 Freeth St W<br />
-                        Ormiston, QLD 4160
+                        Car Sales Brisbane
                       </a>
                     </div>
                   </div>
@@ -67,7 +66,7 @@ const VisitUs = () => {
                       </a>
                     </div>
                   </div>
-                  {/* <hr className="my-0" />
+                  <hr className="my-0" />
                   <div className="cs-contact-row">
                     <span className="cs-contact-icon">
                       <i className="bi bi-star-fill"></i>
@@ -98,7 +97,7 @@ const VisitUs = () => {
                       </div>
                       <div className="fw-bold fs-4">4.8/5 Stars</div>
                     </div>
-                  </div> */}
+                  </div>
                   <hr className="my-0" />
                   <div className="cs-contact-row">
                     <span className="cs-contact-icon">

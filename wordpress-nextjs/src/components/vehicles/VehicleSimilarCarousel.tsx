@@ -8,6 +8,7 @@ export interface SimilarCarItem {
   slug: string;
   /** Full dealer title (fallback + image alt). */
   title: string;
+  year: number;
   make: string;
   model: string;
   image: string | null;
@@ -19,11 +20,12 @@ export interface SimilarCarItem {
 }
 
 function similarCardHeadline(car: SimilarCarItem): string {
+  const y =
+    car.year != null && car.year > 0 ? String(car.year) : "";
   const mk = car.make?.trim();
   const md = car.model?.trim();
-  if (mk && md) return `${mk}, ${md}`;
-  if (mk) return mk;
-  if (md) return md;
+  const parts = [y, mk, md].filter(Boolean);
+  if (parts.length) return parts.join(" ");
   return car.title;
 }
 
@@ -92,21 +94,32 @@ export default function VehicleSimilarCarousel({ items }: VehicleSimilarCarousel
                   {car.condition}
                 </span>
               </div>
-              <h3 className="vdp-similar-card-title">{similarCardHeadline(car)}</h3>
-              {car.tags.length > 0 && (
-                <ul className="vdp-similar-card-tags">
-                  {car.tags.slice(0, 4).map((t, ti) => (
-                    <li key={`${ti}-${t}`}>{t}</li>
-                  ))}
-                </ul>
-              )}
-              {car.odometer ? (
-                <p className="vdp-similar-card-km">{car.odometer}</p>
-              ) : null}
-              <p className="vdp-similar-card-price">{car.price || "—"}</p>
-              {car.location ? (
-                <p className="vdp-similar-card-loc">{car.location}</p>
-              ) : null}
+              <div className="vdp-similar-card-body">
+                <h3 className="vdp-similar-card-title">{similarCardHeadline(car)}</h3>
+                <div className="vdp-similar-card-tags-wrap">
+                  {car.tags.length > 0 ? (
+                    <ul className="vdp-similar-card-tags mb-1">
+                      {car.tags.slice(0, 4).map((t, ti) => (
+                        <li key={`${ti}-${t}`}>{t}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+                <div className="vdp-similar-card-meta">
+                  <div className="vdp-similar-card-km-slot mb-1">
+                    {car.odometer ? (
+                      <p className="vdp-similar-card-km">
+                        <i
+                          className="bi bi-speedometer2 vdp-similar-card-km-icon"
+                          aria-hidden
+                        />
+                        <span>{car.odometer}</span>
+                      </p>
+                    ) : null}
+                  </div>
+                  <p className="vdp-similar-card-price">{car.price || "—"}</p>
+                </div>
+              </div>
             </Link>
           </article>
         ))}

@@ -49,7 +49,7 @@ export default function HomeBanner() {
                   Brisbane based, finance ready, statewide delivery.
                 </h2>
                 <p className="text-secondary mb-0">
-                  56 Freeth St W, Ormiston, QLD 4160
+                  Car Sales Brisbane
                 </p>
               </div>
             </article>

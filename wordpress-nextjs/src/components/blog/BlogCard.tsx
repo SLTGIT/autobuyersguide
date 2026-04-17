@@ -49,9 +49,9 @@ export default function BlogCard({ post }: BlogCardProps) {
             />
           </Link>
         </h3>
-        {plainExcerpt ? (
+        {/* {plainExcerpt ? (
           <p className={styles.excerpt}>{plainExcerpt}</p>
-        ) : null}
+        ) : null} */}
         <Link href={href} className={styles.readBtn}>
           Read Article
         </Link>

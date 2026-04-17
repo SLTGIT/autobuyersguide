@@ -91,6 +91,14 @@
   line-height: 1.15;
 }
 
+.cs-visit-section .text-uppercase.small {
+  font-size: .62rem !important;
+}
+
+.cs-rating-star {
+  color: #ffb400;
+}
+
 /* Contact enquiry form */
 .cs-contact-form {
   max-width: 640px;

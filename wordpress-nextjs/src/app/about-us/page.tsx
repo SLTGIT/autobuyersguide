@@ -133,7 +133,7 @@ const page = async () => {
                     early.
                   </li>
                   <li>
-                    Local support from the team operating out of 56 Freeth St W,
+                    Local support from the team operating out of Car Sales Brisbane,
                     Ormiston.
                   </li>
                   <li>
@@ -240,7 +240,7 @@ const page = async () => {
                   Visit or Contact
                 </p>
                 <p className="mb-2">
-                  <strong>Address:</strong> 56 Freeth St W, Ormiston, QLD 4160
+                  <strong>Address:</strong> Car Sales Brisbane
                 </p>
                 <p className="mb-2">
                   <strong>Phone:</strong>

@@ -64,9 +64,6 @@ export default async function SellMyCarPage() {
         <div className="container py-lg-4">
           <div className="row g-4 align-items-center">
             <div className="col-lg-8">
-              {/* <span className="badge cs-hero-chip cs-pill px-3 py-2 mb-3">
-                Sell My Car
-              </span> */}
               <h1 className="display-5 fw-bold mb-3 cs-title-tight">
                 Obligation-free valuation &amp; competitive offers
               </h1>
@@ -74,6 +71,12 @@ export default async function SellMyCarPage() {
                 Tell us about your vehicle — we&apos;ll tailor an offer to suit
                 you, with no pressure to proceed.
               </p>
+              <a
+                href="#sell-my-car-form"
+                className="btn btn-light btn-lg cs-pill cs-cta-strong text-primary mt-3 px-4 fs-5"
+              >
+                Sell my car
+              </a>
             </div>
           </div>
         </div>
@@ -131,7 +134,10 @@ export default async function SellMyCarPage() {
         </div>
       </section>
 
-      <section className="py-5 smc-form-section border-top border-light-subtle">
+      <section
+        id="sell-my-car-form"
+        className="py-5 smc-form-section border-top border-light-subtle"
+      >
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-lg-8 col-xl-7">
@@ -178,11 +184,9 @@ export default async function SellMyCarPage() {
                       </div>
                       <a
                         className="cs-business-link fs-3 d-inline-block"
-                        href="https://maps.google.com/?q=56+Freeth+St+W,+Ormiston,+QLD+4160"
+                        href="https://www.google.com/maps/place/Car+Sales+Brisbane/@-27.5224896,153.2562743,17z/data=!3m1!4b1!4m6!3m5!1s0x6b91678932e7fccd:0x6a000d7f9589579b!8m2!3d-27.5224896!4d153.2562743!16s%2Fg%2F11vqstz67d?entry=ttu&g_ep=EgoyMDI2MDQwNi4wIKXMDSoASAFQAw%3D%3D"
                       >
-                        56 Freeth St W
-                        <br />
-                        Ormiston, QLD 4160
+                        Car Sales Brisbane
                       </a>
                     </div>
                   </div>
@@ -206,7 +210,7 @@ export default async function SellMyCarPage() {
                       </a>
                     </div>
                   </div>
-                  {/* <hr className="my-0" />
+                  <hr className="my-0" />
                   <div className="cs-contact-row">
                     <span className="cs-contact-icon">
                       <i className="bi bi-star-fill" />
@@ -237,7 +241,7 @@ export default async function SellMyCarPage() {
                       </div>
                       <div className="fw-bold fs-4">4.8/5 Stars</div>
                     </div>
-                  </div> */}
+                  </div>
                   <hr className="my-0" />
                   <div className="cs-contact-row">
                     <span className="cs-contact-icon">

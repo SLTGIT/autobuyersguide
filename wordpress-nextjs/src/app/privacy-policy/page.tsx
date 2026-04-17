@@ -258,7 +258,7 @@ export default async function PrivacyPolicy() {
               </a>
             </li>
             <li>
-              <strong>Mailing address:</strong> 56 Freeth St W, Ormiston, QLD,
+              <strong>Mailing address:</strong> Car Sales Brisbane,
               4160
             </li>
             {/* <li>
