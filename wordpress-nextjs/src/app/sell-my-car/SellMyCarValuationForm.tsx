@@ -42,18 +42,29 @@ function digitsOnly(value: string): string {
   return value.replace(/\D/g, "");
 }
 
+/** Parses km from user input (digits only); null if invalid or out of range. */
+function parseOdometerKm(raw: string): number | null {
+  const digits = digitsOnly(raw);
+  if (!digits) return null;
+  const n = parseInt(digits, 10);
+  if (!Number.isFinite(n) || n < 1 || n > 2_000_000) return null;
+  return n;
+}
+
 function buildMessage(values: FormFields): string {
   const y = values.vehicleYear.trim();
   const mk = sellMyCarMakeLabel(values.vehicleMake.trim());
   const md = values.vehicleModel.trim();
-  const odo = values.odometer.trim();
+  const odoNum = parseOdometerKm(values.odometer);
   const rego = values.rego.trim();
   const comments = values.comments.trim();
 
   const parts = [
     "Sell My Car — obligation-free valuation",
     `Vehicle: ${y} ${mk} ${md}`,
-    odo ? `Odometer: ${odo} km` : null,
+    odoNum != null
+      ? `Odometer: ${odoNum.toLocaleString("en-AU")} km`
+      : null,
     rego ? `Registration: ${rego}` : null,
     comments ? `Comments: ${comments}` : null,
   ].filter(Boolean) as string[];
@@ -130,9 +141,17 @@ export default function SellMyCarValuationForm() {
     const y = formData.vehicleYear.trim();
     const mk = formData.vehicleMake.trim();
     const md = formData.vehicleModel.trim();
+    const odoNum = parseOdometerKm(formData.odometer);
     if (!y || !mk || !md) {
       setStatus("error");
       setStatusMessage("Please select year and make, and enter the model.");
+      return;
+    }
+    if (odoNum == null) {
+      setStatus("error");
+      setStatusMessage(
+        "Please enter a valid odometer reading in kilometres (whole numbers only).",
+      );
       return;
     }
 
@@ -147,6 +166,7 @@ export default function SellMyCarValuationForm() {
         message: buildMessage(formData),
         form_type: FORM_TYPE,
         budget: "",
+        kms: odoNum,
         dob: "",
         driverLicence: "",
         address: "",
@@ -424,6 +444,24 @@ export default function SellMyCarValuationForm() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div className="mb-3">
+              <label className="smc-form-label" htmlFor="smc-odo">
+                Kilometres (km)<span className="smc-form-req">*</span>
+              </label>
+              <input
+                id="smc-odo"
+                name="odometer"
+                type="text"
+                inputMode="numeric"
+                className="form-control smc-form-control"
+                placeholder="e.g. 125000"
+                required
+                autoComplete="off"
+                value={formData.odometer}
+                onChange={handleChange}
+              />
             </div>
 
             <div className="mb-4">
