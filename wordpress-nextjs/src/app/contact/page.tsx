@@ -133,6 +133,11 @@ export default async function Contact() {
                       >
                         0418 908 870
                       </a>
+                      <p className="mt-2 mb-1">
+                        <strong>Working Hours:</strong> Mon-Fri: 8:00am-5:30pm
+                      </p>
+                      <p className="mt-1 mb-1 ps-4">Sat: 8:00am-3:00pm</p>
+                      <p className="mt-1 mb-1 ps-4">Sun: Closed</p>
                     </div>
                   </div>
                   <hr className="my-0" />
