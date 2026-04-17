@@ -313,7 +313,7 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
 
             <VehicleSimilarCarousel items={similar} />
 
-            <section className="vdp-more-cars" aria-labelledby="vdp-more-heading">
+            {/* <section className="vdp-more-cars" aria-labelledby="vdp-more-heading">
               <h2 id="vdp-more-heading" className="vdp-section-heading">
                 More cars for you
               </h2>
@@ -325,7 +325,7 @@ export default async function VehicleDetailPage({ params }: VehicleDetailPagePro
                   </Link>
                 ))}
               </div>
-            </section>
+            </section> */}
 
             <VehicleVdpFaq />
           </div>
