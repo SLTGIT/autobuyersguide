@@ -539,10 +539,10 @@ export function vehicleJsonLdFromInventory(
       ? Math.round(Number(listing.odometer))
       : parseInventoryOdometerKm(v.Odometer);
   if (odoKm != null && Number.isFinite(odoKm) && odoKm >= 0) {
-    node.mileageFromOdometer = {
-      "@type": "QuantitativeValue",
+    node.Odometer = {
+      "@type": "Value",
       value: String(Math.round(odoKm)),
-      unitCode: "KMT",
+      unitCode: "km",
     };
   }
 
