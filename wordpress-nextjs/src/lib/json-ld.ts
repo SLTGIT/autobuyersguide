@@ -521,13 +521,13 @@ export function vehicleJsonLdFromInventory(
     brand: { "@type": "Brand", name: makeName || "Vehicle" },
     model: modelName,
     vehicleModelDate: yearStr,
-    productID: String(v.ItemID),
+    // productID: String(v.ItemID),
     mainEntityOfPage: { "@id": `${productUrl}#webpage` },
     inLanguage: "en-AU",
   };
 
   if (bodyTypeNorm) node.bodyType = bodyTypeForSchemaDisplay(bodyTypeNorm);
-  if (listing.stock_number) node.sku = listing.stock_number;
+  // if (listing.stock_number) node.sku = listing.stock_number;
 
   const colour = v.BodyColour?.trim();
   if (colour) node.color = colour;
