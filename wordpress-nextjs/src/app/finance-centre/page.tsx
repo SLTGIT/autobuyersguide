@@ -6,6 +6,7 @@ import {
   breadcrumbJsonLd,
   jsonLdGraph,
   organizationJsonLd,
+  upgradeHttpToHttpsUrl,
   webPageJsonLd,
   webSiteJsonLd,
 } from "@/lib/json-ld";
@@ -27,27 +28,28 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function FinanceCentre() {
   const { currentUrl } = await getCurrentUrlAndRoute("/finance-centre");
-  const origin = new URL(currentUrl).origin;
+  const pageUrl = upgradeHttpToHttpsUrl(currentUrl);
+  const origin = new URL(pageUrl).origin;
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),
     webSiteJsonLd(origin),
     webPageJsonLd({
-      pageUrl: currentUrl,
+      pageUrl,
       name: "Finance Centre Car Sales Brisbane and Statewide Auto Group",
       description:
         "Check finance eligibility, get pre-approval, and get delivery support from Car Sales Brisbane and Statewide Auto Group.",
     }),
     {
       "@type": "FinancialService",
-      "@id": `${currentUrl}#financial-service`,
+      "@id": `${pageUrl}#financial-service`,
       name: "Vehicle finance — Car Sales Brisbane",
-      url: currentUrl,
+      url: pageUrl,
       provider: { "@id": `${origin}/#organization` },
       areaServed: { "@type": "AdministrativeArea", name: "Queensland" },
     },
-    breadcrumbJsonLd(currentUrl, [
+    breadcrumbJsonLd(pageUrl, [
       { name: "Home", item: `${origin}/` },
-      { name: "Finance centre", item: currentUrl },
+      { name: "Finance centre", item: pageUrl },
     ]),
   );
 

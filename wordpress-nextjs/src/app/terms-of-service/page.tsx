@@ -5,6 +5,7 @@ import {
   breadcrumbJsonLd,
   jsonLdGraph,
   organizationJsonLd,
+  upgradeHttpToHttpsUrl,
   webPageJsonLd,
   webSiteJsonLd,
 } from "@/lib/json-ld";
@@ -23,19 +24,20 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function TermsOfService() {
   const { currentUrl } = await getCurrentUrlAndRoute("/terms-of-service");
-  const origin = new URL(currentUrl).origin;
+  const pageUrl = upgradeHttpToHttpsUrl(currentUrl);
+  const origin = new URL(pageUrl).origin;
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),
     webSiteJsonLd(origin),
     webPageJsonLd({
-      pageUrl: currentUrl,
+      pageUrl,
       name: "Terms of Service Car Sales Brisbane and Statewide Auto Group",
       description:
         "Terms of use for the Statewide Auto Group website, including disclaimers, vehicle information, copyright, and acceptable use.",
     }),
-    breadcrumbJsonLd(currentUrl, [
+    breadcrumbJsonLd(pageUrl, [
       { name: "Home", item: `${origin}/` },
-      { name: "Terms of service", item: currentUrl },
+      { name: "Terms of service", item: pageUrl },
     ]),
   );
 

@@ -3,6 +3,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { fetchDealerInventory } from "@/lib/dealer-solutions/fetch-inventory";
 import {
   dealerVehicleToListing,
+  inventoryPriceField,
   typeCodeLabel,
 } from "@/lib/inventory/transform";
 import {
@@ -29,10 +30,11 @@ import {
 } from "@/lib/site-url";
 import JsonLd from "@/components/JsonLd";
 import {
-  breadcrumbJsonLd,
   jsonLdGraph,
   organizationJsonLd,
+  upgradeHttpToHttpsUrl,
   vehicleJsonLdFromInventory,
+  vehicleVdpBreadcrumbJsonLd,
   webPageJsonLd,
   webSiteJsonLd,
 } from "@/lib/json-ld";
@@ -150,8 +152,8 @@ export default async function VehicleDetailPage({
       alt: listing.title,
     }));
 
-  const advertised = v.Pricing?.AdvertisedPrice?.trim();
-  const driveAway = v.Pricing?.DriveAwayPrice?.trim();
+  const advertised = inventoryPriceField(v.Pricing?.AdvertisedPrice);
+  const driveAway = inventoryPriceField(v.Pricing?.DriveAwayPrice);
   const colour = v.BodyColour?.trim() || "—";
 
   const headline =
@@ -253,14 +255,14 @@ export default async function VehicleDetailPage({
   const isNew = condLower === "new";
 
   const { currentUrl: pageUrl } = await getCurrentUrlAndRoute(sharePath);
-  const origin = new URL(pageUrl).origin;
-  const vehicleNode = vehicleJsonLdFromInventory(origin, v, listing);
-  vehicleNode["@id"] = `${pageUrl}#vehicle`;
-  vehicleNode.url = pageUrl;
-  const offers = vehicleNode.offers;
-  if (offers && typeof offers === "object") {
-    (offers as Record<string, unknown>).url = pageUrl;
-  }
+  const pageUrlHttps = upgradeHttpToHttpsUrl(pageUrl);
+  const origin = new URL(pageUrlHttps).origin;
+  // JSON-LD vehicle node uses the same `v` (DealerVehicle) + `listing` (VehicleListing)
+  // as this page; Offer.price prefers `listingDisplayNumericPriceAud(listing)` (same
+  // strings as the price card: formatted_price / drive_away_price).
+  const vehicleNode = vehicleJsonLdFromInventory(origin, v, listing, {
+    canonicalPageUrl: pageUrlHttps,
+  });
   const vdpDescription = `${listing.condition} ${listing.title}. ${
     listing.formatted_price ? `From ${listing.formatted_price}. ` : ""
   }View photos and details.`;
@@ -268,20 +270,26 @@ export default async function VehicleDetailPage({
     organizationJsonLd(origin),
     webSiteJsonLd(origin),
     webPageJsonLd({
-      pageUrl,
+      pageUrl: pageUrlHttps,
       name: `${listing.title} | Car Sales Brisbane`,
       description: vdpDescription,
+      mainEntity: { "@id": `${pageUrlHttps}#vehicle` },
     }),
     vehicleNode,
-    breadcrumbJsonLd(pageUrl, [
-      { name: "Home", item: `${origin}/` },
-      { name: "Search", item: `${origin}/search` },
-      {
-        name: headline.length > 70 ? `${headline.slice(0, 67)}…` : headline,
-        item: pageUrl,
-      },
-    ]),
+    vehicleVdpBreadcrumbJsonLd(pageUrlHttps, origin, listing, v),
   );
+
+  const catalogHref =
+    condLower === "new" ? "/search?condition=New" : "/search?condition=Used";
+  const catalogLabel = condLower === "new" ? "New Cars" : "Used Cars";
+  const breadcrumbMake = (v.Make?.trim() || listing.make || "").trim();
+  const breadcrumbModel = (v.Model?.trim() || listing.model || "").trim();
+  const breadcrumbMakeHref = breadcrumbMake
+    ? `/search?make=${encodeURIComponent(breadcrumbMake.toLowerCase())}`
+    : "/search";
+  const breadcrumbCurrent =
+    breadcrumbModel ||
+    (headline.length > 70 ? `${headline.slice(0, 67)}…` : headline);
 
   return (
     <div className="vehicles-page vehicle-detail-page inventory-vdp inventory-vdp--design">
@@ -295,11 +303,17 @@ export default async function VehicleDetailPage({
           <span className="inventory-breadcrumb-sep" aria-hidden>
             /
           </span>
-          <Link href="/search">Search</Link>
+          <Link href={catalogHref}>{catalogLabel}</Link>
           <span className="inventory-breadcrumb-sep" aria-hidden>
             /
           </span>
-          <span className="inventory-breadcrumb-current">Vehicle details</span>
+          <Link href={breadcrumbMakeHref}>{breadcrumbMake || "Vehicles"}</Link>
+          <span className="inventory-breadcrumb-sep" aria-hidden>
+            /
+          </span>
+          <span className="inventory-breadcrumb-current">
+            {breadcrumbCurrent}
+          </span>
         </nav>
 
         <div className="inventory-vdp-grid vdp-main-grid">

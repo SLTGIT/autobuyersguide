@@ -10,6 +10,8 @@ import {
   jsonLdGraph,
   organizationJsonLd,
   stripHtml,
+  upgradeHttpToHttpsUrl,
+  webPageJsonLd,
   webSiteJsonLd,
 } from "@/lib/json-ld";
 import "./blog-details.css";
@@ -50,8 +52,10 @@ export default async function BlogPost({ params }: BlogPostProps) {
       getCurrentUrlAndRoute(`/blog/${slug}`),
       getCurrentUrlAndRoute("/blog"),
     ]);
-  const origin = new URL(articleUrl).origin;
-  const blogEntityId = `${blogCanonicalUrl}#blog`;
+  const articleHttps = upgradeHttpToHttpsUrl(articleUrl);
+  const blogCanonicalHttps = upgradeHttpToHttpsUrl(blogCanonicalUrl);
+  const origin = new URL(articleHttps).origin;
+  const blogEntityId = `${blogCanonicalHttps}#blog`;
   const headline = stripHtml(post.title.rendered);
   const excerpt = stripHtml(post.excerpt.rendered);
   const imageUrl = featuredImage?.source_url as string | undefined;
@@ -59,22 +63,20 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
   const blogPosting: Record<string, unknown> = {
     "@type": "BlogPosting",
-    "@id": `${articleUrl}#article`,
+    "@id": `${articleHttps}#article`,
     headline,
-    url: articleUrl,
+    url: articleHttps,
     datePublished: post.date,
     dateModified: post.modified,
+    inLanguage: "en-AU",
     publisher: { "@id": `${origin}/#organization` },
     isPartOf: { "@id": blogEntityId },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `${articleUrl}#webpage`,
-    },
+    mainEntityOfPage: { "@id": `${articleHttps}#webpage` },
   };
-  if (imageUrl) blogPosting.image = [imageUrl];
-  if (authorName) {
-    blogPosting.author = { "@type": "Person", name: authorName };
-  }
+  if (imageUrl) blogPosting.image = [upgradeHttpToHttpsUrl(imageUrl)];
+  blogPosting.author = authorName
+    ? { "@type": "Person", name: authorName }
+    : { "@id": `${origin}/#organization` };
   if (excerpt) blogPosting.description = excerpt;
 
   const jsonLd = jsonLdGraph(
@@ -84,17 +86,23 @@ export default async function BlogPost({ params }: BlogPostProps) {
       "@type": "Blog",
       "@id": blogEntityId,
       name: "Used Car Guides for Brisbane Buyers",
-      url: blogCanonicalUrl,
+      url: blogCanonicalHttps,
+      inLanguage: "en-AU",
       publisher: { "@id": `${origin}/#organization` },
       isPartOf: { "@id": `${origin}/#website` },
     },
+    webPageJsonLd({
+      pageUrl: articleHttps,
+      name: headline,
+      description: excerpt || headline,
+    }),
     blogPosting,
-    breadcrumbJsonLd(articleUrl, [
+    breadcrumbJsonLd(articleHttps, [
       { name: "Home", item: `${origin}/` },
-      { name: "Blog", item: blogCanonicalUrl },
+      { name: "Blog", item: blogCanonicalHttps },
       {
         name: headline.length > 90 ? `${headline.slice(0, 87)}…` : headline,
-        item: articleUrl,
+        item: articleHttps,
       },
     ]),
   );

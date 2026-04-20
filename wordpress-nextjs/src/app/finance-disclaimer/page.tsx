@@ -5,6 +5,7 @@ import {
   breadcrumbJsonLd,
   jsonLdGraph,
   organizationJsonLd,
+  upgradeHttpToHttpsUrl,
   webPageJsonLd,
   webSiteJsonLd,
 } from "@/lib/json-ld";
@@ -24,19 +25,20 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function FinanceDisclaimer() {
   const { currentUrl } = await getCurrentUrlAndRoute("/finance-disclaimer");
-  const origin = new URL(currentUrl).origin;
+  const pageUrl = upgradeHttpToHttpsUrl(currentUrl);
+  const origin = new URL(pageUrl).origin;
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),
     webSiteJsonLd(origin),
     webPageJsonLd({
-      pageUrl: currentUrl,
+      pageUrl,
       name: "Finance Disclaimer Car Sales Brisbane and Statewide Auto Group",
       description:
         "This finance disclaimer explains how we collect, use, and share your personal information when you visit our website or use our services.",
     }),
-    breadcrumbJsonLd(currentUrl, [
+    breadcrumbJsonLd(pageUrl, [
       { name: "Home", item: `${origin}/` },
-      { name: "Finance disclaimer", item: currentUrl },
+      { name: "Finance disclaimer", item: pageUrl },
     ]),
   );
 

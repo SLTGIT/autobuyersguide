@@ -19,6 +19,7 @@ import {
   breadcrumbJsonLd,
   jsonLdGraph,
   organizationJsonLd,
+  upgradeHttpToHttpsUrl,
   vehicleJsonLdFromInventory,
   webPageJsonLd,
   webSiteJsonLd,
@@ -89,7 +90,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const searchQs = serializeInventoryFilters(filters);
   const searchPath = searchQs ? `/search?${searchQs}` : "/search";
   const { currentUrl } = await getCurrentUrlAndRoute(searchPath);
-  const origin = new URL(currentUrl).origin;
+  const currentUrlHttps = upgradeHttpToHttpsUrl(currentUrl);
+  const origin = new URL(currentUrlHttps).origin;
 
   const listTitle =
     "Used Cars for Sale in Brisbane | Car Sales Brisbane and Statewide Auto Group";
@@ -113,31 +115,32 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     organizationJsonLd(origin),
     webSiteJsonLd(origin),
     webPageJsonLd({
-      pageUrl: currentUrl,
+      pageUrl: currentUrlHttps,
       name: listTitle,
       description: listDescription,
     }),
     {
       "@type": "CollectionPage",
-      "@id": `${currentUrl}#collection`,
+      "@id": `${currentUrlHttps}#collection`,
       name: listTitle,
       description: listDescription,
-      url: currentUrl,
+      url: currentUrlHttps,
+      inLanguage: "en-AU",
       isPartOf: { "@id": `${origin}/#website` },
       publisher: { "@id": `${origin}/#organization` },
       ...(itemListElement.length > 0
         ? {
             mainEntity: {
               "@type": "ItemList",
-              numberOfItems: listings.length,
+              numberOfItems: sorted.length,
               itemListElement,
             },
           }
         : {}),
     },
-    breadcrumbJsonLd(currentUrl, [
+    breadcrumbJsonLd(currentUrlHttps, [
       { name: "Home", item: `${origin}/` },
-      { name: "Search", item: currentUrl },
+      { name: "Search", item: currentUrlHttps },
     ]),
   );
 

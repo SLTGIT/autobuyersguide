@@ -1,6 +1,27 @@
 import type { DealerVehicle, VehicleListing } from "@/types/inventory";
 import { buildVehicleSlug } from "./slug";
 
+/** Coerce dealer feed price fields (string or number) — same source as `listing` / VDP. */
+export function inventoryPriceField(raw: unknown): string {
+  if (raw === undefined || raw === null) return "";
+  if (typeof raw === "number" && Number.isFinite(raw)) return String(Math.round(raw));
+  return String(raw).trim();
+}
+
+/** Normalise feed odometer (number, numeric string, or strings with separators). */
+export function parseInventoryOdometerKm(raw: unknown): number | null {
+  if (raw === undefined || raw === null || raw === "") return null;
+  if (typeof raw === "number") {
+    if (!Number.isFinite(raw)) return null;
+    return Math.round(raw);
+  }
+  const digits = String(raw).replace(/\D/g, "");
+  if (!digits) return null;
+  const n = parseInt(digits, 10);
+  if (!Number.isFinite(n) || n < 0) return null;
+  return n;
+}
+
 function formatAudPrice(raw: string | undefined): string {
   if (raw === undefined || raw === null || String(raw).trim() === "") return "";
   const n = Number(String(raw).replace(/[^\d.]/g, ""));
@@ -8,10 +29,34 @@ function formatAudPrice(raw: string | undefined): string {
   return `$${Math.round(n).toLocaleString("en-AU")}`;
 }
 
-export function priceNumber(raw: string | undefined): number | null {
-  if (raw === undefined || raw === null || String(raw).trim() === "") return null;
-  const n = Number(String(raw).replace(/[^\d.]/g, ""));
+export function priceNumber(
+  raw: string | number | undefined | null
+): number | null {
+  if (raw === undefined || raw === null) return null;
+  if (typeof raw === "number") {
+    return Number.isFinite(raw) ? Math.round(raw) : null;
+  }
+  const t = String(raw)
+    .replace(/\u202f|\u00a0/g, " ")
+    .trim();
+  if (t === "") return null;
+  const n = Number(t.replace(/[^\d.]/g, ""));
   return Number.isNaN(n) ? null : n;
+}
+
+/**
+ * Parses the AUD amount actually shown on cards / VDP (`listing.formatted_price`
+ * or `listing.drive_away_price` when drive-away mode is on).
+ */
+export function listingDisplayNumericPriceAud(
+  listing: VehicleListing
+): number | null {
+  const shown =
+    listing.show_drive_away && listing.drive_away_price
+      ? listing.drive_away_price
+      : listing.formatted_price;
+  const n = priceNumber(shown || undefined);
+  return n != null && n > 0 && Number.isFinite(n) ? n : null;
 }
 
 export function shortenLocation(loc: string): string {
@@ -22,8 +67,8 @@ export function shortenLocation(loc: string): string {
 }
 
 export function dealerVehicleToListing(v: DealerVehicle): VehicleListing {
-  const advertised = v.Pricing?.AdvertisedPrice?.trim();
-  const driveAway = v.Pricing?.DriveAwayPrice?.trim();
+  const advertised = inventoryPriceField(v.Pricing?.AdvertisedPrice);
+  const driveAway = inventoryPriceField(v.Pricing?.DriveAwayPrice);
   const isDriveAway =
     Boolean(v.Pricing?.IsDriveAwayPrice) && Boolean(driveAway);
   const priceStr = advertised || driveAway || "";
@@ -34,7 +79,7 @@ export function dealerVehicleToListing(v: DealerVehicle): VehicleListing {
     v.Description?.trim() ||
     [v.ManufactureYear, make, model].filter(Boolean).join(" ");
 
-  const egcRaw = v.Pricing?.EGCPrice?.trim();
+  const egcRaw = inventoryPriceField(v.Pricing?.EGCPrice);
   const advN = priceNumber(advertised || driveAway || undefined);
   const egcN = priceNumber(egcRaw);
   const compare_at_price =
@@ -55,7 +100,7 @@ export function dealerVehicleToListing(v: DealerVehicle): VehicleListing {
     fuel_type: v.FuelType?.trim() || "",
     drive_type: v.DriveType?.trim() || "",
     type_code: v.Type?.trim() || "",
-    odometer: v.Odometer,
+    odometer: parseInventoryOdometerKm(v.Odometer),
     stock_number: v.SKU?.trim() || "",
     formatted_price: formatAudPrice(priceStr),
     compare_at_price,

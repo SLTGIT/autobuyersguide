@@ -5,6 +5,7 @@ import {
   breadcrumbJsonLd,
   jsonLdGraph,
   organizationJsonLd,
+  upgradeHttpToHttpsUrl,
   webPageJsonLd,
   webSiteJsonLd,
 } from "@/lib/json-ld";
@@ -24,20 +25,21 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Contact() {
   const { currentUrl } = await getCurrentUrlAndRoute("/contact");
-  const origin = new URL(currentUrl).origin;
+  const pageUrl = upgradeHttpToHttpsUrl(currentUrl);
+  const origin = new URL(pageUrl).origin;
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),
     webSiteJsonLd(origin),
     webPageJsonLd({
-      pageUrl: currentUrl,
+      pageUrl,
       name: "Contact Car Sales Brisbane and Statewide Auto Group",
       description:
         "Contact Car Sales Brisbane team at Ormiston for used cars, finance pre-approval, sell-my-car enquiries, and Brisbane delivery support.",
       types: ["ContactPage"],
     }),
-    breadcrumbJsonLd(currentUrl, [
+    breadcrumbJsonLd(pageUrl, [
       { name: "Home", item: `${origin}/` },
-      { name: "Contact", item: currentUrl },
+      { name: "Contact", item: pageUrl },
     ]),
   );
 

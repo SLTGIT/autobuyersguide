@@ -10,6 +10,7 @@ import JsonLd from "@/components/JsonLd";
 import {
   jsonLdGraph,
   organizationJsonLd,
+  upgradeHttpToHttpsUrl,
   webPageJsonLd,
   webSiteJsonLd,
 } from "@/lib/json-ld";
@@ -96,12 +97,13 @@ export default async function DiagnosticPage() {
     "NOT SET";
 
   const { currentUrl } = await getCurrentUrlAndRoute("/diagnostics");
-  const origin = new URL(currentUrl).origin;
+  const pageUrl = upgradeHttpToHttpsUrl(currentUrl);
+  const origin = new URL(pageUrl).origin;
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),
     webSiteJsonLd(origin),
     webPageJsonLd({
-      pageUrl: currentUrl,
+      pageUrl,
       name: "WordPress API Diagnostics | Car Sales Brisbane",
       description:
         "Internal diagnostics for WordPress REST API connectivity (posts, pages, settings, menus).",

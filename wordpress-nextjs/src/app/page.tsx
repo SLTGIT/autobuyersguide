@@ -7,6 +7,7 @@ import {
   autoDealerJsonLd,
   jsonLdGraph,
   organizationJsonLd,
+  upgradeHttpToHttpsUrl,
   webPageJsonLd,
   webSiteJsonLd,
 } from "@/lib/json-ld";
@@ -35,7 +36,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Home() {
   const { currentUrl } = await getCurrentUrlAndRoute(HOME_PATH);
-  const origin = new URL(currentUrl).origin;
+  const pageUrl = upgradeHttpToHttpsUrl(currentUrl);
+  const origin = new URL(pageUrl).origin;
   const homeDescription =
     "Access 60+ premium 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.";
   const jsonLd = jsonLdGraph(
@@ -43,7 +45,7 @@ export default async function Home() {
     webSiteJsonLd(origin, { includeSearchAction: true }),
     autoDealerJsonLd(origin),
     webPageJsonLd({
-      pageUrl: currentUrl,
+      pageUrl,
       name: "Quality Used Cars Brisbane | Expert Finance & Sourcing",
       description: homeDescription,
     }),

@@ -9,6 +9,7 @@ import {
     jsonLdGraph,
     organizationJsonLd,
     stripHtml,
+    upgradeHttpToHttpsUrl,
     webPageJsonLd,
     webSiteJsonLd,
 } from '@/lib/json-ld';
@@ -44,7 +45,8 @@ export default async function DynamicPage(props: PageProps) {
 
     const path = `/${params.slug}`;
     const { currentUrl } = await getCurrentUrlAndRoute(path);
-    const origin = new URL(currentUrl).origin;
+    const pageUrl = upgradeHttpToHttpsUrl(currentUrl);
+    const origin = new URL(pageUrl).origin;
     const headline = stripHtml(page.title.rendered);
     const excerpt = stripHtml(page.excerpt?.rendered || '');
     const featuredUrl = page._embedded?.['wp:featuredmedia']?.[0]?.source_url as
@@ -53,34 +55,33 @@ export default async function DynamicPage(props: PageProps) {
 
     const article: Record<string, unknown> = {
         '@type': 'Article',
-        '@id': `${currentUrl}#article`,
+        '@id': `${pageUrl}#article`,
         headline,
-        url: currentUrl,
+        url: pageUrl,
+        inLanguage: 'en-AU',
         datePublished: page.date,
         dateModified: page.modified,
         publisher: { '@id': `${origin}/#organization` },
-        mainEntityOfPage: {
-            '@type': 'WebPage',
-            '@id': `${currentUrl}#webpage`,
-        },
+        author: { '@id': `${origin}/#organization` },
+        mainEntityOfPage: { '@id': `${pageUrl}#webpage` },
     };
-    if (featuredUrl) article.image = [featuredUrl];
+    if (featuredUrl) article.image = [upgradeHttpToHttpsUrl(featuredUrl)];
     if (excerpt) article.description = excerpt;
 
     const jsonLd = jsonLdGraph(
         organizationJsonLd(origin),
         webSiteJsonLd(origin),
         webPageJsonLd({
-            pageUrl: currentUrl,
+            pageUrl,
             name: headline,
             description: excerpt || headline,
         }),
         article,
-        breadcrumbJsonLd(currentUrl, [
+        breadcrumbJsonLd(pageUrl, [
             { name: 'Home', item: `${origin}/` },
             {
                 name: headline.length > 90 ? `${headline.slice(0, 87)}…` : headline,
-                item: currentUrl,
+                item: pageUrl,
             },
         ]),
     );

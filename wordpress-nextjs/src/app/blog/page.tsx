@@ -9,6 +9,7 @@ import {
   jsonLdGraph,
   organizationJsonLd,
   stripHtml,
+  upgradeHttpToHttpsUrl,
   webSiteJsonLd,
 } from "@/lib/json-ld";
 import "./blog.css";
@@ -78,8 +79,10 @@ export default async function Blog({ searchParams }: BlogPageProps) {
       getCurrentUrlAndRoute(listingPath),
       getCurrentUrlAndRoute("/blog"),
     ]);
-  const origin = new URL(listingPageUrl).origin;
-  const blogEntityId = `${blogCanonicalUrl}#blog`;
+  const listingPageHttps = upgradeHttpToHttpsUrl(listingPageUrl);
+  const blogCanonicalHttps = upgradeHttpToHttpsUrl(blogCanonicalUrl);
+  const origin = new URL(listingPageHttps).origin;
+  const blogEntityId = `${blogCanonicalHttps}#blog`;
 
   const pageTitle =
     "Used Car Guides for Brisbane Buyers | Car Sales Brisbane";
@@ -93,7 +96,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
       | undefined;
     const authorName = post._embedded?.author?.[0]?.name as string | undefined;
     const excerpt = stripHtml(post.excerpt.rendered);
-    const articleUrl = `${origin}/blog/${post.slug}`;
+    const articleUrl = upgradeHttpToHttpsUrl(`${origin}/blog/${post.slug}`);
     const blogPosting: Record<string, unknown> = {
       "@type": "BlogPosting",
       "@id": `${articleUrl}#article`,
@@ -101,20 +104,15 @@ export default async function Blog({ searchParams }: BlogPageProps) {
       url: articleUrl,
       datePublished: post.date,
       dateModified: post.modified,
+      inLanguage: "en-AU",
       publisher: { "@id": `${origin}/#organization` },
-      mainEntityOfPage: {
-        "@type": "WebPage",
-        "@id": `${articleUrl}#webpage`,
-      },
+      mainEntityOfPage: articleUrl,
       isPartOf: { "@id": blogEntityId },
     };
-    if (imageUrl) blogPosting.image = [imageUrl];
-    if (authorName) {
-      blogPosting.author = {
-        "@type": "Person",
-        name: authorName,
-      };
-    }
+    if (imageUrl) blogPosting.image = [upgradeHttpToHttpsUrl(imageUrl)];
+    blogPosting.author = authorName
+      ? { "@type": "Person", name: authorName }
+      : { "@id": `${origin}/#organization` };
     if (excerpt) blogPosting.description = excerpt;
     return blogPosting;
   });
@@ -133,16 +131,18 @@ export default async function Blog({ searchParams }: BlogPageProps) {
         "@id": blogEntityId,
         name: "Used Car Guides for Brisbane Buyers",
         description: pageDescription,
-        url: blogCanonicalUrl,
+        url: blogCanonicalHttps,
+        inLanguage: "en-AU",
         publisher: { "@id": `${origin}/#organization` },
         isPartOf: { "@id": `${origin}/#website` },
       },
       {
         "@type": "CollectionPage",
-        "@id": `${listingPageUrl}#webpage`,
+        "@id": `${listingPageHttps}#webpage`,
         name: pageTitle,
         description: pageDescription,
-        url: listingPageUrl,
+        url: listingPageHttps,
+        inLanguage: "en-AU",
         isPartOf: { "@id": `${origin}/#website` },
         publisher: { "@id": `${origin}/#organization` },
         ...(itemListElements.length > 0
@@ -157,7 +157,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
       },
       {
         "@type": "BreadcrumbList",
-        "@id": `${listingPageUrl}#breadcrumb`,
+        "@id": `${listingPageHttps}#breadcrumb`,
         itemListElement: [
           {
             "@type": "ListItem",
@@ -169,7 +169,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
             "@type": "ListItem",
             position: 2,
             name: "Blog",
-            item: listingPageUrl,
+            item: listingPageHttps,
           },
         ],
       },
