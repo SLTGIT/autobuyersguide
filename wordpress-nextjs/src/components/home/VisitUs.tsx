@@ -1,230 +1,32 @@
-import React from "react";
+import ContactInfo from "../ContactInfo";
+import GoogleReviewsSlider from "./GoogleReviewsSlider";
+import { CAR_SALES_BRISBANE_GOOGLE_MAPS_URL, getGoogleReviews } from "@/lib/google-reviews";
 
-const VisitUs = () => {
+const FALLBACK_QUOTE =
+  "Eden and the Statewide team made buying my new Ute effortless. Highly recommend for any Brisbane buyer.";
+const FALLBACK_AUTHOR = "Rylee D.";
+const FALLBACK_SCORE = 4.8;
+
+export default async function VisitUs() {
+  const summary = await getGoogleReviews();
+
   return (
     <>
-      <section className="py-5 bg-white cs-visit-section">
-        <div className="container">
-          <article className="cs-business-card p-4 p-lg-5">
-            <div className="row g-5 align-items-stretch">
-              <div className="col-lg-7">
-                <iframe
-                  className="cs-map-frame"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3538.2886675510936!2d153.2562743!3d-27.522489600000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b91678932e7fccd%3A0x6a000d7f9589579b!2sCar%20Sales%20Brisbane!5e0!3m2!1sen!2sin!4v1775730243051!5m2!1sen!2sin"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Statewide Auto Group map"
-                ></iframe>
-              </div>
-              <div className="col-lg-5">
-                {/* <p
-                  className="text-uppercase fw-semibold small mb-2"
-                  style={{ color: "var(--cs-primary)", letterSpacing: "0.2em" }}
-                >
-                  Visit Us
-                </p> */}
-                {/* <h2 className="display-6 fw-bold cs-title-tight mb-4">
-                  Statewide Auto Group
-                </h2> */}
-                <div className="vstack gap-4">
-                  <div className="cs-contact-row">
-                    <span className="cs-contact-icon">
-                      <i className="bi bi-geo-alt-fill"></i>
-                    </span>
-                    <div>
-                      <div
-                        className="text-secondary text-uppercase small fw-semibold mb-1"
-                        style={{ letterSpacing: "0.18em" }}
-                      >
-                        Address
-                      </div>
-                      <a
-                        className="cs-business-link fs-3 d-inline-block"
-                        href="https://www.google.com/maps/place/Car+Sales+Brisbane/@-27.5224896,153.2562743,17z/data=!3m1!4b1!4m6!3m5!1s0x6b91678932e7fccd:0x6a000d7f9589579b!8m2!3d-27.5224896!4d153.2562743!16s%2Fg%2F11vqstz67d?entry=ttu&g_ep=EgoyMDI2MDQwNi4wIKXMDSoASAFQAw%3D%3D"
-                      >
-                        Car Sales Brisbane
-                      </a>
-                    </div>
-                  </div>
-                  <hr className="my-0" />
-                  <div className="cs-contact-row">
-                    <span className="cs-contact-icon">
-                      <i className="bi bi-telephone-fill"></i>
-                    </span>
-                    <div>
-                      <div
-                        className="text-secondary text-uppercase small fw-semibold mb-1"
-                        style={{ letterSpacing: "0.18em" }}
-                      >
-                        Sales &amp; Service
-                      </div>
-                      <a
-                        className="cs-business-link fs-3 d-inline-block"
-                        href="tel:0418908870"
-                      >
-                        0418 908 870
-                      </a>
-                      <p className="mt-2 mb-1">
-                        <strong>Working Hours:</strong> Mon-Fri: 8:00am-5:30pm
-                      </p>
-                      <p className="mt-1 mb-1 ps-4">Sat: 8:00am-3:00pm</p>
-                      <p className="mt-1 mb-1 ps-4">Sun: Closed</p>
-                    </div>
-                  </div>
-                  <hr className="my-0" />
-                  <div className="cs-contact-row">
-                    <span className="cs-contact-icon">
-                      <i className="bi bi-star-fill"></i>
-                    </span>
-                    <div>
-                      <div
-                        className="text-secondary text-uppercase small fw-semibold mb-1"
-                        style={{ letterSpacing: "0.18em" }}
-                      >
-                        Google Reviews
-                      </div>
-                      <div className="d-flex align-items-center gap-2 mb-2">
-                        <span className="cs-rating-star">
-                          <i className="bi bi-star-fill"></i>
-                        </span>
-                        <span className="cs-rating-star">
-                          <i className="bi bi-star-fill"></i>
-                        </span>
-                        <span className="cs-rating-star">
-                          <i className="bi bi-star-fill"></i>
-                        </span>
-                        <span className="cs-rating-star">
-                          <i className="bi bi-star-fill"></i>
-                        </span>
-                        <span className="cs-rating-star">
-                          <i className="bi bi-star-half"></i>
-                        </span>
-                      </div>
-                      <div className="fw-bold fs-4">4.8/5 Stars</div>
-                    </div>
-                  </div>
-                  <hr className="my-0" />
-                  <div className="cs-contact-row">
-                    <span className="cs-contact-icon">
-                      <i className="bi bi-share-fill"></i>
-                    </span>
-                    <div>
-                      <div
-                        className="text-secondary text-uppercase small fw-semibold mb-2"
-                        style={{ letterSpacing: "0.18em" }}
-                      >
-                        Social Media
-                      </div>
-                      <div className="d-flex gap-3">
-                        <a
-                          className="cs-social-btn cs-social-facebook"
-                          href="https://www.facebook.com/share/1DREXJCBhb/?mibextid=wwXIfr"
-                          aria-label="Facebook"
-                          target="_blank"
-                        >
-                          <img
-                            alt="Facebook"
-                            loading="lazy"
-                            width="24"
-                            height="24"
-                            decoding="async"
-                            data-nimg="1"
-                            style={{ color: "transparent" }}
-                            src="/assets/images/facebook.svg"
-                          />
-                        </a>
-                        <a
-                          className="cs-social-btn cs-social-instagram"
-                          href="https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr"
-                          aria-label="Instagram"
-                          target="_blank"
-                        >
-                          <img
-                            alt="Instagram"
-                            loading="lazy"
-                            width="24"
-                            height="24"
-                            decoding="async"
-                            data-nimg="1"
-                            style={{ color: "transparent" }}
-                            src="/assets/images/instagram.svg"
-                          />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </article>
-        </div>
-      </section>
+      <ContactInfo />
 
-      {/* <section className="pb-5 bg-white">
-        <div className="container">
-          <article className="cs-card p-4 p-lg-5">
-            <div className="row g-4 align-items-center">
-              <div className="col-lg-8">
-                <p
-                  className="text-uppercase fw-semibold small mb-2"
-                  style={{ color: "var(--cs-primary)" }}
-                >
-                  Customer Review
-                </p>
-                <h2 className="display-6 fw-bold cs-title-tight mb-3">
-                  What Our Customers Say
-                </h2>
-                <p className="fs-3 fw-semibold mb-3">
-                  "Eden and the Statewide team made buying my new Ute
-                  effortless. Highly recommend for any Brisbane buyer."
-                </p>
-                <p className="text-secondary mb-0">Rylee D.</p>
-              </div>
-              <div className="col-lg-4">
-                <div className="p-4 rounded-4 cs-map-tone h-100">
-                  <p className="text-secondary mb-2">Review Source</p>
-                  <p className="fw-bold mb-4">
-                    Statewide Auto Group Google Business Profile
-                  </p>
-                  <div className="d-flex align-items-center gap-2 mb-2">
-                    <span className="cs-rating-star">
-                      <i className="bi bi-star-fill"></i>
-                    </span>
-                    <span className="cs-rating-star">
-                      <i className="bi bi-star-fill"></i>
-                    </span>
-                    <span className="cs-rating-star">
-                      <i className="bi bi-star-fill"></i>
-                    </span>
-                    <span className="cs-rating-star">
-                      <i className="bi bi-star-fill"></i>
-                    </span>
-                    <span className="cs-rating-star">
-                      <i className="bi bi-star-half"></i>
-                    </span>
-                  </div>
-                  <p className="fw-bold mb-0">4.8/5 Stars</p>
-                </div>
-              </div>
-            </div>
-            <iframe
-              src="https://0b1c8744c75b4a8fa47935e8949db7a8.elf.site"
-              style={{ border: "none", width: "100%", height: "45vh" }}
-            ></iframe>
-          </article>
-        </div>
-      </section> */}
+      <GoogleReviewsSlider
+        reviews={summary?.reviews ?? []}
+        averageScore={summary?.averageScore ?? FALLBACK_SCORE}
+        reviewCount={summary?.reviewCount ?? null}
+        mapsUrl={CAR_SALES_BRISBANE_GOOGLE_MAPS_URL}
+        fallbackQuote={FALLBACK_QUOTE}
+        fallbackAuthor={FALLBACK_AUTHOR}
+      />
 
       <section id="about-us" className="py-5 bg-white">
         <div className="container">
           <div className="row mb-4 align-items-end">
             <div className="col-lg-8">
-              {/* <p
-                className="text-uppercase fw-semibold small mb-2"
-                style={{ color: "var(--cs-primary)" }}
-              >
-                Trust &amp; Scale
-              </p> */}
               <h2 className="display-6 fw-bold cs-title-tight">
                 Why Choose the Car Sales Brisbane Network?
               </h2>
@@ -283,6 +85,4 @@ const VisitUs = () => {
       </section>
     </>
   );
-};
-
-export default VisitUs;
+}
