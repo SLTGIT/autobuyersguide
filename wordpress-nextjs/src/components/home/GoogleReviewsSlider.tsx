@@ -103,7 +103,7 @@ export default function GoogleReviewsSlider({
       <div className="container">
         <header className={styles.headerRow}>
           <div className={styles.headerTitles}>
-            <p className={styles.kicker}>Customer Reviews</p>
+            {/* <p className={styles.kicker}>Customer Reviews</p> */}
             <h2 className={`display-6 fw-bold cs-title-tight ${styles.title}`}>What Our Customers Say</h2>
           </div>
           <div className={styles.headerActions}>
