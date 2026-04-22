@@ -18,7 +18,7 @@ export default function HeaderNavbar() {
     <nav className="navbar navbar-expand-lg">
       <div className="container py-2">
         <a className="navbar-brand d-flex align-items-center gap-3" href="/">
-          <span className="cs-brand-badge d-inline-flex align-items-center justify-content-center text-white fw-bold">
+          {/* <span className="cs-brand-badge d-inline-flex align-items-center justify-content-center text-white fw-bold">
             CSB
           </span>
           <span className="cs-brand-copy">
@@ -26,7 +26,8 @@ export default function HeaderNavbar() {
             <small className="text-secondary d-block">
               A Statewide Auto Group Digital Showroom
             </small>
-          </span>
+          </span> */}
+          <img src="/assets/images/new-logo_1.png" alt="Car Sales Brisbane" width={140} className="img-fluid rounded-3" />
         </a>
         <button
           className="navbar-toggler"

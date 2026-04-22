@@ -448,7 +448,7 @@ export default function SellMyCarValuationForm() {
 
             <div className="mb-3">
               <label className="smc-form-label" htmlFor="smc-odo">
-                Kilometres (km)<span className="smc-form-req">*</span>
+                Odometer (km)<span className="smc-form-req">*</span>
               </label>
               <input
                 id="smc-odo"

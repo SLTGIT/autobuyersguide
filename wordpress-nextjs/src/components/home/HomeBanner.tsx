@@ -15,7 +15,7 @@ export default function HomeBanner() {
               Quality Used Cars Brisbane | Expert Finance &amp; Sourcing
             </h1>
             <p className="lead mb-4">
-              Access 60+ premium 4x4s, SUVs, and commercial vehicles. Based in
+              Access 50+ premium 4x4s, SUVs, and commercial vehicles. Based in
               Ormiston, we provide $0 deposit finance and statewide delivery
               from Brisbane to Cairns.
             </p>

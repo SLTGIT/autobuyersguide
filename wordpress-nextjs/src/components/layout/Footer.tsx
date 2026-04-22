@@ -12,11 +12,10 @@ export default function Footer() {
           <div className="col-lg-5">
             <h3 className="h5 fw-bold">Our Identity</h3>
             <p className="text-white-50 mb-1">
-              Car Sales Brisbane is an online sales channel of Statewide Auto
-              Group. We specialize in vehicle sourcing, onsite finance, and
+              Car Sales Brisbane is an online sales channel. We specialize in vehicle sourcing, onsite finance, and
               Queensland-wide delivery.
             </p>
-            <p className="text-white-50 mb-0">QLD Dealer License: 4316086</p>
+            <p className="text-white-50 mb-0">QLD Dealer License: 4065904</p>
           </div>
           <div className="col-lg-1"></div>
           <div className="col-lg-3">

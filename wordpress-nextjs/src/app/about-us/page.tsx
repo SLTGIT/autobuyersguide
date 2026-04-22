@@ -253,10 +253,10 @@ const page = async () => {
                 <p className="mb-2">
                   <strong>Email:</strong>
                   <a
-                    href="mailto:sales@statewideautogroup.com.au"
+                    href="mailto:john@statewideautogroup.com.au"
                     className="text-decoration-none text-primary"
                   >
-                    sales@statewideautogroup.com.au
+                    john@statewideautogroup.com.au
                   </a>
                 </p>
                 <p className="mb-2">

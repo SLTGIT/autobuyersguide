@@ -99,7 +99,7 @@ export function organizationJsonLd(origin: string) {
     logo: { "@type": "ImageObject", url: logoUrl },
     description: ORGANIZATION_DESCRIPTION,
     telephone: "+61418908870",
-    // email: "sales@statewideautogroup.com.au",
+    email: "john@statewideautogroup.com.au",
     address: { ...ORG_POSTAL_ADDRESS },
     sameAs: ORG_SAME_AS.map((u) => urlWithoutQueryForSchema(u)),
   };
@@ -156,7 +156,7 @@ export function autoDealerJsonLd(origin: string) {
     image: upgradeHttpToHttpsUrl(`${siteOrigin}/assets/images/favicon.png`),
     url: siteOrigin,
     telephone: "+61418908870",
-    // email: "sales@statewideautogroup.com.au",
+    email: "john@statewideautogroup.com.au",
     address: { ...ORG_POSTAL_ADDRESS },
     parentOrganization: {
       "@type": "Organization",
