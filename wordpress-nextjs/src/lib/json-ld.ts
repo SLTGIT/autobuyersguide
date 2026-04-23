@@ -26,6 +26,10 @@ export const ORGANIZATION_DESCRIPTION =
 export const WEBSITE_DESCRIPTION =
   "Car Sales Brisbane is a leading provider of used cars in Australia. We offer a wide range of used cars for sale in Australia.";
 
+/** Google Maps place URL for the showroom (VDP sidebar, external links). */
+export const ORG_GOOGLE_MAPS_PLACE_URL =
+  "https://www.google.com/maps/place/Car+Sales+Brisbane/@-27.5224896,153.2562743,17z/data=!3m1!4b1!4m6!3m5!1s0x6b91678932e7fccd:0x6a000d7f9589579b!8m2!3d-27.5224896!4d153.2562743!16s%2Fg%2F11vqstz67d?entry=ttu&g_ep=EgoyMDI2MDQwNi4wIKXMDSoASAFQAw%3D%3D";
+
 /**
  * Clean profile URLs for sameAs (no /share/, no tracking query strings).
  * Facebook share links are replaced with the public page slug aligned to Instagram @carsalesbrisbaneau.
@@ -34,7 +38,7 @@ export const ORG_SAME_AS = [
   "https://www.facebook.com/share/1DREXJCBhb/?mibextid=wwXIfr",
   "https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr",
   "https://www.tiktok.com/@carsalesbrisbane?_r=1&_t=ZS-95OLtLR1kfQ",
-  "https://www.google.com/maps/place/Car+Sales+Brisbane/@-27.5224896,153.2562743,17z/data=!3m1!4b1!4m6!3m5!1s0x6b91678932e7fccd:0x6a000d7f9589579b!8m2!3d-27.5224896!4d153.2562743!16s%2Fg%2F11vqstz67d?entry=ttu&g_ep=EgoyMDI2MDQwNi4wIKXMDSoASAFQAw%3D%3D",
+  ORG_GOOGLE_MAPS_PLACE_URL,
 ] as const;
 
 /** Strip query/hash from outbound profile URLs (tracking params) for JSON-LD sameAs. */
@@ -79,10 +83,10 @@ export function upgradeHttpToHttpsUrl(url: string): string {
 /** Physical dealership address (Ormiston showroom). */
 export const ORG_POSTAL_ADDRESS = {
   "@type": "PostalAddress",
-  streetAddress: "56 Freeth St W",
-  addressLocality: "Ormiston",
+  streetAddress: "Car Sales Brisbane",
+  addressLocality: "Brisbane",
   addressRegion: "QLD",
-  postalCode: "4160",
+  postalCode: "4000",
   addressCountry: "AU",
 } as const;
 
@@ -539,10 +543,11 @@ export function vehicleJsonLdFromInventory(
       ? Math.round(Number(listing.odometer))
       : parseInventoryOdometerKm(v.Odometer);
   if (odoKm != null && Number.isFinite(odoKm) && odoKm >= 0) {
-    node.Odometer = {
-      "@type": "Value",
+    // Schema.org Vehicle: same shape as Google vehicle examples (UN/CEFACT KMT = km).
+    node.mileageFromOdometer = {
+      "@type": "QuantitativeValue",
       value: String(Math.round(odoKm)),
-      unitCode: "km",
+      unitCode: "KMT",
     };
   }
 

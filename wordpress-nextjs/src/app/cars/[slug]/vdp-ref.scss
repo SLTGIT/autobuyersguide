@@ -1,0 +1,266 @@
+/* Reference VDP design — scoped so global layout is unaffected */
+.vdp-ref {
+
+  background: var(--cs-bg);
+  color: var(--cs-ink);
+  font-size: 0.95rem;
+
+  .cs-pill {
+    border-radius: 999px;
+  }
+
+  .cs-card {
+    background: var(--cs-card);
+    border: 1px solid var(--cs-line);
+    border-radius: 1.5rem;
+  }
+
+  .cs-hero {
+    background: var(--cs-primary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+
+  .cs-hero nav a,
+  .cs-hero nav span {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  .cs-hero nav a:hover {
+    color: #fff !important;
+    text-decoration: underline;
+  }
+
+  .cs-hero .cs-title-tight,
+  .cs-hero h1 {
+    color: #fff;
+  }
+
+  .cs-hero .lead {
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .cs-hero .cs-price {
+    color: #fff;
+  }
+
+  .cs-hero .text-secondary {
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .cs-hero .badge.text-bg-light {
+    background-color: #fff !important;
+    color: var(--cs-primary) !important;
+  }
+
+  .cs-title-tight {
+    letter-spacing: -0.035em;
+  }
+
+  .cs-muted {
+    color: var(--cs-muted);
+  }
+
+  .cs-price {
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    line-height: 1;
+    font-weight: 800;
+  }
+
+  .cs-spec {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+  }
+
+  .cs-spec > div {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .cs-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background: #fff;
+    color: var(--cs-primary);
+    border: 1px solid var(--cs-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+
+  .cs-sticky {
+    position: sticky;
+    top: 112px;
+  }
+
+  .cs-feature {
+    display: flex;
+    gap: 0.55rem;
+    align-items: flex-start;
+  }
+
+  .cs-feature i {
+    color: var(--cs-primary);
+    margin-top: 0.15rem;
+  }
+
+  .cs-answer {
+    background: #fff;
+    border-left: 5px solid var(--cs-primary);
+  }
+
+  .cs-mini-label {
+    font-size: 0.76rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cs-primary);
+    font-weight: 800;
+  }
+
+  .cs-faq details {
+    border-top: 1px solid var(--cs-line);
+    padding: 1rem 0;
+  }
+
+  .cs-faq summary {
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .cs-faq details:first-child {
+    border-top: 0;
+  }
+
+  .vdp-ref-gallery-wrap {
+    margin-bottom: 1rem;
+  }
+
+  .vdp-ref-gallery-wrap .vehicle-gallery.vehicle-gallery--vdp {
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 0.25rem 0.75rem rgba(30, 39, 50, 0.08);
+  }
+
+  .btn-primary {
+    --bs-btn-bg: var(--cs-primary);
+    --bs-btn-border-color: var(--cs-primary);
+    --bs-btn-color: #fff;
+    --bs-btn-hover-bg: var(--cs-primary);
+    --bs-btn-hover-border-color: var(--cs-primary);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: var(--cs-primary);
+    --bs-btn-active-border-color: var(--cs-primary);
+    --bs-btn-active-color: #fff;
+    background-color: var(--cs-primary) !important;
+    border-color: var(--cs-primary) !important;
+    color: #fff !important;
+  }
+
+  .btn-outline-primary {
+    --bs-btn-color: var(--cs-primary);
+    --bs-btn-border-color: var(--cs-primary);
+    --bs-btn-bg: #fff;
+    --bs-btn-hover-bg: var(--cs-primary);
+    --bs-btn-hover-border-color: var(--cs-primary);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: var(--cs-primary);
+    --bs-btn-active-border-color: var(--cs-primary);
+    --bs-btn-active-color: #fff;
+    background-color: #fff !important;
+    color: var(--cs-primary) !important;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.25;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .btn-lg {
+    line-height: 1.2;
+    font-size: 1.05rem;
+  }
+
+  .text-primary {
+    color: var(--cs-primary) !important;
+  }
+
+  .vdp-ref-maps-link {
+    transition: color 0.2s ease;
+  }
+
+  .vdp-ref-maps-link:hover {
+    color: var(--cs-primary) !important;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: var(--cs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(61, 138, 148, 0.18);
+  }
+
+  @media (max-width: 991px) {
+    .cs-sticky {
+      position: static;
+    }
+  }
+
+  .vdp-ref-faq-list {
+    border-top: 1px solid var(--cs-line);
+  }
+
+  .vdp-ref-faq-item {
+    border-bottom: 1px solid var(--cs-line);
+    padding: 0.15rem 0;
+  }
+
+  .vdp-ref-faq-item:last-child {
+    border-bottom: 0;
+  }
+
+  .vdp-ref-faq-summary {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.02rem;
+    padding: 0.85rem 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: var(--cs-ink);
+  }
+
+  .vdp-ref-faq-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .vdp-ref-faq-summary::after {
+    content: "";
+    width: 0.55rem;
+    height: 0.55rem;
+    border-right: 2px solid var(--cs-primary);
+    border-bottom: 2px solid var(--cs-primary);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+    margin-right: 0.25rem;
+    transition: transform 0.2s ease;
+  }
+
+  .vdp-ref-faq-item[open] .vdp-ref-faq-summary::after {
+    transform: rotate(225deg);
+    margin-top: 0.2rem;
+  }
+
+  .vdp-ref-faq-body {
+    max-width: 52rem;
+    padding-bottom: 0.35rem;
+    line-height: 1.55;
+  }
+}
