@@ -37,7 +37,7 @@ export default function HomeBanner() {
           <div className="col-lg-5">
             <article className="card border-0 shadow-lg rounded-5 overflow-hidden">
               <img
-                src="/assets/images/banner-side-img.webp"
+                src="/assets/images/image_1.jpg"
                 className="card-img-top"
                 alt="Used Cars Brisbane Statewide Auto Group featured vehicle"
               />

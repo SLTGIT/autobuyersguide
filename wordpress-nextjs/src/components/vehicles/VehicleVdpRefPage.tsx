@@ -274,7 +274,7 @@ export default function VehicleVdpRefPage({
                 className="cs-card p-4 p-lg-5 mb-4 cs-faq vdp-ref-faq"
                 id="vehicle-faq"
               >
-                <p className="cs-mini-label mb-2">Vehicle Q&amp;A</p>
+                <p className="cs-mini-label mb-2">Q&amp;A</p>
                 <h2 className="h3 fw-bold mb-3">Questions buyers ask</h2>
                 {ai.faqs.length === 0 ? (
                   <p className="cs-muted mb-0">
@@ -364,7 +364,7 @@ export default function VehicleVdpRefPage({
               <div className="cs-sticky">
                 <div className="cs-card p-4 mb-4 shadow-sm">
                   <p className="text-uppercase small fw-bold text-primary mb-2">
-                    Finance-first enquiry
+                    Used
                   </p>
                   <h2 className="h4 fw-bold mb-2">{headline}</h2>
                   <div className="cs-price mb-1">{priceMain || "—"}</div>

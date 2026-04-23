@@ -64,7 +64,7 @@ const page = async () => {
             <div className="col-lg-5">
               <article className="card border-0 shadow-lg rounded-5 overflow-hidden">
                 <img
-                  src="https://d2s8i866417m9.cloudfront.net/photo/32428698/photo/thumb-232954f40d5f21bf8a4fa35d6daa7a7a.jpg"
+                  src="/assets/images/image_1.jpg"
                   className="card-img-top"
                   alt="Statewide Auto Group used vehicle showroom image"
                 />

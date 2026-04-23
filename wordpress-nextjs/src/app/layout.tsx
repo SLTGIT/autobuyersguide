@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description:
     "Car Sales Brisbane is a leading provider of used cars in Australia. We offer a wide range of used cars for sale in Australia.",
   icons: {
-    icon: "/assets/images/carsalesbrisbane.webp",
+    icon: "/assets/images/favicon.webp",
   },
 };
 
