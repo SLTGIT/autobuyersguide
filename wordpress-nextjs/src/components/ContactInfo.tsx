@@ -193,6 +193,23 @@ export default async function ContactInfo() {
                           src="/assets/images/instagram.svg"
                         />
                       </a>
+                      <a
+                        className="cs-social-btn cs-social-tiktok"
+                        href="https://www.tiktok.com/@carsalesbrisbane?_r=1&_t=ZS-95OLtLR1kfQ"
+                        aria-label="TikTok"
+                        target="_blank"
+                      >
+                        <img
+                          alt="TikTok"
+                          loading="lazy"
+                          width="24"
+                          height="24"
+                          decoding="async"
+                          data-nimg="1"
+                          style={{ color: "transparent" }}
+                          src="/assets/images/tiktok.svg"
+                        />
+                      </a>
                     </div>
                   </div>
                 </div>

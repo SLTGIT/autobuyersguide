@@ -1,5 +1,6 @@
 import "./search.css";
 import type { Metadata } from "next";
+import { after } from "next/server";
 import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
 import { Suspense } from "react";
 import Image from "next/image";
@@ -31,6 +32,7 @@ import InventoryToolbar from "@/components/vehicles/InventoryToolbar";
 import InventorySearchBar from "@/components/vehicles/InventorySearchBar";
 import InventoryPagination from "@/components/vehicles/InventoryPagination";
 import VehicleGrid from "@/components/vehicles/VehicleGrid";
+import { warmVehicleVdpCachesForVehicles } from "@/lib/openai/warmVehicleVdpCache";
 
 interface SearchPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -86,6 +88,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     filters.page * PER_PAGE,
   );
   const listings = pageSlice.map(dealerVehicleToListing);
+
+  if (pageSlice.length > 0) {
+    after(() => {
+      void warmVehicleVdpCachesForVehicles(pageSlice, {
+        max: pageSlice.length,
+      });
+    });
+  }
 
   const searchQs = serializeInventoryFilters(filters);
   const searchPath = searchQs ? `/search?${searchQs}` : "/search";

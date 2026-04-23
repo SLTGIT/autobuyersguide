@@ -1,10 +1,12 @@
 import type { DealerVehicle } from "@/types/inventory";
+import { after } from "next/server";
 import { fetchDealerInventory } from "@/lib/dealer-solutions/fetch-inventory";
 import { dealerVehicleToListing } from "@/lib/inventory/transform";
 import {
   pickFeaturedArrivalVehicles,
 } from "@/lib/inventory/featured-arrivals";
 import VehicleCard from "@/components/vehicles/VehicleCard";
+import { warmVehicleVdpCachesForVehicles } from "@/lib/openai/warmVehicleVdpCache";
 
 export default async function PopularCarTypes() {
   let featured: DealerVehicle[] = [];
@@ -18,6 +20,10 @@ export default async function PopularCarTypes() {
   if (featured.length === 0) {
     return null;
   }
+
+  after(() => {
+    void warmVehicleVdpCachesForVehicles(featured, { max: featured.length });
+  });
 
   return (
     <section id="inventory" className="py-5">
