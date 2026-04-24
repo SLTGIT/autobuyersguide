@@ -113,4 +113,12 @@
     outline: 2px solid rgba(0, 120, 255, 0.45);
     outline-offset: 2px;
   }
+
+  &:active {
+    color: var(--cs-primary, #0078ff);
+  }
+  
+  &:focus {
+    color: var(--cs-primary, #0078ff);
+  }
 }
