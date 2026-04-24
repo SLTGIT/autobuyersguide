@@ -198,11 +198,13 @@ export function webPageJsonLd(input: {
 export function breadcrumbJsonLd(
   pageUrl: string,
   items: { name: string; item: string }[],
+  options?: { idFragment?: string },
 ) {
   const canonicalPage = upgradeHttpToHttpsUrl(pageUrl);
+  const idFragment = options?.idFragment ?? "breadcrumb";
   return {
     "@type": "BreadcrumbList",
-    "@id": `${canonicalPage}#breadcrumb`,
+    "@id": `${canonicalPage}#${idFragment}`,
     itemListElement: items.map((it, i) => ({
       "@type": "ListItem",
       position: i + 1,
@@ -307,17 +309,15 @@ function productCategoryLabel(
   );
 }
 
-/**
- * VDP breadcrumb JSON-LD: Home > Used cars / New cars > Make > Model (no “Search”).
- */
-export function vehicleVdpBreadcrumbJsonLd(
-  pageUrl: string,
+/** Breadcrumb trail for vehicle detail pages (absolute URLs). */
+export function vehicleVdpBreadcrumbListItems(
   origin: string,
+  canonicalPageUrl: string,
   listing: VehicleListing,
   v: DealerVehicle,
-) {
+): { name: string; item: string }[] {
   const siteOrigin = upgradeHttpToHttpsUrl(origin);
-  const canonicalPage = upgradeHttpToHttpsUrl(pageUrl);
+  const canonicalPage = upgradeHttpToHttpsUrl(canonicalPageUrl);
   const conditionLower = (listing.condition || "used").toLowerCase();
   const catalogHref =
     conditionLower === "new"
@@ -337,12 +337,28 @@ export function vehicleVdpBreadcrumbJsonLd(
       ? `${listing.title.slice(0, 77)}…`
       : listing.title);
 
-  return breadcrumbJsonLd(canonicalPage, [
+  return [
     { name: "Home", item: `${siteOrigin}/` },
     { name: catalogLabel, item: catalogHref },
     { name: make || "Vehicles", item: makeHref },
     { name: modelCrumbName, item: canonicalPage },
-  ]);
+  ];
+}
+
+/**
+ * VDP breadcrumb JSON-LD: Home > Used cars / New cars > Make > Model (no “Search”).
+ */
+export function vehicleVdpBreadcrumbJsonLd(
+  pageUrl: string,
+  origin: string,
+  listing: VehicleListing,
+  v: DealerVehicle,
+) {
+  const canonicalPage = upgradeHttpToHttpsUrl(pageUrl);
+  return breadcrumbJsonLd(
+    canonicalPage,
+    vehicleVdpBreadcrumbListItems(origin, canonicalPage, listing, v),
+  );
 }
 
 export type VehicleJsonLdOptions = {
@@ -577,4 +593,224 @@ export function vehicleJsonLdFromInventory(
   return Object.fromEntries(
     Object.entries(node).filter(([, val]) => val !== undefined),
   ) as Record<string, unknown>;
+}
+
+/** AU mobile/landline to E.164 for JSON-LD `telephone` (e.g. +61418908870). */
+export function dealerPhoneToE164Au(raw: string): string {
+  const t = (raw || "").trim();
+  const d = t.replace(/\D/g, "");
+  if (t.startsWith("+")) return t;
+  if (d.startsWith("61") && d.length >= 11) return `+${d}`;
+  if (d.startsWith("0") && d.length >= 9) return `+61${d.slice(1)}`;
+  if (d.length >= 9) return `+${d}`;
+  return "+61418908870";
+}
+
+function driveWheelPlainForCarSchema(drive: string): string | undefined {
+  const t = drive.trim().toLowerCase();
+  if (!t || t === "—") return undefined;
+  if (/awd|all[-\s]?wheel/i.test(t)) return "AWD";
+  if (/4wd|4x4|four[-\s]?wheel/i.test(t)) return "4WD";
+  if (/fwd|front[-\s]?wheel/i.test(t)) return "FWD";
+  if (/rwd|rear[-\s]?wheel/i.test(t)) return "RWD";
+  return drive.trim();
+}
+
+export type VehicleVdpCarListingJsonLdInput = {
+  /** Canonical VDP URL (https). */
+  canonicalPageUrl: string;
+  /** Vehicle summary for structured data (e.g. meta description). */
+  description: string;
+  dealerPhoneE164: string;
+  /** FAQ items for FAQPage rich results (optional). */
+  faqs?: { question: string; answer: string }[];
+};
+
+function vehicleVdpFaqPageJsonLd(
+  canonicalProductUrl: string,
+  faqs: { question: string; answer: string }[],
+): Record<string, unknown> | null {
+  const pageUrl = upgradeHttpToHttpsUrl(canonicalProductUrl);
+  const items = faqs
+    .map((f) => {
+      const name = stripHtml(f.question || "").trim();
+      const text = stripHtml(f.answer || "")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (!name || !text) return null;
+      return {
+        "@type": "Question",
+        name,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text,
+        },
+      };
+    })
+    .filter(Boolean) as Record<string, unknown>[];
+  if (!items.length) return null;
+  return {
+    "@type": "FAQPage",
+    "@id": `${pageUrl}#faqs`,
+    mainEntity: items,
+  };
+}
+
+/**
+ * Vehicle detail JSON-LD: `@graph` with `Car`, `AutoDealer`, `BreadcrumbList`
+ * (dealer-style shape for rich results), plus optional `FAQPage`.
+ */
+export function vehicleVdpCarListingGraphJsonLd(
+  origin: string,
+  v: DealerVehicle,
+  listing: VehicleListing,
+  input: VehicleVdpCarListingJsonLdInput,
+): Record<string, unknown> {
+  const siteOrigin = upgradeHttpToHttpsUrl(origin);
+  const productUrl = upgradeHttpToHttpsUrl(
+    input.canonicalPageUrl || `${siteOrigin}/cars/${listing.slug}`,
+  );
+  const priceVal = resolveVehicleOfferPriceAud(v, listing);
+  const images = (v.Photos ?? [])
+    .map((p) => upgradeHttpToHttpsUrl(p.PhotoUrl))
+    .filter(Boolean)
+    .slice(0, 12);
+
+  const conditionLower = (listing.condition || "used").toLowerCase();
+  const itemCondition =
+    conditionLower === "new"
+      ? "https://schema.org/NewCondition"
+      : "https://schema.org/UsedCondition";
+
+  const bodyTypeNorm = normalizeBodyTypeForGoogleVehicle(
+    listing.body_type || v.BodyType?.trim() || "",
+    listing.type_code,
+  );
+  const makeName = (
+    listing.make?.trim() ||
+    v.Make?.trim() ||
+    inferMakeFromTitle(listing.title, listing.year)
+  ).trim();
+  const modelName = (
+    listing.model?.trim() ||
+    v.Model?.trim() ||
+    inferModelFromTitle(listing.title, listing.year, makeName)
+  ).trim();
+  const modelYear = v.ManufactureYear ?? listing.year;
+  const yearStr =
+    modelYear != null && Number.isFinite(Number(modelYear))
+      ? String(modelYear)
+      : undefined;
+
+  const transmission = (
+    listing.transmission?.trim() ||
+    v.TransmissionType?.trim() ||
+    ""
+  ).trim();
+  const fuel = (
+    listing.fuel_type?.trim() ||
+    v.FuelType?.trim() ||
+    ""
+  ).trim();
+  const drivePlain = driveWheelPlainForCarSchema(
+    listing.drive_type || v.DriveType || "",
+  );
+  const colour = v.BodyColour?.trim();
+  const sku =
+    listing.stock_number?.trim() || String(v.ItemID);
+
+  const odoKm =
+    listing.odometer != null &&
+    Number.isFinite(listing.odometer) &&
+    listing.odometer >= 0
+      ? Math.round(Number(listing.odometer))
+      : parseInventoryOdometerKm(v.Odometer);
+
+  const desc = stripHtml(input.description || "").trim();
+  const imageList =
+    images.length > 0
+      ? images
+      : listing.featured_image
+        ? [upgradeHttpToHttpsUrl(listing.featured_image)]
+        : [productUrl];
+
+  const car: Record<string, unknown> = {
+    "@type": "Car",
+    "@id": `${productUrl}#vehicle`,
+    name: listing.title,
+    url: productUrl,
+    brand: { "@type": "Brand", name: makeName || "Vehicle" },
+    manufacturer: { "@type": "Organization", name: makeName || "Vehicle" },
+    model: modelName,
+    itemCondition,
+    sku,
+  };
+
+  if (yearStr) {
+    car.vehicleModelDate = yearStr;
+    car.productionDate = yearStr;
+  }
+  if (bodyTypeNorm) car.bodyType = bodyTypeForSchemaDisplay(bodyTypeNorm);
+  if (transmission) car.vehicleTransmission = transmission;
+  if (drivePlain) car.driveWheelConfiguration = drivePlain;
+  if (fuel) car.fuelType = fuel;
+  if (colour) car.color = colour;
+  if (desc) car.description = desc;
+  car.image = imageList;
+
+  if (odoKm != null && Number.isFinite(odoKm) && odoKm >= 0) {
+    car.mileageFromOdometer = {
+      "@type": "QuantitativeValue",
+      value: Math.round(odoKm),
+      unitCode: "KMT",
+    };
+  }
+
+  const priceSpecDescription =
+    listing.show_drive_away && listing.drive_away_price
+      ? "Drive away price includes applicable government charges where stated."
+      : "Excludes government charges.";
+
+  if (priceVal != null && Number.isFinite(priceVal) && priceVal > 0) {
+    car.offers = {
+      "@type": "Offer",
+      url: productUrl,
+      price: String(priceVal),
+      priceCurrency: "AUD",
+      availability: "https://schema.org/InStock",
+      itemCondition,
+      seller: { "@id": `${siteOrigin}/#dealer` },
+      priceSpecification: {
+        "@type": "PriceSpecification",
+        price: String(priceVal),
+        priceCurrency: "AUD",
+        description: priceSpecDescription,
+      },
+    };
+  }
+
+  const dealer: Record<string, unknown> = {
+    "@type": "AutoDealer",
+    "@id": `${siteOrigin}/#dealer`,
+    name: "Car Sales Brisbane",
+    url: `${siteOrigin}/`,
+    telephone: input.dealerPhoneE164,
+    address: { ...ORG_POSTAL_ADDRESS },
+    areaServed: {
+      "@type": "AdministrativeArea",
+      name: "Queensland",
+    },
+  };
+
+  const breadcrumbs = breadcrumbJsonLd(
+    productUrl,
+    vehicleVdpBreadcrumbListItems(siteOrigin, productUrl, listing, v),
+    { idFragment: "breadcrumbs" },
+  );
+
+  const faqPage = input.faqs?.length
+    ? vehicleVdpFaqPageJsonLd(productUrl, input.faqs)
+    : null;
+
+  return jsonLdGraph(car, dealer, breadcrumbs, faqPage);
 }

@@ -16,13 +16,9 @@ import {
   siteUrlMetadataFields,
 } from "@/lib/site-url";
 import {
-  jsonLdGraph,
-  organizationJsonLd,
+  dealerPhoneToE164Au,
   upgradeHttpToHttpsUrl,
-  vehicleJsonLdFromInventory,
-  vehicleVdpBreadcrumbJsonLd,
-  webPageJsonLd,
-  webSiteJsonLd,
+  vehicleVdpCarListingGraphJsonLd,
 } from "@/lib/json-ld";
 
 import "./vdp-ref.scss";
@@ -75,25 +71,6 @@ function toSimilarItem(v: DealerVehicle): SimilarCarItem {
         : null,
     location: l.location_short,
     tags,
-  };
-}
-
-function faqPageJsonLd(
-  faqs: { question: string; answer: string }[],
-  _pageUrl: string
-): Record<string, unknown> | null {
-  if (faqs.length === 0) return null;
-  return {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({
-      "@type": "Question",
-      name: f.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: f.answer,
-      },
-    })),
   };
 }
 
@@ -201,41 +178,16 @@ export default async function VehicleDetailPage({
   const { currentUrl: pageUrl } = await getCurrentUrlAndRoute(sharePath);
   const pageUrlHttps = upgradeHttpToHttpsUrl(pageUrl);
   const origin = new URL(pageUrlHttps).origin;
-  const vehicleNode = vehicleJsonLdFromInventory(origin, v, listing, {
+  const vdpJsonLd = vehicleVdpCarListingGraphJsonLd(origin, v, listing, {
     canonicalPageUrl: pageUrlHttps,
+    description: ai.metaDescription,
+    dealerPhoneE164: dealerPhoneToE164Au(dealerPhone),
+    faqs: ai.faqs,
   });
-  const vdpDescription = ai.metaDescription;
-  const faqNode = faqPageJsonLd(ai.faqs, pageUrlHttps);
-  const jsonLd = faqNode
-    ? jsonLdGraph(
-        organizationJsonLd(origin),
-        webSiteJsonLd(origin),
-        webPageJsonLd({
-          pageUrl: pageUrlHttps,
-          name: formatVehicleVdpBrowserTitle(ai.seoTitle),
-          description: vdpDescription,
-          mainEntity: { "@id": `${pageUrlHttps}#vehicle` },
-        }),
-        vehicleNode,
-        vehicleVdpBreadcrumbJsonLd(pageUrlHttps, origin, listing, v),
-        faqNode
-      )
-    : jsonLdGraph(
-        organizationJsonLd(origin),
-        webSiteJsonLd(origin),
-        webPageJsonLd({
-          pageUrl: pageUrlHttps,
-          name: formatVehicleVdpBrowserTitle(ai.seoTitle),
-          description: vdpDescription,
-          mainEntity: { "@id": `${pageUrlHttps}#vehicle` },
-        }),
-        vehicleNode,
-        vehicleVdpBreadcrumbJsonLd(pageUrlHttps, origin, listing, v)
-      );
 
   return (
     <>
-      <JsonLd data={jsonLd} />
+      <JsonLd data={vdpJsonLd} />
       <VehicleVdpRefPage
         snapshot={snapshot}
         ai={ai}

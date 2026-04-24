@@ -235,7 +235,7 @@ export default function VehicleVdpRefPage({
               />
               <VdpFeaturesCard items={ai.featureItems} />
 
-              <section className="cs-card p-4 p-lg-5 mb-4" id="ai-overview">
+              {/* <section className="cs-card p-4 p-lg-5 mb-4" id="ai-overview">
                 <p className="cs-mini-label mb-2">Quick buyer answer</p>
                 <div className="cs-answer rounded-4 p-4 mb-4">
                   <h2 className="h4 fw-bold mb-2">{ai.quickBuyer.title}</h2>
@@ -257,13 +257,13 @@ export default function VehicleVdpRefPage({
                     </p>
                   </div>
                 </div>
-              </section>
+              </section> */}
 
               <section
                 className="cs-card p-4 p-lg-5 mb-4"
                 id="dealer-comment-breakdown"
               >
-                <p className="cs-mini-label mb-2">Dealer comment breakdown</p>
+                <p className="cs-mini-label mb-2">Dealer comment</p>
                 <h2 className="h3 fw-bold mb-3">
                   Original details, grouped for buyers
                 </h2>
@@ -349,7 +349,7 @@ export default function VehicleVdpRefPage({
                 </div>
               </article>
 
-              {/* <VehicleSimilarCarousel items={similarItems} /> */}
+              <VehicleSimilarCarousel items={similarItems} />
 
               <section className="cs-card p-4 p-lg-5 mt-2" id="vehicle-enquiry">
                 <p className="cs-mini-label mb-2">Vehicle enquiry</p>
