@@ -72,9 +72,9 @@ export default async function ContactInfo() {
                     <p className="mt-2 mb-1">
                       <strong>Working Hours:</strong>
                     </p>
-                    <p className="mt-1 mb-1 ps-4">Mon-Fri: 8:00am-5:30pm</p>
-                    <p className="mt-1 mb-1 ps-4">Sat: 8:00am-3:00pm</p>
-                    <p className="mt-1 mb-1 ps-4">Sun: Closed</p>
+                    <p className="mt-1 mb-1">Mon-Fri: 8:00am-5:30pm</p>
+                    <p className="mt-1 mb-1">Sat: 8:00am-3:00pm</p>
+                    <p className="mt-1 mb-1">Sun: Closed</p>
                   </div>
                 </div>
                 <hr className="my-0" />

@@ -20,14 +20,6 @@ import VehicleVdpRefInlineEnquiry from "./VehicleVdpRefInlineEnquiry";
 import VdpRefPhoneReveal from "./VdpRefPhoneReveal";
 import { ORG_GOOGLE_MAPS_PLACE_URL, ORG_POSTAL_ADDRESS } from "@/lib/json-ld";
 
-const DEALER_HOURS = (
-  <>
-    <p className="cs-muted mb-2">Mon–Fri: 8:00am–5:30pm</p>
-    <p className="cs-muted mb-2">Sat: 8:00am–3:00pm</p>
-    <p className="cs-muted mb-0">Sun: Closed</p>
-  </>
-);
-
 function formatDealerAddress(): string {
   const a = ORG_POSTAL_ADDRESS;
   return `${a.streetAddress}, ${a.addressLocality}, ${a.addressRegion} ${a.postalCode}`;
@@ -440,19 +432,52 @@ export default function VehicleVdpRefPage({
                   </ul>
                 </div>
 
-                <div className="cs-card p-4 mb-4">
-                  <h3 className="h5 fw-bold">Location and hours</h3>
-                  <p className="cs-muted mb-2">
-                    <a
-                      href={ORG_GOOGLE_MAPS_PLACE_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="cs-muted link-offset-2 link-underline link-underline-opacity-25 vdp-ref-maps-link"
-                    >
-                      {formatDealerAddress()}
-                    </a>
-                  </p>
-                  {DEALER_HOURS}
+                <div className="cs-card p-4 mb-4 vdp-ref-location-card">
+                  <h3 className="h5 fw-bold mb-3">Location and hours</h3>
+                  <div className="vstack gap-3">
+                    <div className="cs-contact-row">
+                      <span className="cs-contact-icon">
+                        <i className="bi bi-geo-alt-fill" aria-hidden />
+                      </span>
+                      <div className="min-w-0">
+                        <div
+                          className="text-secondary text-uppercase small fw-semibold mb-1"
+                          style={{ letterSpacing: "0.18em" }}
+                        >
+                          Address
+                        </div>
+                        <a
+                          href={ORG_GOOGLE_MAPS_PLACE_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="cs-business-link vdp-ref-location-link d-inline-block"
+                        >
+                          {formatDealerAddress()}, Australia
+                        </a>
+                      </div>
+                    </div>
+                    <hr className="my-0 text-secondary opacity-25" />
+                    <div className="cs-contact-row">
+                      <span className="cs-contact-icon">
+                        <i className="bi bi-clock-fill" aria-hidden />
+                      </span>
+                      <div className="min-w-0">
+                        <div
+                          className="text-secondary text-uppercase small fw-semibold mb-1"
+                          style={{ letterSpacing: "0.18em" }}
+                        >
+                          Working hours
+                        </div>
+                        <p className="mb-1 text-secondary small">
+                          Mon-Fri: 8:00am-5:30pm
+                        </p>
+                        <p className="mb-1 text-secondary small">
+                          Sat: 8:00am-3:00pm
+                        </p>
+                        <p className="mb-0 text-secondary small">Sun: Closed</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="cs-card p-4">

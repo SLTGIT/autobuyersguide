@@ -105,10 +105,12 @@ export function vehicleCardFeatureTags(
   listing: VehicleListing,
   max = 3,
 ): string[] {
+
+  console.log("vehicleCardFeatureTags", listing);
   const candidates = [
     listing.body_type?.trim(),
     listing.drive_type?.trim(),
-    listing.fuel_type?.trim(),
+    // listing.fuel_type?.trim(),
   ].filter(Boolean) as string[];
   const seen = new Set<string>();
   const out: string[] = [];
