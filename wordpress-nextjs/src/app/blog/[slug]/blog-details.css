@@ -1,5 +1,5 @@
 .cs-page-hero {
-  background: rgb(12, 49, 109);
+  background: #f3f7fb;
 
 }
 .cs-card {
@@ -12,7 +12,8 @@
 }
 .cs-hero-chip {
   background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid var(--cs-primary-dark);
+  color: var(--cs-primary-dark);
 }
 .cs-title-tight {
   letter-spacing: -0.03em;

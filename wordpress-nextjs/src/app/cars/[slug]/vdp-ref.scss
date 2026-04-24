@@ -16,41 +16,7 @@
   }
 
   .cs-hero {
-    background: var(--cs-primary);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
-  }
-
-  .cs-hero nav a,
-  .cs-hero nav span {
-    color: rgba(255, 255, 255, 0.9) !important;
-  }
-
-  .cs-hero nav a:hover {
-    color: #fff !important;
-    text-decoration: underline;
-  }
-
-  .cs-hero .cs-title-tight,
-  .cs-hero h1 {
-    color: #fff;
-  }
-
-  .cs-hero .lead {
-    color: rgba(255, 255, 255, 0.92);
-  }
-
-  .cs-hero .cs-price {
-    color: #fff;
-  }
-
-  .cs-hero .text-secondary {
-    color: rgba(255, 255, 255, 0.85) !important;
-  }
-
-  .cs-hero .badge.text-bg-light {
-    background-color: #fff !important;
-    color: var(--cs-primary) !important;
+    border-bottom: 1px solid var(--cs-line);
   }
 
   .cs-title-tight {

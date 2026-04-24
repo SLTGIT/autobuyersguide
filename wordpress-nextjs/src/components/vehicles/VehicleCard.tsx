@@ -144,25 +144,27 @@ export default function VehicleCard({
         >
           {/* <VehicleCardSave listingId={listing.id} /> */}
           <div className="inventory-card-aside-prices">
-            {listing.compare_at_price ? (
-              <span className="inventory-card-price-was inventory-card-price-was--aside">
-                {listing.compare_at_price}
-              </span>
-            ) : null}
-            {listing.formatted_price ? (
-              <span className="inventory-card-price inventory-card-price--aside">
-                {listing.formatted_price}
-              </span>
-            ) : (
-              <span className="inventory-card-price-muted inventory-card-price-muted--aside">
-                Price on request
-              </span>
-            )}
-            {listing.show_drive_away && listing.drive_away_price ? (
-              <span className="inventory-card-driveaway-note inventory-card-driveaway-note--aside">
-                {listing.drive_away_price} drive away
-              </span>
-            ) : null}
+            <div className="inventory-card-price-display inventory-card-price-display--list">
+              {listing.compare_at_price ? (
+                <span className="inventory-card-price-was inventory-card-price-was--aside">
+                  {listing.compare_at_price}
+                </span>
+              ) : null}
+              {listing.formatted_price ? (
+                <span className="inventory-card-price inventory-card-price--aside">
+                  {listing.formatted_price}
+                </span>
+              ) : (
+                <span className="inventory-card-price-muted inventory-card-price-muted--aside">
+                  Price on request
+                </span>
+              )}
+              {listing.show_drive_away && listing.drive_away_price ? (
+                <span className="inventory-card-driveaway-note inventory-card-driveaway-note--aside">
+                  {listing.drive_away_price} drive away
+                </span>
+              ) : null}
+            </div>
           </div>
           <Link href="/finance-centre" className="inventory-card-finance-link">
             Calculate financing

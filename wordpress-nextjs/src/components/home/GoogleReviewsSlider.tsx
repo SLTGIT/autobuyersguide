@@ -26,6 +26,68 @@ function reviewBody(r: GoogleReviewItem): string {
   return stripLeadingStarEmojis(r.text).trim();
 }
 
+const REVIEWS_PER_SLIDE = 2;
+
+function chunkReviews(items: GoogleReviewItem[], size: number): GoogleReviewItem[][] {
+  const pages: GoogleReviewItem[][] = [];
+  for (let i = 0; i < items.length; i += size) {
+    pages.push(items.slice(i, i + size));
+  }
+  return pages;
+}
+
+function ReviewCard({
+  r,
+  averageScore,
+}: {
+  r: GoogleReviewItem;
+  averageScore: number;
+}) {
+  const b = reviewBody(r);
+  const rs = Number.parseFloat(r.rating);
+  const sc = Number.isFinite(rs) ? rs : averageScore;
+  return (
+    <article className={styles.reviewCard}>
+      <span className={styles.cardQuoteMark} aria-hidden>
+        &ldquo;
+      </span>
+      <blockquote className={styles.quote} title={b ? b : undefined}>
+        {b ? (
+          <>
+            <span className="visually-hidden">Quote: </span>
+            {b}
+          </>
+        ) : (
+          <span className={styles.quoteEmpty}>No written review for this rating.</span>
+        )}
+      </blockquote>
+      <footer className={styles.authorBar}>
+        {r.user_photo ? (
+          <Image
+            src={r.user_photo}
+            alt=""
+            width={48}
+            height={48}
+            className={styles.avatar}
+            unoptimized
+          />
+        ) : (
+          <div className={styles.avatarFallback} aria-hidden>
+            <i className="bi bi-person-fill" />
+          </div>
+        )}
+        <div className={styles.authorMetaBlock}>
+          <cite className={styles.authorName}>{r.user}</cite>
+          <div className={styles.authorSub}>
+            <GoogleRatingStars score={sc} className={styles.authorStars} />
+            {r.date ? <time className={styles.date}>{formatReviewDate(r.date)}</time> : null}
+          </div>
+        </div>
+      </footer>
+    </article>
+  );
+}
+
 export default function GoogleReviewsSlider({
   reviews,
   averageScore,
@@ -47,23 +109,30 @@ export default function GoogleReviewsSlider({
     ];
   }, [reviews, fallbackAuthor, fallbackQuote, averageScore]);
 
+  const pagePairs = useMemo(
+    () => chunkReviews(slides, REVIEWS_PER_SLIDE),
+    [slides],
+  );
+
   const [index, setIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const regionRef = useRef<HTMLElement | null>(null);
 
-  const n = slides.length;
-  const safeIndex = ((index % n) + n) % n;
+  const pageCount = pagePairs.length;
+  const safePageIndex =
+    pageCount > 0 ? (((index % pageCount) + pageCount) % pageCount) : 0;
 
   const go = useCallback(
     (dir: -1 | 1) => {
+      if (pageCount <= 1) return;
       setIndex((i) => {
         const next = i + dir;
-        if (next < 0) return n - 1;
-        if (next >= n) return 0;
+        if (next < 0) return pageCount - 1;
+        if (next >= pageCount) return 0;
         return next;
       });
     },
-    [n],
+    [pageCount],
   );
 
   useEffect(() => {
@@ -121,10 +190,10 @@ export default function GoogleReviewsSlider({
               )}
             </div>
             <div className={styles.nav}>
-              <button type="button" className={styles.navBtn} onClick={() => go(-1)} aria-label="Previous review">
+              <button type="button" className={styles.navBtn} onClick={() => go(-1)} aria-label="Previous reviews">
                 <i className="bi bi-chevron-left fs-5" aria-hidden />
               </button>
-              <button type="button" className={styles.navBtn} onClick={() => go(1)} aria-label="Next review">
+              <button type="button" className={styles.navBtn} onClick={() => go(1)} aria-label="Next reviews">
                 <i className="bi bi-chevron-right fs-5" aria-hidden />
               </button>
             </div>
@@ -137,78 +206,46 @@ export default function GoogleReviewsSlider({
           onTouchEnd={onTouchEnd}
           role="group"
           aria-roledescription="carousel"
-          aria-label={`Review ${safeIndex + 1} of ${n}`}
+          aria-label={`Reviews page ${safePageIndex + 1} of ${pageCount}`}
         >
-          <span className={styles.quoteMark} aria-hidden>
-            &ldquo;
-          </span>
-          <div className={styles.track} style={{ transform: `translateX(-${safeIndex * 100}%)` }}>
-            {slides.map((r, i) => {
-              const b = reviewBody(r);
-              const rs = Number.parseFloat(r.rating);
-              const sc = Number.isFinite(rs) ? rs : averageScore;
-              return (
-                <div
-                  key={`${r.user}-${r.date}-${i}`}
-                  className={styles.slide}
-                  aria-hidden={i !== safeIndex}
-                >
-                  <blockquote className={styles.quote}>
-                    {b ? (
-                      <>
-                        <span className="visually-hidden">Quote: </span>
-                        {b}
-                      </>
-                    ) : (
-                      <span className={styles.quoteEmpty}>No written review for this rating.</span>
-                    )}
-                  </blockquote>
-                  <footer className={styles.authorBar}>
-                    {r.user_photo ? (
-                      <Image
-                        src={r.user_photo}
-                        alt=""
-                        width={56}
-                        height={56}
-                        className={styles.avatar}
-                        unoptimized
-                      />
-                    ) : (
-                      <div className={styles.avatarFallback} aria-hidden>
-                        <i className="bi bi-person-fill" />
-                      </div>
-                    )}
-                    <div className={styles.authorMetaBlock}>
-                      <cite className={styles.authorName}>{r.user}</cite>
-                      <div className={styles.authorSub}>
-                        <GoogleRatingStars score={sc} className={styles.authorStars} />
-                        {r.date ? <time className={styles.date}>{formatReviewDate(r.date)}</time> : null}
-                      </div>
-                    </div>
-                  </footer>
+          <div className={styles.track} style={{ transform: `translateX(-${safePageIndex * 100}%)` }}>
+            {pagePairs.map((pair, pageIdx) => (
+              <div
+                key={`slide-${pageIdx}-${pair.map((r) => `${r.user}-${r.date}`).join("|")}`}
+                className={styles.slide}
+                aria-hidden={pageIdx !== safePageIndex}
+              >
+                <div className={styles.slideGrid}>
+                  {pair.map((r, j) => (
+                    <ReviewCard
+                      key={`${pageIdx}-${j}-${r.user}-${r.date}`}
+                      r={r}
+                      averageScore={averageScore}
+                    />
+                  ))}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
 
-        {n > 1 ? (
+        {pageCount > 1 ? (
           <div className={styles.dotsRow}>
-            <div className={styles.dots} role="tablist" aria-label="Select review">
-              {slides.map((r, i) => (
+            <div className={styles.dots} role="tablist" aria-label="Select reviews page">
+              {pagePairs.map((pair, i) => (
                 <button
-                  key={`dot-${r.user}-${r.date}-${i}`}
+                  key={`dot-page-${i}-${pair[0]?.user ?? ""}`}
                   type="button"
                   role="tab"
-                  aria-selected={i === safeIndex}
-                  aria-label={`Show review ${i + 1} of ${n}`}
-                  className={`${styles.dot} ${i === safeIndex ? styles.dotActive : ""}`}
+                  aria-selected={i === safePageIndex}
+                  aria-label={`Show reviews ${i * REVIEWS_PER_SLIDE + 1}–${Math.min((i + 1) * REVIEWS_PER_SLIDE, slides.length)} of ${slides.length}`}
+                  className={`${styles.dot} ${i === safePageIndex ? styles.dotActive : ""}`}
                   onClick={() => setIndex(i)}
                 />
               ))}
             </div>
             <p className={styles.counter}>
-              {safeIndex + 1} / {n}
+              {safePageIndex + 1} / {pageCount}
             </p>
           </div>
         ) : null}

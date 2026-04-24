@@ -56,7 +56,7 @@ export default async function FinanceCentre() {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <section className="cs-page-hero py-5 text-white">
+      <section className="cs-page-hero py-5">
         <div className="container py-lg-4">
           <div className="row g-4 align-items-center">
             <div className="col-lg-7">

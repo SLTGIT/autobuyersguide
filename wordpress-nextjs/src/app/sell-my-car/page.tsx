@@ -63,11 +63,11 @@ export default async function SellMyCarPage() {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <section className="cs-page-hero py-5 text-white">
+      <section className="cs-page-hero py-5">
         <div className="container py-lg-4">
           <div className="row g-4 align-items-center">
             <div className="col-lg-8">
-              <h1 className="display-5 fw-bold mb-3 cs-title-tight">
+              <h1 className="display-3 fw-bold mb-3 ">
                 Obligation-free valuation &amp; competitive offers
               </h1>
               <p className="lead mb-0">
@@ -76,9 +76,9 @@ export default async function SellMyCarPage() {
               </p>
               <a
                 href="#sell-my-car-form"
-                className="btn btn-light btn-lg cs-pill cs-cta-strong text-primary mt-3 px-4 fs-5"
+                className="btn btn-primary btn-lg cs-pill fw-semibold cs-cta-strong mt-3 px-4 fs-5"
               >
-                Sell my car
+                Sell My Car
               </a>
             </div>
           </div>

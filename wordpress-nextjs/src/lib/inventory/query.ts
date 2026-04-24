@@ -36,7 +36,7 @@ export function parseInventorySearchParams(
     ? (sortRaw as InventorySort)
     : "best";
 
-  const view = toStr(raw.view) === "list" ? "list" : "grid";
+  const view = toStr(raw.view) === "grid" ? "grid" : "list";
 
   const makeRaw = toStr(raw.make).trim();
   return {

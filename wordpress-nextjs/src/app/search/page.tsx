@@ -157,7 +157,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <section className="cs-page-hero search-page-hero py-3 py-md-4 text-white">
+      <section className="cs-page-hero search-page-hero py-3 py-md-4">
         <div className="container py-lg-2">
           <div className="row g-3 g-lg-4 align-items-center">
             <div className="col-lg-7">

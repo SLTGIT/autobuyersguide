@@ -14,10 +14,7 @@ import {
 } from "@/lib/json-ld";
 import "./blog.css";
 
-function blogListingPath(
-  page: number,
-  categoryId: number | undefined
-): string {
+function blogListingPath(page: number, categoryId: number | undefined): string {
   const sp = new URLSearchParams();
   if (page > 1) sp.set("page", String(page));
   if (categoryId) sp.set("category", String(categoryId));
@@ -84,8 +81,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
   const origin = new URL(listingPageHttps).origin;
   const blogEntityId = `${blogCanonicalHttps}#blog`;
 
-  const pageTitle =
-    "Used Car Guides for Brisbane Buyers | Car Sales Brisbane";
+  const pageTitle = "Used Car Guides for Brisbane Buyers | Car Sales Brisbane";
   const pageDescription =
     "Read Brisbane used car guides covering car finance, used 4x4s, family SUVs, cheap cars, and first-time buyer tips from Car Sales Brisbane.";
 
@@ -124,62 +120,62 @@ export default async function Blog({ searchParams }: BlogPageProps) {
   }));
 
   const jsonLd = jsonLdGraph(
-      organizationJsonLd(origin),
-      webSiteJsonLd(origin),
-      {
-        "@type": "Blog",
-        "@id": blogEntityId,
-        name: "Used Car Guides for Brisbane Buyers",
-        description: pageDescription,
-        url: blogCanonicalHttps,
-        inLanguage: "en-AU",
-        publisher: { "@id": `${origin}/#organization` },
-        isPartOf: { "@id": `${origin}/#website` },
-      },
-      {
-        "@type": "CollectionPage",
-        "@id": `${listingPageHttps}#webpage`,
-        name: pageTitle,
-        description: pageDescription,
-        url: listingPageHttps,
-        inLanguage: "en-AU",
-        isPartOf: { "@id": `${origin}/#website` },
-        publisher: { "@id": `${origin}/#organization` },
-        ...(itemListElements.length > 0
-          ? {
-              mainEntity: {
-                "@type": "ItemList",
-                numberOfItems: posts.length,
-                itemListElement: itemListElements,
-              },
-            }
-          : {}),
-      },
-      {
-        "@type": "BreadcrumbList",
-        "@id": `${listingPageHttps}#breadcrumb`,
-        itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            name: "Home",
-            item: `${origin}/`,
-          },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: "Blog",
-            item: listingPageHttps,
-          },
-        ],
-      },
-      ...blogPostingSchemas,
+    organizationJsonLd(origin),
+    webSiteJsonLd(origin),
+    {
+      "@type": "Blog",
+      "@id": blogEntityId,
+      name: "Used Car Guides for Brisbane Buyers",
+      description: pageDescription,
+      url: blogCanonicalHttps,
+      inLanguage: "en-AU",
+      publisher: { "@id": `${origin}/#organization` },
+      isPartOf: { "@id": `${origin}/#website` },
+    },
+    {
+      "@type": "CollectionPage",
+      "@id": `${listingPageHttps}#webpage`,
+      name: pageTitle,
+      description: pageDescription,
+      url: listingPageHttps,
+      inLanguage: "en-AU",
+      isPartOf: { "@id": `${origin}/#website` },
+      publisher: { "@id": `${origin}/#organization` },
+      ...(itemListElements.length > 0
+        ? {
+            mainEntity: {
+              "@type": "ItemList",
+              numberOfItems: posts.length,
+              itemListElement: itemListElements,
+            },
+          }
+        : {}),
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${listingPageHttps}#breadcrumb`,
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: `${origin}/`,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Blog",
+          item: listingPageHttps,
+        },
+      ],
+    },
+    ...blogPostingSchemas,
   );
 
   return (
     <>
       <JsonLd data={jsonLd} />
-      <section className="cs-page-hero py-5 text-white">
+      <section className="cs-page-hero py-5">
         <div className="container py-lg-4">
           <div className="row g-4 align-items-center">
             <div className="col-lg-7">
@@ -198,68 +194,70 @@ export default async function Blog({ searchParams }: BlogPageProps) {
           </div>
         </div>
       </section>
-      <div className="container py-5">
-        {/* API Error */}
-        {apiError && (
-          <div className="alert alert-warning text-center mb-4">
-            <strong>Note:</strong> Unable to connect to WordPress API. Please
-            check your <code>.env</code> configuration.
-          </div>
-        )}
-
-        {/* Blog Posts Grid */}
-        <div className="container">
-          {posts.length > 0 ? (
-            <>
-              <div className="row g-4">
-                {posts.map((post) => (
-                  <div
-                    key={post.id}
-                    className="col-12 col-md-6 col-lg-4 d-flex"
-                  >
-                    <BlogCard post={post} />
-                  </div>
-                ))}
-              </div>
-
-              {/* Pagination */}
-              {(hasNextPage || hasPrevPage) && (
-                <div className="d-flex justify-content-center align-items-center gap-2 mt-5">
-                  {hasPrevPage && (
-                    <Link
-                      href={`/blog?page=${currentPage - 1}${
-                        categoryFilter ? `&category=${categoryFilter}` : ""
-                      }`}
-                      className="btn btn-outline-secondary"
-                    >
-                      Previous
-                    </Link>
-                  )}
-
-                  <span className="btn btn-primary disabled">
-                    {currentPage}
-                  </span>
-
-                  {hasNextPage && (
-                    <Link
-                      href={`/blog?page=${currentPage + 1}${
-                        categoryFilter ? `&category=${categoryFilter}` : ""
-                      }`}
-                      className="btn btn-outline-secondary"
-                    >
-                      Next
-                    </Link>
-                  )}
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-5">
-              <p className="text-muted fs-5">No posts found.</p>
+      <section className="bg-white">
+        <div className="container py-5">
+          {/* API Error */}
+          {apiError && (
+            <div className="alert alert-warning text-center mb-4">
+              <strong>Note:</strong> Unable to connect to WordPress API. Please
+              check your <code>.env</code> configuration.
             </div>
           )}
+
+          {/* Blog Posts Grid */}
+          <div className="container">
+            {posts.length > 0 ? (
+              <>
+                <div className="row g-4">
+                  {posts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="col-12 col-md-6 col-lg-4 d-flex"
+                    >
+                      <BlogCard post={post} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {(hasNextPage || hasPrevPage) && (
+                  <div className="d-flex justify-content-center align-items-center gap-2 mt-5">
+                    {hasPrevPage && (
+                      <Link
+                        href={`/blog?page=${currentPage - 1}${
+                          categoryFilter ? `&category=${categoryFilter}` : ""
+                        }`}
+                        className="btn btn-outline-secondary"
+                      >
+                        Previous
+                      </Link>
+                    )}
+
+                    <span className="btn btn-primary disabled">
+                      {currentPage}
+                    </span>
+
+                    {hasNextPage && (
+                      <Link
+                        href={`/blog?page=${currentPage + 1}${
+                          categoryFilter ? `&category=${categoryFilter}` : ""
+                        }`}
+                        className="btn btn-outline-secondary"
+                      >
+                        Next
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-5">
+                <p className="text-muted fs-5">No posts found.</p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

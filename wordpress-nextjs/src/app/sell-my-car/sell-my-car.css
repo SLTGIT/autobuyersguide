@@ -1,12 +1,12 @@
 /* Statewide brand teal (wordmark) for this page; hero keeps site blue gradient */
-.smc-intro,
+/* .smc-intro,
 .smc-form-section {
   --color-primary: #00838f;
-}
+} */
 
-.cs-page-hero {
+/* .cs-page-hero {
   background: var(--cs-primary);
-}
+} */
 
 .smc-hero-cta {
   border-radius: 0.65rem;

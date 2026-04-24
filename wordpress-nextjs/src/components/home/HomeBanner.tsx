@@ -4,7 +4,7 @@ import "./HomeBanner.scss";
 
 export default function HomeBanner() {
   return (
-    <section className="cs-hero py-5 text-white">
+    <section className="cs-hero py-5 text-body">
       <div className="container py-lg-4">
         <div className="row g-4 align-items-center">
           <div className="col-lg-7">
@@ -12,9 +12,9 @@ export default function HomeBanner() {
               Car Sales Brisbane
             </span> */}
             <h1 className="display-3 fw-bold mb-3 cs-title-tight">
-              Quality Used Cars Brisbane | Expert Finance &amp; Sourcing
+              Quality Used Cars Brisbane | Easy Finance & Car Sourcing
             </h1>
-            <p className="lead mb-4">
+            <p className="lead text-secondary mb-4">
               Access 50+ premium 4x4s, SUVs, and commercial vehicles. Based in
               Ormiston, we provide $0 deposit finance and statewide delivery
               from Brisbane to Cairns.
@@ -27,7 +27,7 @@ export default function HomeBanner() {
                 Browse All Vehicles
               </a>
               <a
-                className="btn btn-light btn-lg cs-pill cs-cta-strong text-primary"
+                className="btn btn-outline-primary btn-lg cs-pill cs-cta-strong"
                 href="/finance-centre"
               >
                 Check Finance Eligibility
@@ -48,9 +48,7 @@ export default function HomeBanner() {
                 <h2 className="h4 fw-bold text-dark mb-2">
                   Brisbane based, finance ready, statewide delivery.
                 </h2>
-                <p className="text-secondary mb-0">
-                  Car Sales Brisbane
-                </p>
+                <p className="text-secondary mb-0">Car Sales Brisbane</p>
               </div>
             </article>
           </div>

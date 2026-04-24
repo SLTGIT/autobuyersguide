@@ -69,6 +69,13 @@
   color: #ffb400;
 }
 
-a:hover, a:active, a:focus {
+.inventory-card-detail-btn:hover, .inventory-card-detail-btn:active, .inventory-card-detail-btn:focus {
   color: #fff !important;
+}
+
+.cs-cta-strong {
+  border: 2px solid #eff2f8;
+  font-weight: 700;
+  padding: .9rem 1.5rem !important;
+  font-size: .9rem !important;
 }
