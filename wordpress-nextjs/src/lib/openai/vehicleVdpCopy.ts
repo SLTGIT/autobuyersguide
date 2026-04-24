@@ -39,16 +39,42 @@ function isPlaceholderHeroBadge(s: string): boolean {
   return false;
 }
 
+/**
+ * Inventory feeds often send full fuel taxonomy (e.g. "Petrol - Unleaded"). That is
+ * correct data from the DMS — "Unleaded" distinguishes ULP from diesel/LPG — but for
+ * the hero pill we shorten to what buyers expect in a one-line summary.
+ */
+function simplifyFuelTypeForHero(fuel: string): string {
+  const t = fuel.trim().replace(/\s+/g, " ");
+  if (!t) return t;
+  const lower = t.toLowerCase();
+  if (lower === "ulp") return "Petrol";
+  if (/^unleaded\s+petrol$/i.test(t)) return "Petrol";
+  if (/^petrol\s*[-–]\s*unleaded$/i.test(t)) return "Petrol";
+  if (/^petrol\s*[-–]\s*premium(?:\s+98)?$/i.test(t)) return "Petrol (Premium)";
+  if (/^petrol\s*[-–]\s*prem(?:ium)?\s+unleaded$/i.test(t)) return "Petrol (Premium)";
+  return t;
+}
+
+/** Normalise fuel phrasing inside an assembled hero badge (model or snapshot). */
+function normalizeHeroBadgeFuelPhrases(badge: string): string {
+  return badge
+    .replace(/\bPetrol\s*[-–]\s*Unleaded\b/gi, "Petrol")
+    .replace(/\bUnleaded\s+Petrol\b/gi, "Petrol")
+    .replace(/\bPetrol\s*[-–]\s*Premium(?:\s+98)?\b/gi, "Petrol (Premium)")
+    .trim();
+}
+
 function formatHeroBadgeFromSnapshot(snapshot: VehicleVdpSnapshot): string {
   const parts = [
     String(snapshot.year),
     snapshot.condition,
     snapshot.bodyType,
-    snapshot.fuelType,
+    simplifyFuelTypeForHero(snapshot.fuelType),
   ]
     .map((p) => String(p ?? "").trim())
     .filter(Boolean);
-  return parts.join(" · ");
+  return normalizeHeroBadgeFuelPhrases(parts.join(" · "));
 }
 
 const VDP_BROWSER_TITLE_SUFFIX = " | Car Sales Brisbane";
@@ -125,9 +151,9 @@ export function buildListingHeroBadge(
     return formatHeroBadgeFromSnapshot(snapshot);
   }
   const year = String(snapshot.year);
-  if (/^\d{4}\b/.test(cleaned)) return cleaned;
-  if (cleaned.includes(year)) return cleaned;
-  return `${year} · ${cleaned}`;
+  if (/^\d{4}\b/.test(cleaned)) return normalizeHeroBadgeFuelPhrases(cleaned);
+  if (cleaned.includes(year)) return normalizeHeroBadgeFuelPhrases(cleaned);
+  return normalizeHeroBadgeFuelPhrases(`${year} · ${cleaned}`);
 }
 
 function stripTypicalGenerationPreamble(value: string): string {
@@ -705,7 +731,7 @@ export function fallbackVehicleVdpAiContent(
 }
 
 const JSON_INSTRUCTION = `Return a single JSON object only (no markdown). Required keys:
-- heroBadge (string): short pill from REAL listing fields only, e.g. "2019 · Used · SUV · Diesel" (year · condition · body · fuel as available). Never output template words like "condition", "body type", "fuel", or "year" as literals. Do NOT mention warranty. heroLead (string): one-line hook under the title.
+- heroBadge (string): short pill from REAL listing fields only, e.g. "2019 · Used · SUV · Diesel" (year · condition · body · fuel as available). For fuel, use a short buyer-facing label (e.g. "Petrol", "Diesel", "Hybrid") — not long DMS strings like "Petrol - Unleaded". Never output template words like "condition", "body type", "fuel", or "year" as literals. Do NOT mention warranty. heroLead (string): one-line hook under the title.
 - overviewParagraphs (array of 2 strings)
 - carDetailsRows: array of { label, value, sourceTag ("listing"|"inferred"|"mixed"), icon? }. Cover Condition, Year, Odometer, Transmission, Body, Fuel, Drive, Colour, Doors, Seats when the listing supports it; omit unknowns. Optional icon = Bootstrap Icons suffix only (e.g. speedometer2).
 - engineTowingRows: same row shape as carDetailsRows; every row MUST include non-empty "label", non-empty "value", "sourceTag", and "icon" (Bootstrap Icons suffix). Output 6–12 rows (Engine, Transmission, Cylinders, Torque, fuel economy, tank size, Payload, Braked/unbraked towing, Dimensions, Wheelbase, GVM, Compliance, etc.). Use the listing snapshot first. When the snapshot is silent on numbers, you MUST still fill these rows using your knowledge of that generation for the Australian market (match year, make, model, body type, fuel, transmission, drive from the snapshot). Mark those rows sourceTag "inferred" or "mixed". Write compact "value" text: lead with the figure or fact, then optional "— confirm with dealer" (e.g. "~9.0 L/100 km — confirm with dealer", "~3200 kg braked — confirm with dealer"). Never use the phrase "Not in listing — typical for this generation:" or "Typical for this generation:" as a prefix. Never leave value empty.

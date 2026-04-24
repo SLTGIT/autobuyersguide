@@ -17,6 +17,7 @@ import VehicleSimilarCarousel, {
   type SimilarCarItem,
 } from "./VehicleSimilarCarousel";
 import VehicleVdpRefInlineEnquiry from "./VehicleVdpRefInlineEnquiry";
+import VdpRefPhoneReveal from "./VdpRefPhoneReveal";
 import { ORG_GOOGLE_MAPS_PLACE_URL, ORG_POSTAL_ADDRESS } from "@/lib/json-ld";
 
 const DEALER_HOURS = (
@@ -153,25 +154,34 @@ export default function VehicleVdpRefPage({
     <div className="vdp-ref">
       <section className="cs-hero py-4 py-lg-5">
         <div className="container">
-          <nav className="small mb-3" aria-label="Breadcrumb">
-            <Link className="text-secondary" href="/">
+          <nav className="vdp-ref-breadcrumb mb-3" aria-label="Breadcrumb">
+            <Link className="vdp-ref-breadcrumb-link" href="/">
               Home
             </Link>
-            <span className="text-secondary"> / </span>
-            <Link className="text-secondary" href={catalogHref}>
+            <span className="vdp-ref-breadcrumb-sep" aria-hidden>
+              {" "}
+              /{" "}
+            </span>
+            <Link className="vdp-ref-breadcrumb-link" href={catalogHref}>
               {catalogLabel}
             </Link>
-            <span className="text-secondary"> / </span>
-            <Link className="text-secondary" href={breadcrumbMakeHref}>
+            <span className="vdp-ref-breadcrumb-sep" aria-hidden>
+              {" "}
+              /{" "}
+            </span>
+            <Link className="vdp-ref-breadcrumb-link" href={breadcrumbMakeHref}>
               {breadcrumbMake || "Vehicles"}
             </Link>
-            <span className="text-secondary"> / </span>
-            <span className="text-secondary">{breadcrumbCurrent}</span>
+            <span className="vdp-ref-breadcrumb-sep" aria-hidden>
+              {" "}
+              /{" "}
+            </span>
+            <span className="vdp-ref-breadcrumb-current">{breadcrumbCurrent}</span>
           </nav>
           <div className="row g-4 align-items-end">
             <div className="col-lg-8">
               {ai.heroBadge.trim() ? (
-                <span className="badge rounded-pill text-bg-light text-primary mb-3">
+                <span className="badge rounded-pill text-bg-light text-primary mb-3 vdp-ref-hero-badge">
                   {ai.heroBadge}
                 </span>
               ) : null}
@@ -359,10 +369,14 @@ export default function VehicleVdpRefPage({
                   Call us or use the enquiry form above — we will confirm a time
                   that suits you.
                 </p>
+                <VdpRefPhoneReveal
+                  dealerPhone={dealerPhone}
+                  telHref={telHref}
+                  stockNumber={snapshot.stockNumber}
+                  showDivider={false}
+                  className="mb-3"
+                />
                 <div className="d-flex flex-wrap gap-2">
-                  <a className="btn btn-primary cs-pill px-4" href={telHref}>
-                    Call {dealerPhone}
-                  </a>
                   <Link
                     className="btn btn-outline-primary cs-pill px-4"
                     href="/contact"
@@ -388,6 +402,11 @@ export default function VehicleVdpRefPage({
                     Finance available subject to approval, term, deposit, and
                     lender criteria.
                   </p>
+                  <VdpRefPhoneReveal
+                    dealerPhone={dealerPhone}
+                    telHref={telHref}
+                    stockNumber={snapshot.stockNumber}
+                  />
                   <div className="d-grid gap-2">
                     <Link
                       className="btn btn-primary btn-lg cs-pill"
@@ -406,12 +425,6 @@ export default function VehicleVdpRefPage({
                       href="#schedule-test-drive"
                     >
                       Schedule Test Drive
-                    </a>
-                    <a
-                      className="btn btn-outline-primary btn-lg cs-pill"
-                      href={telHref}
-                    >
-                      Call {dealerPhone}
                     </a>
                   </div>
                 </div>

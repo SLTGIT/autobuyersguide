@@ -1,5 +1,6 @@
 /* Reference VDP design — scoped so global layout is unaffected */
 .vdp-ref {
+  
 
   background: var(--cs-bg);
   color: var(--cs-ink);
@@ -17,6 +18,117 @@
 
   .cs-hero {
     border-bottom: 1px solid var(--cs-line);
+    background: #fff;
+  }
+
+  .vdp-ref-breadcrumb {
+    font-size: 1.0625rem;
+    line-height: 1.45;
+    font-weight: 500;
+  }
+
+  .vdp-ref-breadcrumb-link {
+    color: var(--cs-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--cs-primary);
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba(61, 138, 148, 0.45);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+  }
+
+  .vdp-ref-breadcrumb-sep,
+  .vdp-ref-breadcrumb-current {
+    color: var(--cs-muted);
+  }
+
+  .vdp-ref-breadcrumb-current {
+    font-weight: 600;
+    color: var(--cs-ink);
+  }
+
+  .vdp-ref-hero-badge {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+    padding: 0.5rem 1.15rem;
+  }
+
+  .vdp-ref-phone-inline {
+    margin-bottom: 1rem;
+
+    &--ruled {
+      padding-top: 1rem;
+      border-top: 1px solid var(--cs-line);
+    }
+  }
+
+  .vdp-ref-phone-hint {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--cs-muted);
+  }
+
+  .vdp-ref-phone-stock {
+    font-weight: 600;
+    color: var(--cs-ink);
+  }
+
+  .vdp-ref-phone-row {
+    min-height: 2.5rem;
+  }
+
+  .vdp-ref-phone-reveal-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: opacity 0.15s ease;
+
+    &:hover .vdp-ref-phone-masked {
+      text-decoration: underline;
+      text-underline-offset: 0.12em;
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba(61, 138, 148, 0.45);
+      outline-offset: 3px;
+    }
+  }
+
+  .vdp-ref-phone-masked,
+  .vdp-ref-phone-number--link {
+    font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--cs-primary);
+  }
+
+  .vdp-ref-phone-number--link:hover {
+    color: var(--cs-primary-dark);
+    text-decoration: underline !important;
+    text-underline-offset: 0.12em;
+  }
+
+  .vdp-ref-phone-icon {
+    font-size: 1.5rem;
+    color: var(--cs-primary);
+    opacity: 0.95;
   }
 
   .cs-title-tight {

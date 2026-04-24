@@ -83,11 +83,11 @@ export default function VehicleCard({
               <h3 className="inventory-card-headline inventory-card-headline--list">
                 {primary}
               </h3>
-              {subtitle ? (
+              {/* {subtitle ? (
                 <p className="inventory-card-subtitle inventory-card-subtitle--list">
                   {subtitle}
                 </p>
-              ) : null}
+              ) : null} */}
             </Link>
           </div>
 
