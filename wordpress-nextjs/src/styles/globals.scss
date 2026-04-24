@@ -79,3 +79,9 @@
   padding: .9rem 1.5rem !important;
   font-size: .9rem !important;
 }
+
+.btn-outline-primary:active {
+  background-color: unset !important;
+  color: var(--cs-primary) !important;
+  border-color: var(--cs-primary) !important;
+}
