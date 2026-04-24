@@ -72,12 +72,10 @@ function VdpFeaturesCard({ items }: { items: VehicleVdpAiFeatureItem[] }) {
       <h2 className="h3 fw-bold mb-4">Features listed</h2>
       <div className="row g-4">
         {items.map((it, i) => {
-          const iconSuf = it.icon || fallbackIconForFeatureItem(it.label, it.value);
+          const iconSuf =
+            it.icon || fallbackIconForFeatureItem(it.label, it.value);
           return (
-            <div
-              key={`${it.label}-${i}`}
-              className="col-md-6"
-            >
+            <div key={`${it.label}-${i}`} className="col-md-6">
               <div className="cs-spec">
                 <span className="cs-icon">
                   <i className={biClass(iconSuf)} aria-hidden />
@@ -147,9 +145,7 @@ export default function VehicleVdpRefPage({
         ? `${snapshot.odometerKm.toLocaleString("en-AU")} km`
         : null,
       snapshot.fuelType || null,
-      snapshot.locationShort
-        ? `In stock: ${snapshot.locationShort}`
-        : null,
+      snapshot.locationShort ? `In stock: ${snapshot.locationShort}` : null,
     ] as (string | null)[]
   ).filter(Boolean) as string[];
 
@@ -179,7 +175,9 @@ export default function VehicleVdpRefPage({
                   {ai.heroBadge}
                 </span>
               ) : null}
-              <h1 className="display-5 fw-bold cs-title-tight mb-3">{headline}</h1>
+              <h1 className="display-5 fw-bold cs-title-tight mb-3">
+                {headline}
+              </h1>
               <p className="lead mb-0">{ai.heroLead}</p>
             </div>
             <div className="col-lg-4 text-lg-end">
@@ -211,7 +209,10 @@ export default function VehicleVdpRefPage({
               <article className="cs-card p-4 p-lg-5 mb-4">
                 <h2 className="h3 fw-bold mb-3">Vehicle overview</h2>
                 {ai.overviewParagraphs.map((p, i) => (
-                  <p className={`cs-muted ${i < ai.overviewParagraphs.length - 1 ? "mb-3" : "mb-0"}`} key={i}>
+                  <p
+                    className={`cs-muted ${i < ai.overviewParagraphs.length - 1 ? "mb-3" : "mb-0"}`}
+                    key={i}
+                  >
                     {p}
                   </p>
                 ))}
@@ -241,7 +242,9 @@ export default function VehicleVdpRefPage({
                   </div>
                   <div className="col-md-4">
                     <strong>Search intent</strong>
-                    <p className="cs-muted mb-0">{ai.quickBuyer.searchIntent}</p>
+                    <p className="cs-muted mb-0">
+                      {ai.quickBuyer.searchIntent}
+                    </p>
                   </div>
                 </div>
               </section>
@@ -256,7 +259,8 @@ export default function VehicleVdpRefPage({
                 </h2>
                 <p className="cs-muted mb-3">
                   Grouped summary from the listing. Always confirm with the
-                  dealer before relying on inferred or general model information.
+                  dealer before relying on inferred or general model
+                  information.
                 </p>
                 <div className="row g-3">
                   {ai.dealerBreakdownCards.map((c) => (
@@ -294,7 +298,10 @@ export default function VehicleVdpRefPage({
                         </summary>
                         <div className="vdp-ref-faq-body cs-muted">
                           {(faq.answer.includes("\n\n")
-                            ? faq.answer.split(/\n{2,}/).map((b) => b.trim()).filter(Boolean)
+                            ? faq.answer
+                                .split(/\n{2,}/)
+                                .map((b) => b.trim())
+                                .filter(Boolean)
                             : [faq.answer]
                           ).map((block, j) => (
                             <p
@@ -323,7 +330,10 @@ export default function VehicleVdpRefPage({
                   >
                     Check Finance Eligibility
                   </Link>
-                  <Link className="btn btn-outline-primary cs-pill px-4" href="/search">
+                  <Link
+                    className="btn btn-outline-primary cs-pill px-4"
+                    href="/search"
+                  >
                     Search all vehicles
                   </Link>
                 </div>
@@ -339,7 +349,10 @@ export default function VehicleVdpRefPage({
                 <VehicleVdpRefInlineEnquiry item={enquiryItem} />
               </section>
 
-              <section className="cs-card p-4 p-lg-5 mt-4" id="schedule-test-drive">
+              <section
+                className="cs-card p-4 p-lg-5 mt-4"
+                id="schedule-test-drive"
+              >
                 <p className="cs-mini-label mb-2">Test drive</p>
                 <h2 className="h3 fw-bold mb-3">Schedule a test drive</h2>
                 <p className="cs-muted mb-3">
@@ -432,9 +445,8 @@ export default function VehicleVdpRefPage({
                 <div className="cs-card p-4">
                   <h3 className="h5 fw-bold">Disclaimer</h3>
                   <p className="cs-muted mb-0">
-                    Please confirm price, specifications, rego details, features,
-                    and availability with the dealer before purchase. AI-assisted
-                    text may contain errors.
+                    Please confirm price, specifications, features, and photo
+                    availability with Car Sales Brisbane before purchase.
                   </p>
                 </div>
               </div>
