@@ -50,7 +50,7 @@ export default async function ContactInfo() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Car Sales Brisbane
+                      56 Freeth St W, Ormiston QLD 4160, Australia
                     </a>
                   </div>
                 </div>
@@ -70,8 +70,9 @@ export default async function ContactInfo() {
                       0418 908 870
                     </a>
                     <p className="mt-2 mb-1">
-                      <strong>Working Hours:</strong> Mon-Fri: 8:00am-5:30pm
+                      <strong>Working Hours:</strong>
                     </p>
+                    <p className="mt-1 mb-1 ps-4">Mon-Fri: 8:00am-5:30pm</p>
                     <p className="mt-1 mb-1 ps-4">Sat: 8:00am-3:00pm</p>
                     <p className="mt-1 mb-1 ps-4">Sun: Closed</p>
                   </div>

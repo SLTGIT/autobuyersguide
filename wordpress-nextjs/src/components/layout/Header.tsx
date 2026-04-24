@@ -32,7 +32,7 @@ export default async function Header() {
             href={CAR_SALES_BRISBANE_GOOGLE_MAPS_URL}
           >
             <i className="bi bi-geo-alt-fill"></i>
-            <span>Car Sales Brisbane</span>
+            <span>56 Freeth St W, Ormiston QLD 4160, Australia</span>
           </a>
           <a className="d-inline-flex align-items-center gap-2" href="tel:0418908870">
             <i className="bi bi-telephone-fill"></i>

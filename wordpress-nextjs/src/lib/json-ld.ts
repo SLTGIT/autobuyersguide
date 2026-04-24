@@ -83,10 +83,10 @@ export function upgradeHttpToHttpsUrl(url: string): string {
 /** Physical dealership address (Ormiston showroom). */
 export const ORG_POSTAL_ADDRESS = {
   "@type": "PostalAddress",
-  streetAddress: "Car Sales Brisbane",
-  addressLocality: "Brisbane",
+  streetAddress: "56 Freeth St W",
+  addressLocality: "Ormiston",
   addressRegion: "QLD",
-  postalCode: "4000",
+  postalCode: "4160",
   addressCountry: "AU",
 } as const;
 
