@@ -1,7 +1,6 @@
 import OpenAI from "openai";
 import { unstable_cache } from "next/cache";
 import { splitVehicleDescription } from "@/lib/inventory/transform";
-import { isOpenAiApiKeyConfigured } from "./openAiApiKeyCookie";
 import type {
   VehicleVdpAiBreakdownCard,
   VehicleVdpAiContent,
@@ -21,9 +20,6 @@ import {
 } from "./vehicleVdpDisplayUtils";
 
 const VDP_AI_REVALIDATE_SEC = 86400; // 1 day
-
-/** Re-export for client / middleware — cookie is set in `src/middleware.ts`, not in RSC. */
-export { OPENAI_API_KEY_MISSING_COOKIE } from "./openAiApiKeyCookie";
 
 /** Hero pill should summarise year/condition/body/fuel — not warranty marketing. */
 function sanitizeHeroBadgeForDisplay(badge: string): string {
@@ -842,7 +838,7 @@ const runCachedOpenAi = unstable_cache(
 export async function getVehicleVdpAiContent(
   snapshot: VehicleVdpSnapshot
 ): Promise<VehicleVdpAiContent> {
-  if (!isOpenAiApiKeyConfigured()) {
+  if (!process.env.OPENAI_API_KEY?.trim()) {
     const coerced = applyRuntimeVehicleVdpCoercion(
       fallbackVehicleVdpAiContent(snapshot)
     );

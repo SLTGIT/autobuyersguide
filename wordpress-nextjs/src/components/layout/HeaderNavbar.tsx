@@ -27,7 +27,7 @@ export default function HeaderNavbar() {
               A Statewide Auto Group Digital Showroom
             </small>
           </span> */}
-          <img src="/assets/images/carsalesbrisbane.webp" alt="Car Sales Brisbane" width={140} className="img-fluid rounded-3" />
+          <img src="/assets/images/carsalesbrisbane_white.webp" alt="Car Sales Brisbane" width={150} className="img-fluid rounded-3" />
         </a>
         <button
           className="navbar-toggler"

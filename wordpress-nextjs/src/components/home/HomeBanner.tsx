@@ -12,10 +12,10 @@ export default function HomeBanner() {
               Car Sales Brisbane
             </span> */}
             <h1 className="display-3 fw-bold mb-3 cs-title-tight">
-              Quality Used Cars Brisbane | Easy Finance & Car Sourcing
+              Quality Used Cars Brisbane
             </h1>
             <p className="lead text-secondary mb-4">
-              Access 50+ premium 4x4s, SUVs, and commercial vehicles. Based in
+              Access premium used 4x4s, SUVs, and commercial vehicles. Based in
               Ormiston, we provide $0 deposit finance and statewide delivery
               from Brisbane to Cairns.
             </p>

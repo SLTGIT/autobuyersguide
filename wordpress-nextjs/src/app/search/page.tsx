@@ -157,7 +157,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <section className="cs-page-hero search-page-hero py-3 py-md-4">
+      <section className="cs-page-hero search-page-hero py-3 py-md-2">
         <div className="container py-lg-2">
           <div className="row g-3 g-lg-4 align-items-center">
             <div className="col-lg-7">
@@ -184,11 +184,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     priority
                   />
                 </div>
-                <div className="card-body search-page-hero-card-body">
+                {/* <div className="card-body search-page-hero-card-body">
                   <h2 className="h5 fw-bold mb-0 text-dark">
                     Used Cars for Sale
                   </h2>
-                </div>
+                </div> */}
               </article>
             </div>
           </div>
