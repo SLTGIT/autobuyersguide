@@ -752,6 +752,7 @@ async function fetchVehicleVdpAiFromOpenAI(
 ): Promise<VehicleVdpAiContent> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
+    console.log("fetchVehicleVdpAiFromOpenAI: No API key");
     return fallbackVehicleVdpAiContent(snapshot);
   }
 
