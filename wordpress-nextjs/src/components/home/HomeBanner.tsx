@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import "./HomeBanner.scss";
 
-const AUTO_MS = 15000; // 15 seconds
+const AUTO_MS = 12000; // 12 seconds
 
 type Slide = {
   id: string;
