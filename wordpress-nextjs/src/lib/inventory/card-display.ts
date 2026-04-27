@@ -106,7 +106,6 @@ export function vehicleCardFeatureTags(
   max = 3,
 ): string[] {
 
-  console.log("vehicleCardFeatureTags", listing);
   const candidates = [
     listing.body_type?.trim(),
     listing.drive_type?.trim(),

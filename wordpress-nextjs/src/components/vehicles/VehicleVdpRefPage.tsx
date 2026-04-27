@@ -17,6 +17,7 @@ import VehicleSimilarCarousel, {
   type SimilarCarItem,
 } from "./VehicleSimilarCarousel";
 import VehicleVdpRefInlineEnquiry from "./VehicleVdpRefInlineEnquiry";
+import VehicleTestDriveForm from "./VehicleTestDriveForm";
 import VdpRefPhoneReveal from "./VdpRefPhoneReveal";
 import { ORG_GOOGLE_MAPS_PLACE_URL, ORG_POSTAL_ADDRESS } from "@/lib/json-ld";
 
@@ -168,7 +169,9 @@ export default function VehicleVdpRefPage({
               {" "}
               /{" "}
             </span>
-            <span className="vdp-ref-breadcrumb-current">{breadcrumbCurrent}</span>
+            <span className="vdp-ref-breadcrumb-current">
+              {breadcrumbCurrent}
+            </span>
           </nav>
           <div className="row g-4 align-items-end">
             <div className="col-lg-8">
@@ -358,24 +361,20 @@ export default function VehicleVdpRefPage({
                 <p className="cs-mini-label mb-2">Test drive</p>
                 <h2 className="h3 fw-bold mb-3">Schedule a test drive</h2>
                 <p className="cs-muted mb-3">
-                  Call us or use the enquiry form above — we will confirm a time
-                  that suits you.
+                  Call us or submit the form below — we will confirm a time that
+                  suits you.
                 </p>
                 <VdpRefPhoneReveal
                   dealerPhone={dealerPhone}
                   telHref={telHref}
                   stockNumber={snapshot.stockNumber}
                   showDivider={false}
-                  className="mb-3"
+                  className="mb-4"
                 />
-                <div className="d-flex flex-wrap gap-2">
-                  <Link
-                    className="btn btn-outline-primary cs-pill px-4"
-                    href="/contact"
-                  >
-                    Contact page
-                  </Link>
-                </div>
+                <h2 className="h3 fw-bold mb-3">
+                  Book a test drive for this {snapshot.make} {snapshot.model}
+                </h2>
+                <VehicleTestDriveForm item={enquiryItem} />
               </section>
             </div>
 
