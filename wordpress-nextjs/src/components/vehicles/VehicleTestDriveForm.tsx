@@ -90,7 +90,7 @@ export default function VehicleTestDriveForm({
         phone: phoneDigits,
         email: "",
         message,
-        form_type: "request for demo ride",
+        form_type: "Request for Test Drive",
         preferredDate: preferredDate.trim(),
         preferredTime: preferredTime,
         budget: "",

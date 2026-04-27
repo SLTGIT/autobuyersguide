@@ -160,7 +160,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <section className="cs-page-hero search-page-hero py-3 py-md-2">
         <div className="container py-lg-2">
           <div className="row g-3 g-lg-4 align-items-center">
-            <div className="col-lg-7">
+            <div className="col-lg-7 py-5">
               {/* <span className="badge cs-hero-chip cs-pill px-3 py-1 mb-2">
                 Used Cars For Sale
               </span> */}
@@ -173,7 +173,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               </p>
             </div>
             <div className="col-lg-5">
-              <article className="search-page-hero-card card border-0 shadow-lg rounded-5 overflow-hidden">
+              {/* <article className="search-page-hero-card card border-0 shadow-lg rounded-5 overflow-hidden">
                 <div className="search-page-hero-media position-relative">
                   <Image
                     src="https://d2s8i866417m9.cloudfront.net/photo/32428698/photo/thumb-232954f40d5f21bf8a4fa35d6daa7a7a.jpg"
@@ -184,12 +184,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     priority
                   />
                 </div>
-                {/* <div className="card-body search-page-hero-card-body">
+                <div className="card-body search-page-hero-card-body">
                   <h2 className="h5 fw-bold mb-0 text-dark">
                     Used Cars for Sale
                   </h2>
-                </div> */}
-              </article>
+                </div>
+              </article> */}
             </div>
           </div>
         </div>
