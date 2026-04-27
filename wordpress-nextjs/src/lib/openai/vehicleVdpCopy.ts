@@ -19,7 +19,7 @@ import {
   sanitizeBiSuffix,
 } from "./vehicleVdpDisplayUtils";
 
-const VDP_AI_REVALIDATE_SEC = 86400; // 1 day
+const VDP_AI_REVALIDATE_SEC = 2592000; //  1 month
 
 /** Hero pill should summarise year/condition/body/fuel — not warranty marketing. */
 function sanitizeHeroBadgeForDisplay(badge: string): string {
