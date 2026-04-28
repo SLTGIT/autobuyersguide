@@ -73,16 +73,16 @@
 }
 
 .cs-hero-card-img-wrap {
-  height: clamp(260px, 32vw, 340px);
-  min-height: 260px;
+  height: clamp(320px, 46vw, 420px);
+  min-height: 320px;
   overflow: hidden;
   background: color-mix(in srgb, var(--cs-line) 35%, #f4f7fb);
 }
 
 @media (min-width: 992px) {
   .cs-hero-card-img-wrap {
-    height: 320px;
-    min-height: 320px;
+    height: 420px;
+    min-height: 420px;
   }
 }
 

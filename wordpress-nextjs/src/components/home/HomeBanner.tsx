@@ -36,7 +36,7 @@ const SLIDES: Slide[] = [
     ),
     primaryCta: { label: "Browse All Vehicles", href: "/search" },
     secondaryCta: { label: "Check Finance Eligibility", href: "/finance-centre" },
-    imageSrc: "/assets/images/banner_1.webp",
+    imageSrc: "/assets/images/new banner-1.webp",
     imageAlt:
       "Quality used 4x4s and SUVs at Car Sales Brisbane, Ormiston",
     cardTitle: "Brisbane based, finance ready, statewide delivery.",
@@ -77,7 +77,7 @@ const SLIDES: Slide[] = [
     ),
     primaryCta: { label: "Quick and easy get finance", href: "/finance-centre" },
     secondaryCta: { label: "About us", href: "/about-us" },
-    imageSrc: "/assets/images/banner-side-img.webp",
+    imageSrc: "/assets/images/new banner-3.webp",
     imageObjectPosition: "center 85%",
     imageAlt:
       "Car Sales Brisbane — used cars, finance, and customer service",
