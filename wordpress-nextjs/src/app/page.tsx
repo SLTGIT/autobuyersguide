@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: "Quality Used Cars Brisbane | Expert Finance &amp; Sourcing",
     description:
       siteSettings?.description ||
-      "Access 60+ premium 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.",
+      "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.",
     ...siteUrlMetadataFields(currentUrl, currentRoute),
   };
 }
@@ -39,7 +39,7 @@ export default async function Home() {
   const pageUrl = upgradeHttpToHttpsUrl(currentUrl);
   const origin = new URL(pageUrl).origin;
   const homeDescription =
-    "Access 60+ premium 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.";
+    "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.";
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),
     webSiteJsonLd(origin, { includeSearchAction: true }),

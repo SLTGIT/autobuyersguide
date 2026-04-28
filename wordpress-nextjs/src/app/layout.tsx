@@ -5,7 +5,7 @@ import "@/styles/globals.scss";
 import { Manrope } from "next/font/google";
 import { Layout } from "@/components/layout";
 import { ClientImports } from "@/components/ClientImports";
-import { normalizePublicSiteBase } from "@/lib/site-url";
+import { DEFAULT_OG_IMAGE_PATH, normalizePublicSiteBase } from "@/lib/site-url";
 
 const manrope = Manrope({ subsets: ["latin"] });
 
@@ -15,16 +15,16 @@ const siteOrigin = rawSite
   ? normalizePublicSiteBase(rawSite)
   : "http://localhost:3000";
 
-const title = "Car Sales Brisbane";
+const title = "Quality Used Cars Brisbane | Expert Finance &amp; Sourcing";
 const description =
-  "Car Sales Brisbane is a leading provider of used cars in Australia. We offer a wide range of used cars for sale in Australia.";
+  "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
   title,
   description,
   icons: {
-    icon: "/assets/images/favicon.webp",
+    icon: DEFAULT_OG_IMAGE_PATH,
   },
   openGraph: {
     type: "website",
@@ -32,13 +32,13 @@ export const metadata: Metadata = {
     siteName: title,
     title,
     description,
-    images: [{ url: "/assets/images/favicon.webp" }],
+    images: [{ url: DEFAULT_OG_IMAGE_PATH }],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
-    images: ["/assets/images/favicon.webp"],
+    images: [DEFAULT_OG_IMAGE_PATH],
   },
 };
 

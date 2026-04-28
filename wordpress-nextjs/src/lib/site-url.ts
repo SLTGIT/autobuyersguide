@@ -91,6 +91,13 @@ export async function getCurrentUrlAndRoute(
   return { currentUrl, currentRoute };
 }
 
+/**
+ * App-root path for default share previews. Pages that call `siteUrlMetadataFields`
+ * return `openGraph: { url }` which replaces the root layout’s `openGraph` in Next.js
+ * merge — include this image there so `og:image` is never dropped on those routes.
+ */
+export const DEFAULT_OG_IMAGE_PATH = "/assets/images/favicon.webp";
+
 /** Canonical + Open Graph URL + metadataBase from resolved site URL (Next.js pattern). */
 export function siteUrlMetadataFields(
   currentUrl: string,
@@ -104,6 +111,7 @@ export function siteUrlMetadataFields(
     },
     openGraph: {
       url: currentUrl,
+      images: [{ url: DEFAULT_OG_IMAGE_PATH }],
     },
   };
 }
@@ -124,7 +132,10 @@ export async function mergeSiteUrlMetadata(
     },
     openGraph:
       meta.openGraph === undefined
-        ? { url: currentUrl }
+        ? {
+            url: currentUrl,
+            images: [{ url: DEFAULT_OG_IMAGE_PATH }],
+          }
         : { ...meta.openGraph, url: currentUrl },
   };
 }
