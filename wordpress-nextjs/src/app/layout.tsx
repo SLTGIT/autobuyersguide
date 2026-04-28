@@ -23,6 +23,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
   title,
   description,
+  robots: {
+    index: true,
+    follow: true,
+  },
   icons: {
     icon: DEFAULT_OG_IMAGE_PATH,
   },

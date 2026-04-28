@@ -102,7 +102,7 @@ export const DEFAULT_OG_IMAGE_PATH = "/assets/images/favicon.webp";
 export function siteUrlMetadataFields(
   currentUrl: string,
   currentRoute: string
-): Pick<Metadata, "metadataBase" | "alternates" | "openGraph"> {
+): Pick<Metadata, "metadataBase" | "alternates" | "openGraph" | "robots"> {
   const origin = new URL(currentUrl).origin;
   return {
     metadataBase: new URL(origin),
@@ -112,6 +112,10 @@ export function siteUrlMetadataFields(
     openGraph: {
       url: currentUrl,
       images: [{ url: DEFAULT_OG_IMAGE_PATH }],
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
@@ -137,5 +141,9 @@ export async function mergeSiteUrlMetadata(
             images: [{ url: DEFAULT_OG_IMAGE_PATH }],
           }
         : { ...meta.openGraph, url: currentUrl },
+    robots: meta.robots ?? {
+      index: true,
+      follow: true,
+    },
   };
 }
