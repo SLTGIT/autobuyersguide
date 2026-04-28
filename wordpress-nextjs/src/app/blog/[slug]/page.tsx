@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getPostBySlug } from "@/lib/wordpress";
 import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
 import { getMetadata } from "@/lib/wordpress/seo";
@@ -20,6 +21,23 @@ interface BlogPostProps {
   params: Promise<{
     slug: string;
   }>;
+}
+
+function normalizeFaqItems(
+  items: unknown[],
+): { question: string; answer: string }[] {
+  return items
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const it = item as Record<string, unknown>;
+      const rawQuestion = typeof it.question === "string" ? it.question : "";
+      const rawAnswer = typeof it.answer === "string" ? it.answer : "";
+      const question = stripHtml(rawQuestion).trim();
+      const answer = stripHtml(rawAnswer).replace(/\s+/g, " ").trim();
+      if (!question || !answer) return null;
+      return { question, answer };
+    })
+    .filter(Boolean) as { question: string; answer: string }[];
 }
 
 /* SEO Metadata */
@@ -78,7 +96,6 @@ export default async function BlogPost({ params }: BlogPostProps) {
     ? { "@type": "Person", name: authorName }
     : { "@id": `${origin}/#organization` };
   if (excerpt) blogPosting.description = excerpt;
-
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),
     webSiteJsonLd(origin),
@@ -110,6 +127,21 @@ export default async function BlogPost({ params }: BlogPostProps) {
   return (
     <div className="bg-white min-vh-100">
       <JsonLd data={jsonLd} />
+      <div className="container pt-4">
+        <nav aria-label="breadcrumb">
+          <ol className="breadcrumb mb-3">
+            <li className="breadcrumb-item">
+              <Link href="/">Home</Link>
+            </li>
+            <li className="breadcrumb-item">
+              <Link href="/blog">Blog</Link>
+            </li>
+            <li className="breadcrumb-item active" aria-current="page">
+              {slug}
+            </li>
+          </ol>
+        </nav>
+      </div>
       {/* <div className="container pt-4">
         Back Link
         <Link
