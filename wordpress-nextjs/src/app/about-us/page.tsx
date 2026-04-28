@@ -260,10 +260,11 @@ const page = async () => {
                   </a>
                 </p>
                 <p className="mb-2">
-                  <strong>Hours:</strong> Mon-Fri 8:00am-5:30pm
+                  <strong>Hours:</strong>
                 </p>
-                <p className="mb-2 ps-4">Sat 8:00am-3:00pm</p>
-                <p className="mb-4 ps-4">Sun Closed</p>
+                <p className="mb-2">Mon-Fri 8:00am-5:30pm</p>
+                <p className="mb-2">Sat 8:00am-3:00pm</p>
+                <p className="mb-4">Sun Closed</p>
                 <div className="d-flex flex-wrap gap-3">
                   <a className="btn btn-primary cs-pill px-4" href="/contact">
                     Contact Us
