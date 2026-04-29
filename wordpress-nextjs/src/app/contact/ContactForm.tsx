@@ -1,6 +1,6 @@
 "use client";
 
-import { getAPIUrl } from "@/lib/wordpress";
+import { submitLead } from "@/lib/leads/submit-lead-client";
 import { useState, ChangeEvent, FormEvent, useCallback } from "react";
 
 type FormDataType = {
@@ -58,27 +58,19 @@ export default function ContactForm() {
     setStatusMessage("");
 
     try {
-      const res = await fetch(getAPIUrl("/custom/v1/submit-lead"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const data = await submitLead({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        email: formData.email,
+        message: formData.message,
+        form_type: formData.enquiryType,
+        budget: "",
+        date: new Date().toISOString(),
+        item: {
+          tag: "Car Sales Brisbane",
         },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phone: formData.phone,
-          email: formData.email,
-          message: formData.message,
-          form_type: formData.enquiryType,
-          budget: "",
-          date: new Date().toISOString(),
-          item: {
-            tag: "Car Sales Brisbane",
-          },
-        }),
       });
-
-      const data = await res.json();
 
       if (data.success) {
         setStatus("success");

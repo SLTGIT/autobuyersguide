@@ -1,6 +1,6 @@
 "use client";
 
-import { getAPIUrl } from "@/lib/wordpress";
+import { submitLead } from "@/lib/leads/submit-lead-client";
 import "@/app/contact/contact.css";
 import { useCallback, useState, ChangeEvent, FormEvent } from "react";
 
@@ -119,13 +119,7 @@ export default function VehicleEnquiryForm({
         },
       };
 
-      const res = await fetch(getAPIUrl("/custom/v1/submit-lead"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      const data = await res.json();
+      const data = await submitLead(body);
       if (data.success) {
         setStatus("success");
         setStatusMessage(
