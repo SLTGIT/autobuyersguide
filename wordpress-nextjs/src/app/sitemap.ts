@@ -23,14 +23,18 @@ const staticRoutes = [
 
 const excludedPageSlugs = new Set([
   "about-us",
+  "blog",
   "contact",
   "finance-centre",
-  "sell-my-car",
-  "terms-of-service",
-  "privacy-policy",
   "finance-disclaimer",
-  "blog",
+  "home",
+  "privacy-policy",
   "search",
+  "sell-my-car",
+  "sample-page",
+  "terms-of-service",
+  "test",
+  "vehicle",
 ]);
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
