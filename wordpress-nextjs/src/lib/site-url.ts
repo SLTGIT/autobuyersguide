@@ -23,7 +23,7 @@ function isLocalOrPrivateHost(hostname: string): boolean {
 
 /**
  * If `NEXT_PUBLIC_SITE_URL` is mistakenly set to `http://` on a public hostname,
- * canonical / Open Graph URLs become http while users hit https — bad for SEO.
+ * canonical URLs become http while users hit https — bad for SEO.
  * Upgrade to https for public hosts; keep http for localhost / private IPs.
  */
 export function normalizePublicSiteBase(base: string): string {
@@ -94,84 +94,16 @@ export async function getCurrentUrlAndRoute(
 /** Small icon for the browser tab. */
 export const FAVICON_PATH = "/assets/images/favicon.png";
 
-/**
- * Default `og:image` / `twitter:image`. Wordmark PNG (635×250) — large enough for Facebook;
- * the favicon alone was too small (~72px).
- */
-export const DEFAULT_OG_IMAGE_PATH = "/carsalesbrisbane_logo.png";
-
-/** Must match `public/assets/images/carsalesbrisbane_logo.png` pixel size (IHDR). */
-export const OG_SHARE_IMAGE_DIMENSIONS = { width: 635, height: 250 } as const;
-
-/** Facebook reads `og:image:alt`; keep non-empty. */
-export const OG_SHARE_IMAGE_ALT = "Car Sales Brisbane";
-
-/**
- * Absolute URL to the static logo in `public/`. Relative paths can be rewritten to
- * Next/Vercel `__static/...` URLs that Facebook’s debugger treats as inferred — use this instead.
- */
-export function absoluteOgLogoUrl(origin: string): string {
-  return new URL(DEFAULT_OG_IMAGE_PATH, origin).href;
-}
-
-export function defaultOpenGraphLogoImage(origin: string) {
-  return {
-    url: "/carsalesbrisbane_logo.png",
-    type: "image/png",
-    width: OG_SHARE_IMAGE_DIMENSIONS.width,
-    height: OG_SHARE_IMAGE_DIMENSIONS.height,
-    alt: "Car Sales Brisbane",
-  };
-}
-
-type OgImageEntry = NonNullable<
-  NonNullable<Metadata["openGraph"]>["images"]
-> extends infer I
-  ? I extends readonly (infer E)[]
-    ? E
-    : I
-  : never;
-
-/** Ensures every `openGraph.images` entry has `alt` (emits `og:image:alt` in HTML). */
-export function openGraphWithImageAlts(
-  openGraph: NonNullable<Metadata["openGraph"]>,
-  fallbackAlt: string,
-): NonNullable<Metadata["openGraph"]> {
-  if (!openGraph.images) return openGraph;
-  const raw = openGraph.images;
-  const list = (Array.isArray(raw) ? raw : [raw]) as OgImageEntry[];
-  const normalized = list.map((img) => {
-    if (typeof img === "string") return { url: img, alt: fallbackAlt };
-    if (img instanceof URL) return { url: img.href, alt: fallbackAlt };
-    const d = img as {
-      url: string | URL;
-      alt?: string;
-      width?: string | number;
-      height?: string | number;
-      type?: string;
-      secureUrl?: string | URL;
-    };
-    const url = typeof d.url === "string" ? d.url : d.url.href;
-    const alt = d.alt?.trim() ? d.alt : fallbackAlt;
-    return { ...d, url, alt };
-  });
-  return { ...openGraph, images: normalized };
-}
-
-/** Canonical + Open Graph URL + metadataBase from resolved site URL (Next.js pattern). */
+/** Canonical URL + metadataBase from resolved site URL (Next.js pattern). */
 export function siteUrlMetadataFields(
   currentUrl: string,
   currentRoute: string
-): Pick<Metadata, "metadataBase" | "alternates" | "openGraph" | "robots"> {
+): Pick<Metadata, "metadataBase" | "alternates" | "robots"> {
   const origin = new URL(currentUrl).origin;
   return {
     metadataBase: new URL(origin),
     alternates: {
       canonical: currentRoute,
-    },
-    openGraph: {
-      url: currentUrl,
-      images: [defaultOpenGraphLogoImage(origin)],
     },
     robots: {
       index: true,
@@ -180,35 +112,20 @@ export function siteUrlMetadataFields(
   };
 }
 
-/** Merge Yoast/basic metadata from CMS with site URL + canonical handling. */
+/** Merge Yoast/basic metadata from CMS with site URL + canonical handling (no Open Graph). */
 export async function mergeSiteUrlMetadata(
   meta: Metadata,
   pathname: string
 ): Promise<Metadata> {
   const { currentUrl, currentRoute } = await getCurrentUrlAndRoute(pathname);
-  const origin = new URL(currentUrl).origin;
-  const existingOg = meta.openGraph;
-  const mergedOpenGraph =
-    existingOg == null
-      ? {
-          url: currentUrl,
-          images: [defaultOpenGraphLogoImage(origin)],
-        }
-      : openGraphWithImageAlts(
-          { ...existingOg, url: currentUrl },
-          typeof existingOg.title === "string" && existingOg.title.trim()
-            ? existingOg.title
-            : OG_SHARE_IMAGE_ALT,
-        );
-
+  const { openGraph: _og, ...metaWithoutOpenGraph } = meta;
   return {
-    ...meta,
-    metadataBase: new URL(origin),
+    ...metaWithoutOpenGraph,
+    metadataBase: new URL(new URL(currentUrl).origin),
     alternates: {
       ...meta.alternates,
       canonical: currentRoute,
     },
-    openGraph: mergedOpenGraph,
     robots: meta.robots ?? {
       index: true,
       follow: true,

@@ -10,7 +10,6 @@ import type { DealerVehicle } from "@/types/inventory";
 import type { VehicleImage } from "@/types/vehicle";
 import type { SimilarCarItem } from "@/components/vehicles/VehicleSimilarCarousel";
 import {
-  defaultOpenGraphLogoImage,
   getCurrentUrlAndRoute,
   normalizePublicSiteBase,
   resolvePublicOriginFromRequest,
@@ -81,8 +80,7 @@ export async function generateMetadata({ params }: VehicleDetailPageProps) {
   if (!res.ok) {
     return { title: "Vehicle not found | Car Sales Brisbane" };
   }
-  const { listing, ai, vehicle: v } = res;
-  const image = v.Photos?.[0]?.PhotoUrl ?? listing.featured_image;
+  const { ai, vehicle: v } = res;
   const canonicalPath = `/cars/${buildVehicleSlug(v)}`;
   const { currentUrl, currentRoute } =
     await getCurrentUrlAndRoute(canonicalPath);
@@ -92,19 +90,6 @@ export async function generateMetadata({ params }: VehicleDetailPageProps) {
     title: pageTitle,
     description: desc,
     ...siteUrlMetadataFields(currentUrl, currentRoute),
-    openGraph: image
-      ? {
-          title: pageTitle,
-          description: desc,
-          images: [{ url: image, alt: pageTitle }],
-          url: currentUrl,
-        }
-      : {
-          url: currentUrl,
-          title: pageTitle,
-          description: desc,
-          images: [defaultOpenGraphLogoImage(new URL(currentUrl).origin)],
-        },
   };
 }
 

@@ -30,8 +30,33 @@ export async function generateMetadata(): Promise<Metadata> {
     description:
       siteSettings?.description ||
       "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.",
-    // ...siteUrlMetadataFields(currentUrl, currentRoute),
+    ...siteUrlMetadataFields(currentUrl, currentRoute),
+    // openGraph: {
+    //   title: "Quality Used Cars Brisbane | Expert Finance & Sourcing",
+    //   description:
+    //     "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.",
+    //   url: currentUrl,
+    //   siteName: "Car Sales Brisbane",
+    //   locale: "en_AU",
+    //   type: "website",
+    //   images: [
+    //     {
+    //       url: '/carsalesbrisbane_logo.png',
+    //       width: 1200,
+    //       height: 630,
+    //       alt: "Car Sales Brisbane Logo",
+    //     },
+    //   ],
+    // },
+    // twitter: {
+    //   card: "summary_large_image",
+    //   title: "Quality Used Cars Brisbane | Expert Finance & Sourcing",
+    //   description:
+    //     "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.",
+    //   images: ["/carsalesbrisbane_logo.png"],
+    // },
   };
+  
 }
 
 export default async function Home() {
