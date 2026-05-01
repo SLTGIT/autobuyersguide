@@ -41,35 +41,35 @@ export const metadata: Metadata = {
   icons: {
     icon: FAVICON_PATH,
   },
-  openGraph: {
-    type: "website",
-    url: "/",
-    siteName: title,
-    title,
-    description,
-    images: [
-      {
-        url: '/carsalesbrisbane_logo.png',
-        type: "image/png",
-        width: OG_SHARE_IMAGE_DIMENSIONS.width,
-        height: OG_SHARE_IMAGE_DIMENSIONS.height,
-        alt: OG_SHARE_IMAGE_ALT,
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: [
-      {
-        url: '/carsalesbrisbane_logo.png',
-        alt: OG_SHARE_IMAGE_ALT,
-        width: OG_SHARE_IMAGE_DIMENSIONS.width,
-        height: OG_SHARE_IMAGE_DIMENSIONS.height,
-      },
-    ],
-  },
+  // openGraph: {
+  //   type: "website",
+  //   url: "/",
+  //   siteName: title,
+  //   title,
+  //   description,
+  //   images: [
+  //     {
+  //       url: '/carsalesbrisbane_logo.png',
+  //       type: "image/png",
+  //       width: OG_SHARE_IMAGE_DIMENSIONS.width,
+  //       height: OG_SHARE_IMAGE_DIMENSIONS.height,
+  //       alt: OG_SHARE_IMAGE_ALT,
+  //     },
+  //   ],
+  // },
+  // twitter: {
+  //   card: "summary_large_image",
+  //   title,
+  //   description,
+  //   images: [
+  //     {
+  //       url: '/carsalesbrisbane_logo.png',
+  //       alt: OG_SHARE_IMAGE_ALT,
+  //       width: OG_SHARE_IMAGE_DIMENSIONS.width,
+  //       height: OG_SHARE_IMAGE_DIMENSIONS.height,
+  //     },
+  //   ],
+  // },
 };
 
 export default function RootLayout({

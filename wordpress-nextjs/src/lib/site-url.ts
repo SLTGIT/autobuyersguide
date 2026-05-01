@@ -116,11 +116,11 @@ export function absoluteOgLogoUrl(origin: string): string {
 
 export function defaultOpenGraphLogoImage(origin: string) {
   return {
-    url: absoluteOgLogoUrl(origin),
-    type: "image/png" as const,
+    url: "/carsalesbrisbane_logo.png",
+    type: "image/png",
     width: OG_SHARE_IMAGE_DIMENSIONS.width,
     height: OG_SHARE_IMAGE_DIMENSIONS.height,
-    alt: OG_SHARE_IMAGE_ALT,
+    alt: "Car Sales Brisbane",
   };
 }
 
