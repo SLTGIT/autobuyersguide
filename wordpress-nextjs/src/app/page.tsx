@@ -30,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description:
       siteSettings?.description ||
       "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.",
-    ...siteUrlMetadataFields(currentUrl, currentRoute),
+    // ...siteUrlMetadataFields(currentUrl, currentRoute),
   };
 }
 
