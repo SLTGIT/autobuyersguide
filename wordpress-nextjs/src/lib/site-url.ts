@@ -103,6 +103,61 @@ export const DEFAULT_OG_IMAGE_PATH = "/assets/images/carsalesbrisbane_logo.png";
 /** Must match `public/assets/images/carsalesbrisbane_logo.png` pixel size (IHDR). */
 export const OG_SHARE_IMAGE_DIMENSIONS = { width: 635, height: 250 } as const;
 
+/** Facebook reads `og:image:alt`; keep non-empty. */
+export const OG_SHARE_IMAGE_ALT = "Car Sales Brisbane";
+
+/**
+ * Absolute URL to the static logo in `public/`. Relative paths can be rewritten to
+ * Next/Vercel `__static/...` URLs that Facebook’s debugger treats as inferred — use this instead.
+ */
+export function absoluteOgLogoUrl(origin: string): string {
+  return new URL(DEFAULT_OG_IMAGE_PATH, origin).href;
+}
+
+export function defaultOpenGraphLogoImage(origin: string) {
+  return {
+    url: absoluteOgLogoUrl(origin),
+    type: "image/png" as const,
+    width: OG_SHARE_IMAGE_DIMENSIONS.width,
+    height: OG_SHARE_IMAGE_DIMENSIONS.height,
+    alt: OG_SHARE_IMAGE_ALT,
+  };
+}
+
+type OgImageEntry = NonNullable<
+  NonNullable<Metadata["openGraph"]>["images"]
+> extends infer I
+  ? I extends readonly (infer E)[]
+    ? E
+    : I
+  : never;
+
+/** Ensures every `openGraph.images` entry has `alt` (emits `og:image:alt` in HTML). */
+export function openGraphWithImageAlts(
+  openGraph: NonNullable<Metadata["openGraph"]>,
+  fallbackAlt: string,
+): NonNullable<Metadata["openGraph"]> {
+  if (!openGraph.images) return openGraph;
+  const raw = openGraph.images;
+  const list = (Array.isArray(raw) ? raw : [raw]) as OgImageEntry[];
+  const normalized = list.map((img) => {
+    if (typeof img === "string") return { url: img, alt: fallbackAlt };
+    if (img instanceof URL) return { url: img.href, alt: fallbackAlt };
+    const d = img as {
+      url: string | URL;
+      alt?: string;
+      width?: string | number;
+      height?: string | number;
+      type?: string;
+      secureUrl?: string | URL;
+    };
+    const url = typeof d.url === "string" ? d.url : d.url.href;
+    const alt = d.alt?.trim() ? d.alt : fallbackAlt;
+    return { ...d, url, alt };
+  });
+  return { ...openGraph, images: normalized };
+}
+
 /** Canonical + Open Graph URL + metadataBase from resolved site URL (Next.js pattern). */
 export function siteUrlMetadataFields(
   currentUrl: string,
@@ -116,14 +171,7 @@ export function siteUrlMetadataFields(
     },
     openGraph: {
       url: currentUrl,
-      images: [
-        {
-          url: DEFAULT_OG_IMAGE_PATH,
-          type: "image/png",
-          width: OG_SHARE_IMAGE_DIMENSIONS.width,
-          height: OG_SHARE_IMAGE_DIMENSIONS.height,
-        },
-      ],
+      images: [defaultOpenGraphLogoImage(origin)],
     },
     robots: {
       index: true,
@@ -139,6 +187,20 @@ export async function mergeSiteUrlMetadata(
 ): Promise<Metadata> {
   const { currentUrl, currentRoute } = await getCurrentUrlAndRoute(pathname);
   const origin = new URL(currentUrl).origin;
+  const existingOg = meta.openGraph;
+  const mergedOpenGraph =
+    existingOg == null
+      ? {
+          url: currentUrl,
+          images: [defaultOpenGraphLogoImage(origin)],
+        }
+      : openGraphWithImageAlts(
+          { ...existingOg, url: currentUrl },
+          typeof existingOg.title === "string" && existingOg.title.trim()
+            ? existingOg.title
+            : OG_SHARE_IMAGE_ALT,
+        );
+
   return {
     ...meta,
     metadataBase: new URL(origin),
@@ -146,20 +208,7 @@ export async function mergeSiteUrlMetadata(
       ...meta.alternates,
       canonical: currentRoute,
     },
-    openGraph:
-      meta.openGraph === undefined
-        ? {
-            url: currentUrl,
-            images: [
-              {
-                url: DEFAULT_OG_IMAGE_PATH,
-                type: "image/png",
-                width: OG_SHARE_IMAGE_DIMENSIONS.width,
-                height: OG_SHARE_IMAGE_DIMENSIONS.height,
-              },
-            ],
-          }
-        : { ...meta.openGraph, url: currentUrl },
+    openGraph: mergedOpenGraph,
     robots: meta.robots ?? {
       index: true,
       follow: true,

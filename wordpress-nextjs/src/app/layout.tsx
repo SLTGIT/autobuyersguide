@@ -7,9 +7,10 @@ import { Manrope } from "next/font/google";
 import { Layout } from "@/components/layout";
 import { ClientImports } from "@/components/ClientImports";
 import {
-  DEFAULT_OG_IMAGE_PATH,
   FAVICON_PATH,
+  OG_SHARE_IMAGE_ALT,
   OG_SHARE_IMAGE_DIMENSIONS,
+  absoluteOgLogoUrl,
   normalizePublicSiteBase,
 } from "@/lib/site-url";
 
@@ -25,6 +26,9 @@ const title = "Quality Used Cars Brisbane | Expert Finance & Sourcing";
 const description =
   "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.";
 const GTM_ID = "GTM-W397LKXC";
+
+/** Static file URL only — avoids Next rewriting relative image paths for social crawlers. */
+const ogLogoAbsolute = absoluteOgLogoUrl(siteOrigin);
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
@@ -45,10 +49,11 @@ export const metadata: Metadata = {
     description,
     images: [
       {
-        url: DEFAULT_OG_IMAGE_PATH,
+        url: ogLogoAbsolute,
         type: "image/png",
         width: OG_SHARE_IMAGE_DIMENSIONS.width,
         height: OG_SHARE_IMAGE_DIMENSIONS.height,
+        alt: OG_SHARE_IMAGE_ALT,
       },
     ],
   },
@@ -56,7 +61,14 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: [DEFAULT_OG_IMAGE_PATH],
+    images: [
+      {
+        url: ogLogoAbsolute,
+        alt: OG_SHARE_IMAGE_ALT,
+        width: OG_SHARE_IMAGE_DIMENSIONS.width,
+        height: OG_SHARE_IMAGE_DIMENSIONS.height,
+      },
+    ],
   },
 };
 

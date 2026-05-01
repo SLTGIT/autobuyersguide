@@ -15,12 +15,14 @@ export function getMetadata(item: WPPost | WPPage, fallbackTitle?: string): Meta
       openGraph: {
         title: yoast.og_title || yoast.title,
         description: yoast.og_description || yoast.description,
-        images: yoast.og_image ? yoast.og_image.map((img: any) => ({
-          url: img.url,
-          width: img.width,
-          height: img.height,
-          alt: item.title.rendered
-        })) : []
+        images: yoast.og_image
+          ? yoast.og_image.map((img: { url: string; width?: number; height?: number; alt?: string }) => ({
+              url: img.url,
+              width: img.width,
+              height: img.height,
+              alt: img.alt?.trim() || item.title.rendered,
+            }))
+          : [],
       }
     };
   }
