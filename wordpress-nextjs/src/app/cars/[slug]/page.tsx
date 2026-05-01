@@ -11,6 +11,7 @@ import type { VehicleImage } from "@/types/vehicle";
 import type { SimilarCarItem } from "@/components/vehicles/VehicleSimilarCarousel";
 import {
   DEFAULT_OG_IMAGE_PATH,
+  OG_SHARE_IMAGE_DIMENSIONS,
   getCurrentUrlAndRoute,
   normalizePublicSiteBase,
   resolvePublicOriginFromRequest,
@@ -103,7 +104,14 @@ export async function generateMetadata({ params }: VehicleDetailPageProps) {
           url: currentUrl,
           title: pageTitle,
           description: desc,
-          images: [{ url: DEFAULT_OG_IMAGE_PATH, type: "image/png" }],
+          images: [
+            {
+              url: DEFAULT_OG_IMAGE_PATH,
+              type: "image/png",
+              width: OG_SHARE_IMAGE_DIMENSIONS.width,
+              height: OG_SHARE_IMAGE_DIMENSIONS.height,
+            },
+          ],
         },
   };
 }

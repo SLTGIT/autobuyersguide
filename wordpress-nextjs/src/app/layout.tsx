@@ -9,6 +9,7 @@ import { ClientImports } from "@/components/ClientImports";
 import {
   DEFAULT_OG_IMAGE_PATH,
   FAVICON_PATH,
+  OG_SHARE_IMAGE_DIMENSIONS,
   normalizePublicSiteBase,
 } from "@/lib/site-url";
 
@@ -42,10 +43,17 @@ export const metadata: Metadata = {
     siteName: title,
     title,
     description,
-    images: [{ url: DEFAULT_OG_IMAGE_PATH, type: "image/png" }],
+    images: [
+      {
+        url: DEFAULT_OG_IMAGE_PATH,
+        type: "image/png",
+        width: OG_SHARE_IMAGE_DIMENSIONS.width,
+        height: OG_SHARE_IMAGE_DIMENSIONS.height,
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title,
     description,
     images: [DEFAULT_OG_IMAGE_PATH],

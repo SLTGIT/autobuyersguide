@@ -91,14 +91,17 @@ export async function getCurrentUrlAndRoute(
   return { currentUrl, currentRoute };
 }
 
-/** Browser tab + static share image (PNG under `public/`). */
+/** Small icon for the browser tab. */
 export const FAVICON_PATH = "/assets/images/favicon.png";
 
 /**
- * Default `og:image` / `twitter:image` path. Same file as the favicon — no generated card.
- * (Some networks want images ≥~200px; if previews fail, use a larger PNG here instead.)
+ * Default `og:image` / `twitter:image`. Wordmark PNG (635×250) — large enough for Facebook;
+ * the favicon alone was too small (~72px).
  */
-export const DEFAULT_OG_IMAGE_PATH = FAVICON_PATH;
+export const DEFAULT_OG_IMAGE_PATH = "/assets/images/carsalesbrisbane_logo.png";
+
+/** Must match `public/assets/images/carsalesbrisbane_logo.png` pixel size (IHDR). */
+export const OG_SHARE_IMAGE_DIMENSIONS = { width: 635, height: 250 } as const;
 
 /** Canonical + Open Graph URL + metadataBase from resolved site URL (Next.js pattern). */
 export function siteUrlMetadataFields(
@@ -113,7 +116,14 @@ export function siteUrlMetadataFields(
     },
     openGraph: {
       url: currentUrl,
-      images: [{ url: DEFAULT_OG_IMAGE_PATH, type: "image/png" }],
+      images: [
+        {
+          url: DEFAULT_OG_IMAGE_PATH,
+          type: "image/png",
+          width: OG_SHARE_IMAGE_DIMENSIONS.width,
+          height: OG_SHARE_IMAGE_DIMENSIONS.height,
+        },
+      ],
     },
     robots: {
       index: true,
@@ -140,7 +150,14 @@ export async function mergeSiteUrlMetadata(
       meta.openGraph === undefined
         ? {
             url: currentUrl,
-            images: [{ url: DEFAULT_OG_IMAGE_PATH, type: "image/png" }],
+            images: [
+              {
+                url: DEFAULT_OG_IMAGE_PATH,
+                type: "image/png",
+                width: OG_SHARE_IMAGE_DIMENSIONS.width,
+                height: OG_SHARE_IMAGE_DIMENSIONS.height,
+              },
+            ],
           }
         : { ...meta.openGraph, url: currentUrl },
     robots: meta.robots ?? {

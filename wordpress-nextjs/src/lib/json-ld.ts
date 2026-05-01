@@ -157,7 +157,9 @@ export function autoDealerJsonLd(origin: string) {
     "@type": "AutoDealer",
     "@id": `${siteOrigin}/#dealer`,
     name: "Car Sales Brisbane",
-    image: upgradeHttpToHttpsUrl(`${siteOrigin}/assets/images/favicon.png`),
+    image: upgradeHttpToHttpsUrl(
+      `${siteOrigin}/assets/images/carsalesbrisbane_logo.png`,
+    ),
     url: siteOrigin,
     telephone: "+61418908870",
     email: "sales@carsalesbrisbane.com.au",
