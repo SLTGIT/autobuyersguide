@@ -98,7 +98,7 @@ export const FAVICON_PATH = "/assets/images/favicon.png";
  * Default `og:image` / `twitter:image`. Wordmark PNG (635×250) — large enough for Facebook;
  * the favicon alone was too small (~72px).
  */
-export const DEFAULT_OG_IMAGE_PATH = "/assets/images/carsalesbrisbane_logo.png";
+export const DEFAULT_OG_IMAGE_PATH = "/carsalesbrisbane_logo.png";
 
 /** Must match `public/assets/images/carsalesbrisbane_logo.png` pixel size (IHDR). */
 export const OG_SHARE_IMAGE_DIMENSIONS = { width: 635, height: 250 } as const;
