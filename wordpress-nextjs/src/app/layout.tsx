@@ -6,7 +6,13 @@ import "@/styles/globals.scss";
 import { Manrope } from "next/font/google";
 import { Layout } from "@/components/layout";
 import { ClientImports } from "@/components/ClientImports";
-import { FAVICON_PATH, normalizePublicSiteBase } from "@/lib/site-url";
+import {
+  FAVICON_PATH,
+  OG_SHARE_IMAGE_ALT,
+  OG_SHARE_IMAGE_DIMENSIONS,
+  absoluteOgLogoUrl,
+  normalizePublicSiteBase,
+} from "@/lib/site-url";
 
 const manrope = Manrope({ subsets: ["latin"] });
 
@@ -21,6 +27,8 @@ const description =
   "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.";
 const GTM_ID = "GTM-W397LKXC";
 
+const ogLogoAbsolute = absoluteOgLogoUrl(siteOrigin);
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
   title,
@@ -32,30 +40,35 @@ export const metadata: Metadata = {
   icons: {
     icon: FAVICON_PATH,
   },
-  // openGraph: {
-  //   title: "Quality Used Cars Brisbane | Expert Finance & Sourcing",
-  //   description:
-  //     "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.",
-  //   url: siteOrigin,
-  //   siteName: "Car Sales Brisbane",
-  //   locale: "en_AU",
-  //   type: "website",
-  //   images: [
-  //     {
-  //       url: '/carsalesbrisbane_logo.png',
-  //       width: 1200,
-  //       height: 630,
-  //       alt: "Car Sales Brisbane Logo",
-  //     },
-  //   ],
-  // },
-  // twitter: {
-  //   card: "summary_large_image",
-  //   title: "Quality Used Cars Brisbane | Expert Finance & Sourcing",
-  //   description:
-  //     "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.",
-  //   images: ["/carsalesbrisbane_logo.png"],
-  // },
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: title,
+    title,
+    description,
+    images: [
+      {
+        url: ogLogoAbsolute,
+        type: "image/png",
+        width: OG_SHARE_IMAGE_DIMENSIONS.width,
+        height: OG_SHARE_IMAGE_DIMENSIONS.height,
+        alt: OG_SHARE_IMAGE_ALT,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [
+      {
+        url: ogLogoAbsolute,
+        alt: OG_SHARE_IMAGE_ALT,
+        width: OG_SHARE_IMAGE_DIMENSIONS.width,
+        height: OG_SHARE_IMAGE_DIMENSIONS.height,
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

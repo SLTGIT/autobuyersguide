@@ -94,16 +94,77 @@ export async function getCurrentUrlAndRoute(
 /** Small icon for the browser tab. */
 export const FAVICON_PATH = "/assets/images/favicon.png";
 
-/** Canonical URL + metadataBase from resolved site URL (Next.js pattern). */
+/** Default share image under `public/` (PNG wordmark, 635×250). */
+export const DEFAULT_OG_IMAGE_PATH = "/metalogo.jpg";
+
+/** Pixel size of `carsalesbrisbane_logo.png` (IHDR). */
+export const OG_SHARE_IMAGE_DIMENSIONS = { width: 635, height: 250 } as const;
+
+export const OG_SHARE_IMAGE_ALT = "Car Sales Brisbane";
+
+/** Absolute logo URL so crawlers get a plain `/assets/...` path (not rewritten `__static/...`). */
+export function absoluteOgLogoUrl(origin: string): string {
+  return new URL(DEFAULT_OG_IMAGE_PATH, origin).href;
+}
+
+export function defaultOpenGraphLogoImage(origin: string) {
+  return {
+    url: "/metalogo.jpg",
+    type: "image/jpg" as const,
+    width: OG_SHARE_IMAGE_DIMENSIONS.width,
+    height: OG_SHARE_IMAGE_DIMENSIONS.height,
+    alt: "Car Sales Brisbane Logo",
+  };
+}
+
+type OgImageEntry = NonNullable<
+  NonNullable<Metadata["openGraph"]>["images"]
+> extends infer I
+  ? I extends readonly (infer E)[]
+    ? E
+    : I
+  : never;
+
+/** Fills missing `alt` on `openGraph.images` (emits `og:image:alt`). */
+export function openGraphWithImageAlts(
+  openGraph: NonNullable<Metadata["openGraph"]>,
+  fallbackAlt: string,
+): NonNullable<Metadata["openGraph"]> {
+  if (!openGraph.images) return openGraph;
+  const raw = openGraph.images;
+  const list = (Array.isArray(raw) ? raw : [raw]) as OgImageEntry[];
+  const normalized = list.map((img) => {
+    if (typeof img === "string") return { url: img, alt: fallbackAlt };
+    if (img instanceof URL) return { url: img.href, alt: fallbackAlt };
+    const d = img as {
+      url: string | URL;
+      alt?: string;
+      width?: string | number;
+      height?: string | number;
+      type?: string;
+      secureUrl?: string | URL;
+    };
+    const url = typeof d.url === "string" ? d.url : d.url.href;
+    const alt = d.alt?.trim() ? d.alt : fallbackAlt;
+    return { ...d, url, alt };
+  });
+  return { ...openGraph, images: normalized };
+}
+
+/** Canonical + Open Graph URL + metadataBase from resolved site URL (Next.js pattern). */
 export function siteUrlMetadataFields(
   currentUrl: string,
   currentRoute: string
-): Pick<Metadata, "metadataBase" | "alternates" | "robots"> {
+): Pick<Metadata, "metadataBase" | "alternates" | "openGraph" | "robots"> {
   const origin = new URL(currentUrl).origin;
   return {
     metadataBase: new URL(origin),
     alternates: {
       canonical: currentRoute,
+    },
+    openGraph: {
+      url: currentUrl,
+      images: [defaultOpenGraphLogoImage(origin)],
     },
     robots: {
       index: true,
@@ -112,20 +173,40 @@ export function siteUrlMetadataFields(
   };
 }
 
-/** Merge Yoast/basic metadata from CMS with site URL + canonical handling (no Open Graph). */
+/** Merge Yoast/basic metadata with site URL + canonical + Open Graph. */
 export async function mergeSiteUrlMetadata(
   meta: Metadata,
   pathname: string
 ): Promise<Metadata> {
   const { currentUrl, currentRoute } = await getCurrentUrlAndRoute(pathname);
-  const { openGraph: _og, ...metaWithoutOpenGraph } = meta;
+  const origin = new URL(currentUrl).origin;
+  const existingOg = meta.openGraph;
+  const ogImages = existingOg?.images;
+  const hasOgImages =
+    Array.isArray(ogImages) ? ogImages.length > 0 : Boolean(ogImages);
+
+  const mergedOpenGraph =
+    existingOg == null || !hasOgImages
+      ? {
+          ...(existingOg ?? {}),
+          url: currentUrl,
+          images: [defaultOpenGraphLogoImage(origin)],
+        }
+      : openGraphWithImageAlts(
+          { ...existingOg, url: currentUrl },
+          typeof existingOg.title === "string" && existingOg.title.trim()
+            ? existingOg.title
+            : OG_SHARE_IMAGE_ALT,
+        );
+
   return {
-    ...metaWithoutOpenGraph,
-    metadataBase: new URL(new URL(currentUrl).origin),
+    ...meta,
+    metadataBase: new URL(origin),
     alternates: {
       ...meta.alternates,
       canonical: currentRoute,
     },
+    openGraph: mergedOpenGraph,
     robots: meta.robots ?? {
       index: true,
       follow: true,
