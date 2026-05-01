@@ -91,12 +91,14 @@ export async function getCurrentUrlAndRoute(
   return { currentUrl, currentRoute };
 }
 
+/** Browser tab + static share image (PNG under `public/`). */
+export const FAVICON_PATH = "/assets/images/favicon.png";
+
 /**
- * App-root path for default share previews. Pages that call `siteUrlMetadataFields`
- * return `openGraph: { url }` which replaces the root layout’s `openGraph` in Next.js
- * merge — include this image there so `og:image` is never dropped on those routes.
+ * Default `og:image` / `twitter:image` path. Same file as the favicon — no generated card.
+ * (Some networks want images ≥~200px; if previews fail, use a larger PNG here instead.)
  */
-export const DEFAULT_OG_IMAGE_PATH = "/assets/images/favicon.webp";
+export const DEFAULT_OG_IMAGE_PATH = FAVICON_PATH;
 
 /** Canonical + Open Graph URL + metadataBase from resolved site URL (Next.js pattern). */
 export function siteUrlMetadataFields(
@@ -111,7 +113,7 @@ export function siteUrlMetadataFields(
     },
     openGraph: {
       url: currentUrl,
-      images: [{ url: DEFAULT_OG_IMAGE_PATH }],
+      images: [{ url: DEFAULT_OG_IMAGE_PATH, type: "image/png" }],
     },
     robots: {
       index: true,
@@ -138,7 +140,7 @@ export async function mergeSiteUrlMetadata(
       meta.openGraph === undefined
         ? {
             url: currentUrl,
-            images: [{ url: DEFAULT_OG_IMAGE_PATH }],
+            images: [{ url: DEFAULT_OG_IMAGE_PATH, type: "image/png" }],
           }
         : { ...meta.openGraph, url: currentUrl },
     robots: meta.robots ?? {

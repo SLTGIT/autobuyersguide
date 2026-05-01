@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { currentUrl, currentRoute } = await getCurrentUrlAndRoute(HOME_PATH);
   return {
     // title: siteSettings?.title || 'Home | Statewide Auto Group',
-    title: "Quality Used Cars Brisbane | Expert Finance &amp; Sourcing",
+    title: "Quality Used Cars Brisbane | Expert Finance & Sourcing",
     description:
       siteSettings?.description ||
       "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.",

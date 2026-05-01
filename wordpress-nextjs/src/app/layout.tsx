@@ -6,7 +6,11 @@ import "@/styles/globals.scss";
 import { Manrope } from "next/font/google";
 import { Layout } from "@/components/layout";
 import { ClientImports } from "@/components/ClientImports";
-import { DEFAULT_OG_IMAGE_PATH, normalizePublicSiteBase } from "@/lib/site-url";
+import {
+  DEFAULT_OG_IMAGE_PATH,
+  FAVICON_PATH,
+  normalizePublicSiteBase,
+} from "@/lib/site-url";
 
 const manrope = Manrope({ subsets: ["latin"] });
 
@@ -16,7 +20,7 @@ const siteOrigin = rawSite
   ? normalizePublicSiteBase(rawSite)
   : "http://localhost:3000";
 
-const title = "Quality Used Cars Brisbane | Expert Finance &amp; Sourcing";
+const title = "Quality Used Cars Brisbane | Expert Finance & Sourcing";
 const description =
   "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.";
 const GTM_ID = "GTM-W397LKXC";
@@ -30,7 +34,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   icons: {
-    icon: DEFAULT_OG_IMAGE_PATH,
+    icon: FAVICON_PATH,
   },
   openGraph: {
     type: "website",
@@ -38,10 +42,10 @@ export const metadata: Metadata = {
     siteName: title,
     title,
     description,
-    images: [{ url: DEFAULT_OG_IMAGE_PATH }],
+    images: [{ url: DEFAULT_OG_IMAGE_PATH, type: "image/png" }],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title,
     description,
     images: [DEFAULT_OG_IMAGE_PATH],

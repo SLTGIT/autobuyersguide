@@ -103,7 +103,7 @@ export async function generateMetadata({ params }: VehicleDetailPageProps) {
           url: currentUrl,
           title: pageTitle,
           description: desc,
-          images: [{ url: DEFAULT_OG_IMAGE_PATH }],
+          images: [{ url: DEFAULT_OG_IMAGE_PATH, type: "image/png" }],
         },
   };
 }
