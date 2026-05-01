@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     description,
     images: [
       {
-        url: ogLogoAbsolute,
+        url: '/carsalesbrisbane_logo.png',
         type: "image/png",
         width: OG_SHARE_IMAGE_DIMENSIONS.width,
         height: OG_SHARE_IMAGE_DIMENSIONS.height,
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     description,
     images: [
       {
-        url: ogLogoAbsolute,
+        url: '/carsalesbrisbane_logo.png',
         alt: OG_SHARE_IMAGE_ALT,
         width: OG_SHARE_IMAGE_DIMENSIONS.width,
         height: OG_SHARE_IMAGE_DIMENSIONS.height,
