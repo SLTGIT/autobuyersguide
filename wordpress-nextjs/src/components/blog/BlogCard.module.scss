@@ -115,10 +115,11 @@
   }
 
   &:active {
-    color: var(--cs-primary, #0078ff);
+    color: #fff !important;
   }
   
   &:focus {
-    color: var(--cs-primary, #0078ff);
+    color: #fff !important;
+    background-color: var(--cs-primary, #0078ff) !important;
   }
 }
