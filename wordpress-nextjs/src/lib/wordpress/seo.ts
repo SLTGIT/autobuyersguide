@@ -10,7 +10,7 @@ export function getMetadata(item: WPPost | WPPage, fallbackTitle?: string): Meta
   
   if (yoast) {
     return {
-      title: yoast.title || item.title.rendered,
+      title: ((yoast.title || item.title.rendered) + ' Car Sales Brisbane').trim(),
       description: yoast.og_description || yoast.description || item.excerpt?.rendered?.replace(/<[^>]*>/g, '').slice(0, 160),
       openGraph: {
         title: yoast.og_title || yoast.title,
@@ -29,7 +29,7 @@ export function getMetadata(item: WPPost | WPPage, fallbackTitle?: string): Meta
 
   // Fallback to basic fields
   return {
-    title: `${item.title.rendered} | Auto Buyers Guide`,
+    title: `${item.title.rendered}  Car Sales Brisbane`,
     description: item.excerpt?.rendered?.replace(/<[^>]*>/g, '').slice(0, 160) || `Read more about ${item.title.rendered}`,
   };
 }
