@@ -312,7 +312,7 @@ export function buildLeadEmailHtml(payload: Record<string, unknown>): string {
     const imgRaw = typeof item.image === "string" ? item.image : "";
     const imgSrc = imgRaw ? safeImageSrc(imgRaw) : null;
     const imgHtml = imgSrc
-      ? `<img src="${escapeHtml(imgSrc)}" alt="" width="280" style="display:block;max-width:100%;height:auto;border-radius:8px;border:1px solid ${border};margin-bottom:16px;" />`
+      ? `<img src="${escapeHtml(imgSrc)}" alt="Vehicle Image" width="280" style="display:block;max-width:100%;height:auto;border-radius:8px;border:1px solid ${border};margin-bottom:16px;" />`
       : "";
 
     const specRows = itemRows(item)

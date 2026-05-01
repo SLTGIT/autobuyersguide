@@ -65,7 +65,7 @@ function ReviewCard({
         {r.user_photo ? (
           <Image
             src={r.user_photo}
-            alt=""
+            alt="Google Reviewer's Profile Picture"
             width={48}
             height={48}
             className={styles.avatar}

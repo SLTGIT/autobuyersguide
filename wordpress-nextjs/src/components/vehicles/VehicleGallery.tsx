@@ -277,7 +277,7 @@ export default function VehicleGallery({
               <span className="vehicle-gallery__grid-thumb-frame">
                 <Image
                   src={image.url}
-                  alt=""
+                  alt="Vehicle Image"
                   fill
                   className="vehicle-gallery__grid-thumb-img"
                   sizes="(max-width: 576px) 45vw, 22vw"
@@ -392,7 +392,7 @@ export default function VehicleGallery({
                       >
                         <Image
                           src={image.url}
-                          alt=""
+                          alt="Vehicle Image"
                           width={112}
                           height={84}
                           className="vehicle-gallery__lightbox-thumb-img"

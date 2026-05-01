@@ -100,51 +100,6 @@ export default async function ContactInfo() {
                         </span>
                       ) : null}
                     </div>
-                    {/* {reviews.length > 0 ? (
-                      <ul className="list-unstyled mt-3 mb-0 small">
-                        {reviews.map((r, index) => {
-                          const body = r.text ? stripLeadingStarEmojis(r.text) : "";
-                          const ratingNum = Number.parseFloat(r.rating);
-                          const rowScore = Number.isFinite(ratingNum) ? ratingNum : score;
-                          return (
-                            <li
-                              key={`${r.user}-${r.date}-${index}`}
-                              className="border-top border-light-subtle pt-3 mt-3"
-                            >
-                              <div className="d-flex gap-2 align-items-start">
-                                <Image
-                                  src={r.user_photo}
-                                  alt=""
-                                  width={40}
-                                  height={40}
-                                  className="rounded-circle flex-shrink-0"
-                                  unoptimized
-                                />
-                                <div className="flex-grow-1 min-w-0">
-                                  <div className="d-flex flex-wrap align-items-center gap-2 mb-1">
-                                    <span className="fw-semibold">{r.user}</span>
-                                    <span className="text-secondary">{formatReviewDate(r.date)}</span>
-                                  </div>
-                                  <div className="mb-1">
-                                    <GoogleRatingStars score={rowScore} className="d-inline-flex align-items-center gap-1" />
-                                    <span className="text-secondary ms-1">{rowScore.toFixed(1)}</span>
-                                  </div>
-                                  {body ? <p className="mb-0 text-secondary">{body}</p> : null}
-                                </div>
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    ) : null} */}
-                    {/* <a
-                      className="d-inline-block mt-3 fw-semibold"
-                      href={CAR_SALES_BRISBANE_GOOGLE_MAPS_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Read all reviews on Google
-                    </a> */}
                   </div>
                 </div>
                 <hr className="my-0" />

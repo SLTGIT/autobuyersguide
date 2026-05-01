@@ -200,7 +200,7 @@ export default function HeaderSearch() {
                   {hit.image ? (
                     <Image
                       src={hit.image}
-                      alt=""
+                      alt="Vehicle Image"
                       width={72}
                       height={54}
                       className={styles["header-search__img"]}

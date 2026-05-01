@@ -62,15 +62,6 @@ export default function HeaderNavbar() {
             <li className="nav-item">
               <a
                 className="nav-link text-dark"
-                href="/search?driveType=4WD&driveType=4x4"
-                onClick={closeNav}
-              >
-                Used 4x4s For Sale
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                className="nav-link text-dark"
                 href="/sell-my-car"
                 onClick={closeNav}
               >
@@ -84,6 +75,15 @@ export default function HeaderNavbar() {
                 onClick={closeNav}
               >
                 Finance Pre-Approval
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                className="nav-link text-dark"
+                href="/blog"
+                onClick={closeNav}
+              >
+                Blog
               </a>
             </li>
             <li className="nav-item dropdown">
@@ -105,15 +105,6 @@ export default function HeaderNavbar() {
                     onClick={closeNav}
                   >
                     About Us
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="dropdown-item"
-                    href="/blog"
-                    onClick={closeNav}
-                  >
-                    Blog
                   </a>
                 </li>
                 <li>

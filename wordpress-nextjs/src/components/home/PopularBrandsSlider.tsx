@@ -41,7 +41,7 @@ function BrandLogo({ logoSlug, label }: { logoSlug: string; label: string }) {
   return (
     <Image
       src={src}
-      alt=""
+      alt="Brand Logo"
       title={label}
       width={100}
       height={100}
