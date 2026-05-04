@@ -2,15 +2,15 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
-  // async redirects() {
-  //   return [
-  //     {
-  //       source: "/cars/:slug/preview",
-  //       destination: "/cars/:slug",
-  //       permanent: true,
-  //     },
-  //   ];
-  // },
+  async headers() {
+    return [
+      {
+        // When the platform serves this path through Next, tell crawlers not to index listings.
+        source: "/__static/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

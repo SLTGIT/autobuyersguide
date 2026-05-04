@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getPages, getPosts } from "@/lib/wordpress";
+import { getPosts } from "@/lib/wordpress";
 import { normalizePublicSiteBase } from "@/lib/site-url";
 
 function getSiteOrigin(): string {
@@ -21,22 +21,6 @@ const staticRoutes = [
   "/finance-disclaimer",
 ] as const;
 
-const excludedPageSlugs = new Set([
-  "about-us",
-  "blog",
-  "contact",
-  "finance-centre",
-  "finance-disclaimer",
-  "home",
-  "privacy-policy",
-  "search",
-  "sell-my-car",
-  "sample-page",
-  "terms-of-service",
-  "test",
-  "vehicle",
-]);
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = getSiteOrigin();
 
@@ -56,22 +40,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "weekly" as const,
         priority: 0.7,
       })),
-    );
-  } catch {
-    // Keep sitemap generation resilient even if WP API is unavailable.
-  }
-
-  try {
-    const pages = await getPages({ per_page: 100 });
-    entries.push(
-      ...pages
-        .filter((page) => !excludedPageSlugs.has(page.slug))
-        .map((page) => ({
-          url: `${origin}/${page.slug}`,
-          lastModified: page.modified ? new Date(page.modified) : new Date(),
-          changeFrequency: "monthly" as const,
-          priority: 0.6,
-        })),
     );
   } catch {
     // Keep sitemap generation resilient even if WP API is unavailable.

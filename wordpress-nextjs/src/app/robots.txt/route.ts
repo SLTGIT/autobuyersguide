@@ -32,6 +32,8 @@ Allow: /
 # App internals & non-public surfaces
 Disallow: /api/
 Disallow: /diagnostics
+# Build / CDN asset folders (directory listings must be disabled at the host as well)
+Disallow: /__static/
 # Faceted inventory SRP (canonical is typically /search without filters)
 Disallow: /search?*
 

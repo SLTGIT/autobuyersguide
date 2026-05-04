@@ -38,7 +38,7 @@ Authoritative crawl policy: [robots.txt](${robots}). Full URL list for indexers:
 
 ## Optional
 
-- Additional WordPress-managed pages may appear at short root paths; see [sitemap.xml](${sitemap}) for indexable URLs. An internal diagnostics path exists at \`/diagnostics\` for operators only (not a consumer destination).
+- Indexable URLs are those listed in [sitemap.xml](${sitemap}). An internal diagnostics path exists at \`/diagnostics\` for operators only (not a consumer destination).
 `;
 }
 

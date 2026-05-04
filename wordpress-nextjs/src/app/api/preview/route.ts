@@ -57,6 +57,21 @@ export async function GET(request: NextRequest) {
     );
   }
   
+  /** WordPress pages that map to first-party Next routes (no generic /[slug] CMS renderer). */
+  const pagePreviewPath = new Map<string, string>([
+    ['home', '/'],
+    ['front-page', '/'],
+    ['about-us', '/about-us'],
+    ['blog', '/blog'],
+    ['contact', '/contact'],
+    ['finance-centre', '/finance-centre'],
+    ['finance-disclaimer', '/finance-disclaimer'],
+    ['privacy-policy', '/privacy-policy'],
+    ['sell-my-car', '/sell-my-car'],
+    ['search', '/search'],
+    ['terms-of-service', '/terms-of-service'],
+  ]);
+
   // Build the preview URL based on content type
   let previewUrl: string;
   
@@ -65,14 +80,20 @@ export async function GET(request: NextRequest) {
       previewUrl = `/blog/${slug}`;
       break;
       
-    case 'page':
-      // Handle special cases
-      if (slug === 'home' || slug === 'front-page') {
-        previewUrl = '/';
-      } else {
-        previewUrl = `/${slug}`;
+    case 'page': {
+      const path = pagePreviewPath.get(slug);
+      if (!path) {
+        return NextResponse.json(
+          {
+            error: 'No preview route',
+            message: `WordPress page slug "${slug}" is not mapped to a Next.js page.`,
+          },
+          { status: 404 },
+        );
       }
+      previewUrl = path;
       break;
+    }
       
     case 'vehicle':
       previewUrl = `/vehicles/${slug}`;
