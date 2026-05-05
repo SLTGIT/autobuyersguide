@@ -1,6 +1,7 @@
 "use client";
 
 import { submitLead } from "@/lib/leads/submit-lead-client";
+import RecaptchaField from "@/components/forms/RecaptchaField";
 import {
   digitsOnly,
   isValidEmail,
@@ -56,6 +57,7 @@ export default function VehicleEnquiryForm({
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const resetForm = useCallback(() => {
     setFirstName("");
@@ -83,6 +85,11 @@ export default function VehicleEnquiryForm({
       setStatusMessage("Please enter a valid email address.");
       return;
     }
+    if (!recaptchaToken) {
+      setStatus("error");
+      setStatusMessage("Please complete reCAPTCHA.");
+      return;
+    }
     if (phoneDigits.length !== 10) {
       setStatus("error");
       setStatusMessage(
@@ -99,9 +106,7 @@ export default function VehicleEnquiryForm({
       messageParts.push(`Preferred dealership: ${dealerLabel}`);
     }
     if (similarStock) {
-      messageParts.push(
-        "Please email me similar stock and latest offers.",
-      );
+      messageParts.push("Please email me similar stock and latest offers.");
     }
     const message = messageParts.filter(Boolean).join("\n\n");
 
@@ -119,6 +124,7 @@ export default function VehicleEnquiryForm({
         driverLicence: "",
         address: "",
         date: new Date().toISOString(),
+        recaptchaToken,
         item: {
           image: item.image,
           make: item.make,
@@ -139,6 +145,7 @@ export default function VehicleEnquiryForm({
           "Thank you — your enquiry was sent. We will be in touch shortly.",
         );
         resetForm();
+        setRecaptchaToken(null);
       } else {
         setStatus("error");
         setStatusMessage(
@@ -216,7 +223,6 @@ export default function VehicleEnquiryForm({
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setFirstName(sanitizeNameInput(e.target.value))
               }
-              pattern="[A-Za-z][A-Za-z '\\-]*"
             />
           </div>
           <div className="col-md-6">
@@ -240,68 +246,65 @@ export default function VehicleEnquiryForm({
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setLastName(sanitizeNameInput(e.target.value))
               }
-              pattern="[A-Za-z][A-Za-z '\\-]*"
+            />
+          </div>
+        </div>
+
+        <div className="row g-3 mb-3">
+          <div className="col-md-6">
+            <label
+              className="cs-contact-form__label"
+              htmlFor={`${idPrefix}-email`}
+            >
+              Email address
+              <span className="cs-contact-form__req" aria-hidden>
+                *
+              </span>
+            </label>
+            <input
+              id={`${idPrefix}-email`}
+              name="email"
+              type="email"
+              className="form-control cs-contact-form__control"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setEmail(e.target.value)
+              }
+            />
+          </div>
+          <div className="col-md-6">
+            <label
+              className="cs-contact-form__label"
+              htmlFor={`${idPrefix}-phone`}
+            >
+              Mobile number
+              <span className="cs-contact-form__req" aria-hidden>
+                *
+              </span>
+            </label>
+            <input
+              id={`${idPrefix}-phone`}
+              name="phone"
+              type="tel"
+              inputMode="tel"
+              className="form-control cs-contact-form__control"
+              required
+              autoComplete="tel"
+              placeholder=""
+              value={phone}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setPhone(sanitizePhoneInput(e.target.value))
+              }
+              pattern="[0-9]{10}"
+              maxLength={10}
             />
           </div>
         </div>
 
         <div className="mb-3">
-          <label
-            className="cs-contact-form__label"
-            htmlFor={`${idPrefix}-email`}
-          >
-            Email address
-            <span className="cs-contact-form__req" aria-hidden>
-              *
-            </span>
-          </label>
-          <input
-            id={`${idPrefix}-email`}
-            name="email"
-            type="email"
-            className="form-control cs-contact-form__control"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setEmail(e.target.value)
-            }
-          />
-        </div>
-
-        <div className="mb-3">
-          <label
-            className="cs-contact-form__label"
-            htmlFor={`${idPrefix}-phone`}
-          >
-            Mobile number
-            <span className="cs-contact-form__req" aria-hidden>
-              *
-            </span>
-          </label>
-          <input
-            id={`${idPrefix}-phone`}
-            name="phone"
-            type="tel"
-            inputMode="tel"
-            className="form-control cs-contact-form__control"
-            required
-            autoComplete="tel"
-            placeholder=""
-            value={phone}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setPhone(sanitizePhoneInput(e.target.value))
-            }
-              pattern="[0-9]{10}"
-              maxLength={10}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label
-            className="cs-contact-form__label"
-            htmlFor={`${idPrefix}-msg`}
-          >
+          <label className="cs-contact-form__label" htmlFor={`${idPrefix}-msg`}>
             Comments
             <span className="cs-contact-form__req" aria-hidden>
               *
@@ -359,18 +362,21 @@ export default function VehicleEnquiryForm({
             checked={similarStock}
             onChange={(e) => setSimilarStock(e.target.checked)}
           />
-          <label
-            className="form-check-label"
-            htmlFor={`${idPrefix}-similar`}
-          >
+          <label className="form-check-label" htmlFor={`${idPrefix}-similar`}>
             Email me similar stock and latest offers.
           </label>
         </div>
 
+        <div className="mb-3">
+          <RecaptchaField
+            token={recaptchaToken}
+            onTokenChange={setRecaptchaToken}
+          />
+        </div>
         <div className="d-flex flex-column flex-sm-row gap-2">
           <button
             type="submit"
-            className="btn cs-contact-form__submit flex-grow-1"
+            className="btn cs-contact-form__submit cs-pill"
             disabled={loading}
           >
             {loading ? (

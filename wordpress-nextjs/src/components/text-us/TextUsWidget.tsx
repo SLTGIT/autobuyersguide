@@ -1,6 +1,7 @@
 "use client";
 
 import { submitLead } from "@/lib/leads/submit-lead-client";
+import RecaptchaField from "@/components/forms/RecaptchaField";
 import {
   digitsOnly,
   isValidName,
@@ -51,6 +52,7 @@ export default function TextUsWidget() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [submittedPhoneDigits, setSubmittedPhoneDigits] = useState("");
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const phoneDigits = useMemo(() => digitsOnly(phone), [phone]);
   const nameOk = isValidName(fullName);
@@ -63,6 +65,7 @@ export default function TextUsWidget() {
     setMessage("");
     setError("");
     setSubmittedPhoneDigits("");
+    setRecaptchaToken(null);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -128,6 +131,10 @@ export default function TextUsWidget() {
       );
       return;
     }
+    if (!recaptchaToken) {
+      setError("Please complete reCAPTCHA.");
+      return;
+    }
 
     const { firstName, lastName } = splitFullName(fullName);
     if (!firstName.trim()) {
@@ -146,6 +153,7 @@ export default function TextUsWidget() {
         form_type: "General Enquiry",
         budget: "",
         date: new Date().toISOString(),
+        recaptchaToken,
         item: {
           tag: "Car Sales Brisbane",
         },
@@ -298,16 +306,17 @@ export default function TextUsWidget() {
                       >
                         Message
                       </label>
-                      <div className={styles.inputRow}>
-                        <input
+                      <div className={`${styles.inputRow} ${styles.messageRow}`}>
+                        <textarea
                           id={`${baseId}-message`}
-                          className={styles.input}
+                          className={`${styles.input} ${styles.messageInput}`}
                           name="message"
                           autoComplete="off"
                           placeholder="How can we help?"
                           value={message}
                           onChange={(e) => setMessage(e.target.value)}
                           disabled={loading}
+                          rows={2}
                         />
                       </div>
                     </div>
@@ -326,6 +335,12 @@ export default function TextUsWidget() {
                 </div>
 
                 <div className={styles.footerActions}>
+                  <div className={styles.captchaCompact}>
+                    <RecaptchaField
+                      token={recaptchaToken}
+                      onTokenChange={setRecaptchaToken}
+                    />
+                  </div>
                   <button
                     type="submit"
                     className={styles.send}

@@ -1,6 +1,7 @@
 "use client";
 
 import { submitLead } from "@/lib/leads/submit-lead-client";
+import RecaptchaField from "@/components/forms/RecaptchaField";
 import {
   digitsOnly,
   isValidName,
@@ -42,6 +43,7 @@ export default function VehicleTestDriveForm({
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const minDate = useMemo(() => {
     const d = new Date();
@@ -68,6 +70,11 @@ export default function VehicleTestDriveForm({
     if (!isValidName(firstName) || !isValidName(lastName)) {
       setStatus("error");
       setStatusMessage("Please enter a valid first and last name.");
+      return;
+    }
+    if (!recaptchaToken) {
+      setStatus("error");
+      setStatusMessage("Please complete reCAPTCHA.");
       return;
     }
     if (phoneDigits.length !== 10) {
@@ -105,6 +112,7 @@ export default function VehicleTestDriveForm({
         driverLicence: "",
         address: "",
         date: new Date().toISOString(),
+        recaptchaToken,
         item: {
           image: item.image,
           make: item.make,
@@ -125,6 +133,7 @@ export default function VehicleTestDriveForm({
           "Thank you — your test drive request was sent. We will be in touch shortly.",
         );
         resetForm();
+        setRecaptchaToken(null);
       } else {
         setStatus("error");
         setStatusMessage(
@@ -193,7 +202,6 @@ export default function VehicleTestDriveForm({
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setFirstName(sanitizeNameInput(e.target.value))
               }
-              pattern="[A-Za-z][A-Za-z '\\-]*"
             />
           </div>
           <div className="col-md-6">
@@ -217,60 +225,60 @@ export default function VehicleTestDriveForm({
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setLastName(sanitizeNameInput(e.target.value))
               }
-              pattern="[A-Za-z][A-Za-z '\\-]*"
             />
           </div>
         </div>
 
-        <div className="mb-3">
-          <label
-            className="cs-contact-form__label"
-            htmlFor={`${idPrefix}-phone`}
-          >
-            Phone
-            <span className="cs-contact-form__req" aria-hidden>
-              *
-            </span>
-          </label>
-          <input
-            id={`${idPrefix}-phone`}
-            name="phone"
-            type="tel"
-            inputMode="tel"
-            className="form-control rounded-pill cs-contact-form__control"
-            required
-            autoComplete="tel"
-            value={phone}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+        <div className="row g-3 mb-3">
+          <div className="col-md-6">
+            <label
+              className="cs-contact-form__label"
+              htmlFor={`${idPrefix}-phone`}
+            >
+              Phone
+              <span className="cs-contact-form__req" aria-hidden>
+                *
+              </span>
+            </label>
+            <input
+              id={`${idPrefix}-phone`}
+              name="phone"
+              type="tel"
+              inputMode="tel"
+              className="form-control rounded-pill cs-contact-form__control"
+              required
+              autoComplete="tel"
+              value={phone}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setPhone(sanitizePhoneInput(e.target.value))
-            }
+              }
               pattern="[0-9]{10}"
               maxLength={10}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label
-            className="cs-contact-form__label"
-            htmlFor={`${idPrefix}-date`}
-          >
-            Preferred date
-            <span className="cs-contact-form__req" aria-hidden>
-              *
-            </span>
-          </label>
-          <input
-            id={`${idPrefix}-date`}
-            name="preferredDate"
-            type="date"
-            min={minDate}
-            className="form-control rounded-pill cs-contact-form__control"
-            required
-            value={preferredDate}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setPreferredDate(e.target.value)
-            }
-          />
+            />
+          </div>
+          <div className="col-md-6">
+            <label
+              className="cs-contact-form__label"
+              htmlFor={`${idPrefix}-date`}
+            >
+              Preferred date
+              <span className="cs-contact-form__req" aria-hidden>
+                *
+              </span>
+            </label>
+            <input
+              id={`${idPrefix}-date`}
+              name="preferredDate"
+              type="date"
+              min={minDate}
+              className="form-control rounded-pill cs-contact-form__control"
+              required
+              value={preferredDate}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setPreferredDate(e.target.value)
+              }
+            />
+          </div>
         </div>
 
         <div className="mb-4">
@@ -303,6 +311,12 @@ export default function VehicleTestDriveForm({
           </select>
         </div>
 
+        <div className="mb-3">
+          <RecaptchaField
+            token={recaptchaToken}
+            onTokenChange={setRecaptchaToken}
+          />
+        </div>
         <button
           type="submit"
           className="btn btn-primary cs-pill px-4"

@@ -19,23 +19,16 @@ async function resolveSiteOrigin(): Promise<string> {
   return `${proto === "http" || proto === "https" ? proto : "https"}://${host}`;
 }
 
-/**
- * Plain-text robots.txt for Car Sales Brisbane (Next.js app routes).
- * Structure follows the Carweek-style reference: default crawl + selective
- * disallows for this site, then AI search vs training bot blocks.
- */
 function buildRobotsBody(sitemapUrl: string): string {
   return `Sitemap: ${sitemapUrl}
 
 User-agent: *
 Allow: /
-# App internals & non-public surfaces
 Disallow: /api/
-Disallow: /diagnostics
-# Build / CDN asset folders (directory listings must be disabled at the host as well)
-Disallow: /__static/
-# Faceted inventory SRP (canonical is typically /search without filters)
+Disallow: /privacy-policy
+Disallow: /terms-of-service
 Disallow: /search?*
+Disallow: /*?
 
 # ------------------------------------------
 # AI SEARCH / TRAFFIC BOTS (Allowed)

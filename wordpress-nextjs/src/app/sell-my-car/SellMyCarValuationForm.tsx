@@ -1,6 +1,7 @@
 "use client";
 
 import { submitLead } from "@/lib/leads/submit-lead-client";
+import RecaptchaField from "@/components/forms/RecaptchaField";
 import {
   digitsOnly,
   isValidEmail,
@@ -65,9 +66,7 @@ function buildMessage(values: FormFields): string {
   const parts = [
     "Sell My Car — obligation-free valuation",
     `Vehicle: ${y} ${mk} ${md}`,
-    odoNum != null
-      ? `Odometer: ${odoNum.toLocaleString("en-AU")} km`
-      : null,
+    odoNum != null ? `Odometer: ${odoNum.toLocaleString("en-AU")} km` : null,
     rego ? `Registration: ${rego}` : null,
     comments ? `Comments: ${comments}` : null,
   ].filter(Boolean) as string[];
@@ -81,6 +80,7 @@ export default function SellMyCarValuationForm() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
@@ -142,6 +142,11 @@ export default function SellMyCarValuationForm() {
       setStep(1);
       return;
     }
+    if (!recaptchaToken) {
+      setStatus("error");
+      setStatusMessage("Please complete reCAPTCHA.");
+      return;
+    }
 
     const phoneDigits = digitsOnly(formData.phone);
     const y = formData.vehicleYear.trim();
@@ -177,6 +182,7 @@ export default function SellMyCarValuationForm() {
         driverLicence: "",
         address: "",
         date: new Date().toISOString(),
+        recaptchaToken,
         item: {
           tag: "Car Sales Brisbane",
           make: makeLabel,
@@ -194,6 +200,7 @@ export default function SellMyCarValuationForm() {
         );
         setFormData(emptyForm);
         setStep(1);
+        setRecaptchaToken(null);
       } else {
         setStatus("error");
         setStatusMessage(
@@ -314,7 +321,6 @@ export default function SellMyCarValuationForm() {
                   placeholder="First name"
                   required
                   autoComplete="given-name"
-                  pattern="[A-Za-z][A-Za-z '\\-]*"
                   value={formData.firstName}
                   onChange={handleChange}
                 />
@@ -331,48 +337,52 @@ export default function SellMyCarValuationForm() {
                   placeholder="Last name"
                   required
                   autoComplete="family-name"
-                  pattern="[A-Za-z][A-Za-z '\\-]*"
                   value={formData.lastName}
                   onChange={handleChange}
                 />
               </div>
             </div>
 
-            <div className="mb-3">
-              <label className="smc-form-label" htmlFor="smc-email">
-                Email address<span className="smc-form-req">*</span>
-              </label>
-              <input
-                id="smc-email"
-                name="email"
-                type="email"
-                className="form-control smc-form-control"
-                placeholder="Email"
-                required
-                autoComplete="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="smc-form-label" htmlFor="smc-phone">
-                Mobile number<span className="smc-form-req">*</span>
-              </label>
-              <input
-                id="smc-phone"
-                name="phone"
-                type="tel"
-                inputMode="tel"
-                className="form-control smc-form-control"
-                placeholder=""
-                required
-                autoComplete="tel"
-                pattern="[0-9]{10}"
-                maxLength={10}
-                value={formData.phone}
-                onChange={handleChange}
-              />
+            <div className="row g-3 mb-3">
+              <div className="col-md-6">
+                <div className="">
+                  <label className="smc-form-label" htmlFor="smc-email">
+                    Email address<span className="smc-form-req">*</span>
+                  </label>
+                  <input
+                    id="smc-email"
+                    name="email"
+                    type="email"
+                    className="form-control smc-form-control"
+                    placeholder="Email"
+                    required
+                    autoComplete="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+              <div className="col-md-6">
+                <div className="">
+                  <label className="smc-form-label" htmlFor="smc-phone">
+                    Mobile number<span className="smc-form-req">*</span>
+                  </label>
+                  <input
+                    id="smc-phone"
+                    name="phone"
+                    type="tel"
+                    inputMode="tel"
+                    className="form-control smc-form-control"
+                    placeholder=""
+                    required
+                    autoComplete="tel"
+                    pattern="[0-9]{10}"
+                    maxLength={10}
+                    value={formData.phone}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="d-flex justify-content-end">
@@ -387,85 +397,95 @@ export default function SellMyCarValuationForm() {
           </>
         ) : (
           <>
-            <div className="mb-3">
-              <label className="smc-form-label" htmlFor="smc-make">
-                Vehicle make<span className="smc-form-req">*</span>
-              </label>
-              <select
-                id="smc-make"
-                name="vehicleMake"
-                className="form-select smc-form-control"
-                required
-                value={formData.vehicleMake}
-                onChange={handleChange}
-              >
-                <option value="" disabled>
-                  Vehicle make
-                </option>
-                {SELL_MY_CAR_MAKES.map((m) => (
-                  <option key={m.value} value={m.value}>
-                    {m.label}
-                  </option>
-                ))}
-              </select>
+            <div className="row">
+              <div className="col-md-6">
+                <div className="mb-3">
+                  <label className="smc-form-label" htmlFor="smc-make">
+                    Vehicle make<span className="smc-form-req">*</span>
+                  </label>
+                  <select
+                    id="smc-make"
+                    name="vehicleMake"
+                    className="form-select smc-form-control"
+                    required
+                    value={formData.vehicleMake}
+                    onChange={handleChange}
+                  >
+                    <option value="" disabled>
+                      Vehicle make
+                    </option>
+                    {SELL_MY_CAR_MAKES.map((m) => (
+                      <option key={m.value} value={m.value}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="col-md-6">
+                <div className="mb-3">
+                  <label className="smc-form-label" htmlFor="smc-model">
+                    Model<span className="smc-form-req">*</span>
+                  </label>
+                  <input
+                    id="smc-model"
+                    name="vehicleModel"
+                    type="text"
+                    className="form-control smc-form-control"
+                    placeholder="Model"
+                    required
+                    autoComplete="off"
+                    value={formData.vehicleModel}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="mb-3">
-              <label className="smc-form-label" htmlFor="smc-model">
-                Model<span className="smc-form-req">*</span>
-              </label>
-              <input
-                id="smc-model"
-                name="vehicleModel"
-                type="text"
-                className="form-control smc-form-control"
-                placeholder="Model"
-                required
-                autoComplete="off"
-                value={formData.vehicleModel}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="smc-form-label" htmlFor="smc-year">
-                Year<span className="smc-form-req">*</span>
-              </label>
-              <select
-                id="smc-year"
-                name="vehicleYear"
-                className="form-select smc-form-control"
-                required
-                value={formData.vehicleYear}
-                onChange={handleChange}
-              >
-                <option value="" disabled>
-                  Vehicle year…
-                </option>
-                {YEAR_OPTIONS.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="mb-3">
-              <label className="smc-form-label" htmlFor="smc-odo">
-                Odometer (km)<span className="smc-form-req">*</span>
-              </label>
-              <input
-                id="smc-odo"
-                name="odometer"
-                type="number"
-                inputMode="numeric"
-                className="form-control smc-form-control"
-                placeholder="e.g. 125000"
-                required
-                autoComplete="off"
-                value={formData.odometer}
-                onChange={handleChange}
-              />
+            <div className="row">
+              <div className="col-md-6">
+                <div className="mb-3">
+                  <label className="smc-form-label" htmlFor="smc-year">
+                    Year<span className="smc-form-req">*</span>
+                  </label>
+                  <select
+                    id="smc-year"
+                    name="vehicleYear"
+                    className="form-select smc-form-control"
+                    required
+                    value={formData.vehicleYear}
+                    onChange={handleChange}
+                  >
+                    <option value="" disabled>
+                      Vehicle year…
+                    </option>
+                    {YEAR_OPTIONS.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="col-md-6">
+                <div className="mb-3">
+                  <label className="smc-form-label" htmlFor="smc-odo">
+                    Odometer (km)<span className="smc-form-req">*</span>
+                  </label>
+                  <input
+                    id="smc-odo"
+                    name="odometer"
+                    type="number"
+                    inputMode="numeric"
+                    className="form-control smc-form-control"
+                    placeholder="e.g. 125000"
+                    required
+                    autoComplete="off"
+                    value={formData.odometer}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="mb-4">
@@ -484,6 +504,12 @@ export default function SellMyCarValuationForm() {
               />
             </div>
 
+            <div className="mb-3">
+              <RecaptchaField
+                token={recaptchaToken}
+                onTokenChange={setRecaptchaToken}
+              />
+            </div>
             <div className="d-flex flex-column flex-sm-row gap-2 justify-content-between">
               <button
                 type="button"

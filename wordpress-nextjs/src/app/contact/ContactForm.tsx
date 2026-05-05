@@ -1,6 +1,7 @@
 "use client";
 
 import { submitLead } from "@/lib/leads/submit-lead-client";
+import RecaptchaField from "@/components/forms/RecaptchaField";
 import {
   digitsOnly,
   isValidEmail,
@@ -44,6 +45,7 @@ export default function ContactForm() {
   const [loading, setLoading] = useState<boolean>(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState<string>("");
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
@@ -85,7 +87,15 @@ export default function ContactForm() {
     }
     if (digitsOnly(formData.phone).length !== 10) {
       setStatus("error");
-      setStatusMessage("Please enter a valid 10-digit Australian mobile number.");
+      setStatusMessage(
+        "Please enter a valid 10-digit Australian mobile number.",
+      );
+      setLoading(false);
+      return;
+    }
+    if (!recaptchaToken) {
+      setStatus("error");
+      setStatusMessage("Please complete reCAPTCHA.");
       setLoading(false);
       return;
     }
@@ -100,6 +110,7 @@ export default function ContactForm() {
         form_type: formData.enquiryType,
         budget: "",
         date: new Date().toISOString(),
+        recaptchaToken,
         item: {
           tag: "Car Sales Brisbane",
         },
@@ -118,6 +129,7 @@ export default function ContactForm() {
           enquiryType: "",
           message: "",
         });
+        setRecaptchaToken(null);
       } else {
         setStatus("error");
         setStatusMessage(
@@ -208,7 +220,6 @@ export default function ContactForm() {
                 className="form-control cs-contact-form__control"
                 required
                 autoComplete="given-name"
-                pattern="[A-Za-z][A-Za-z '\\-]*"
                 value={formData.firstName}
                 onChange={handleChange}
               />
@@ -231,54 +242,64 @@ export default function ContactForm() {
                 className="form-control cs-contact-form__control"
                 required
                 autoComplete="family-name"
-                pattern="[A-Za-z][A-Za-z '\\-]*"
                 value={formData.lastName}
                 onChange={handleChange}
               />
             </div>
           </div>
 
-          <div className="mb-3">
-            <label className="cs-contact-form__label" htmlFor="contact-email">
-              Email
-              <span className="cs-contact-form__req" aria-hidden>
-                *
-              </span>
-            </label>
-            <input
-              id="contact-email"
-              name="email"
-              type="email"
-              className="form-control cs-contact-form__control"
-              required
-              autoComplete="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="cs-contact-form__label" htmlFor="contact-phone">
-              Phone number
-              <span className="cs-contact-form__req" aria-hidden>
-                *
-              </span>
-            </label>
-            <input
-              id="contact-phone"
-              name="phone"
-              type="tel"
-              inputMode="numeric"
-              className="form-control cs-contact-form__control"
-              required
-                pattern="[0-9]{10}"
-              maxLength={10}
-              autoComplete="tel"
-              placeholder=""
-              value={formData.phone}
-              onChange={handleChange}
-            />
-            <p className="form-text text-muted small mb-0 mt-1"></p>
+          <div className="row g-3 mb-3">
+            <div className="col-md-6">
+              <div className="">
+                <label
+                  className="cs-contact-form__label"
+                  htmlFor="contact-email"
+                >
+                  Email
+                  <span className="cs-contact-form__req" aria-hidden>
+                    *
+                  </span>
+                </label>
+                <input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  className="form-control cs-contact-form__control"
+                  required
+                  autoComplete="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <div className="col-md-6">
+              <div className="">
+                <label
+                  className="cs-contact-form__label"
+                  htmlFor="contact-phone"
+                >
+                  Phone number
+                  <span className="cs-contact-form__req" aria-hidden>
+                    *
+                  </span>
+                </label>
+                <input
+                  id="contact-phone"
+                  name="phone"
+                  type="tel"
+                  inputMode="numeric"
+                  className="form-control cs-contact-form__control"
+                  required
+                  pattern="[0-9]{10}"
+                  maxLength={10}
+                  autoComplete="tel"
+                  placeholder=""
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+                <p className="form-text text-muted small mb-0 mt-1"></p>
+              </div>
+            </div>
           </div>
 
           <div className="mb-3">
@@ -326,9 +347,15 @@ export default function ContactForm() {
             />
           </div>
 
+          <div className="mt-3">
+            <RecaptchaField
+              token={recaptchaToken}
+              onTokenChange={setRecaptchaToken}
+            />
+          </div>
           <button
             type="submit"
-            className="btn w-100 cs-contact-form__submit"
+            className="btn w-100 cs-contact-form__submit mt-3"
             disabled={loading}
           >
             {loading ? (

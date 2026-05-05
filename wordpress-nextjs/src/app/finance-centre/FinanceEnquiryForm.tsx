@@ -1,6 +1,7 @@
 "use client";
 
 import { submitLead } from "@/lib/leads/submit-lead-client";
+import RecaptchaField from "@/components/forms/RecaptchaField";
 import {
   isValidEmail,
   isValidName,
@@ -75,6 +76,7 @@ export default function FinanceEnquiryForm() {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
   const [dobError, setDobError] = useState("");
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const resetForm = useCallback(() => {
     setBudget("");
@@ -89,6 +91,7 @@ export default function FinanceEnquiryForm() {
     setAddress("");
     setSubscribe(false);
     setDobError("");
+    setRecaptchaToken(null);
   }, []);
 
   const dismissSuccess = useCallback(() => {
@@ -120,6 +123,12 @@ export default function FinanceEnquiryForm() {
     if (!isValidEmail(email)) {
       setStatus("error");
       setStatusMessage("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+    if (!recaptchaToken) {
+      setStatus("error");
+      setStatusMessage("Please complete reCAPTCHA.");
       setLoading(false);
       return;
     }
@@ -161,6 +170,7 @@ export default function FinanceEnquiryForm() {
         address: address.trim(),
         date: new Date().toISOString(),
         subscribe,
+        recaptchaToken,
         item: {
           tag: "Car Sales Brisbane",
         },
@@ -311,7 +321,6 @@ export default function FinanceEnquiryForm() {
                     placeholder="First name"
                     value={firstName}
                     onChange={(e) => setFirstName(sanitizeNameInput(e.target.value))}
-                    pattern="[A-Za-z][A-Za-z '\\-]*"
                   />
                 </div>
                 <div className="col-md-6">
@@ -334,7 +343,6 @@ export default function FinanceEnquiryForm() {
                     placeholder="Last name"
                     value={lastName}
                     onChange={(e) => setLastName(sanitizeNameInput(e.target.value))}
-                    pattern="[A-Za-z][A-Za-z '\\-]*"
                   />
                 </div>
               </div>
@@ -503,9 +511,15 @@ export default function FinanceEnquiryForm() {
                 </label>
               </div>
 
+              <div className="mt-3">
+                <RecaptchaField
+                  token={recaptchaToken}
+                  onTokenChange={setRecaptchaToken}
+                />
+              </div>
               <button
                 type="submit"
-                className="btn w-100 cs-contact-form__submit"
+                className="btn w-100 cs-contact-form__submit mt-3"
                 disabled={loading}
               >
                 {loading ? (

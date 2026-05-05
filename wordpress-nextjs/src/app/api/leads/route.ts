@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { forwardLeadToWordpress } from "@/lib/leads/forward-lead-to-wordpress";
 import { sendLeadEmail } from "@/lib/leads/send-lead-email";
+import { verifyRecaptchaToken } from "@/lib/recaptcha/verify-recaptcha";
 
 export const runtime = "nodejs";
 
@@ -25,14 +26,41 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!isNonEmptyString(body.firstName) || !isNonEmptyString(body.lastName)) {
+  const recaptchaToken = String(body.recaptchaToken ?? "").trim();
+  if (!recaptchaToken) {
+    return NextResponse.json(
+      { success: false, message: "Please complete the reCAPTCHA challenge." },
+      { status: 400 },
+    );
+  }
+
+  const remoteIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const recaptcha = await verifyRecaptchaToken(recaptchaToken, remoteIp);
+  if (!recaptcha.ok) {
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          recaptcha.message ??
+          "Could not verify reCAPTCHA. Please refresh and try again.",
+      },
+      { status: 400 },
+    );
+  }
+
+  const { recaptchaToken: _unusedRecaptchaToken, ...leadBody } = body;
+
+  if (
+    !isNonEmptyString(leadBody.firstName) ||
+    !isNonEmptyString(leadBody.lastName)
+  ) {
     return NextResponse.json(
       { success: false, message: "First name and last name are required." },
       { status: 400 },
     );
   }
 
-  if (!isNonEmptyString(body.phone)) {
+  if (!isNonEmptyString(leadBody.phone)) {
     return NextResponse.json(
       { success: false, message: "Phone is required." },
       { status: 400 },
@@ -40,7 +68,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    await Promise.all([sendLeadEmail(body), forwardLeadToWordpress(body)]);
+    await Promise.all([sendLeadEmail(leadBody), forwardLeadToWordpress(leadBody)]);
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Could not send your enquiry.";
