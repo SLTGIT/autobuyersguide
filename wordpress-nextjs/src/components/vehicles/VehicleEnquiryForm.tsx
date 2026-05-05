@@ -1,6 +1,13 @@
 "use client";
 
 import { submitLead } from "@/lib/leads/submit-lead-client";
+import {
+  digitsOnly,
+  isValidEmail,
+  isValidName,
+  sanitizeNameInput,
+  sanitizePhoneInput,
+} from "@/lib/forms/validation";
 import "@/app/contact/contact.css";
 import { useCallback, useState, ChangeEvent, FormEvent } from "react";
 
@@ -22,10 +29,6 @@ const DEALERSHIP_OPTIONS = [
     label: "Car Sales Brisbane",
   },
 ] as const;
-
-function digitsOnly(value: string): string {
-  return value.replace(/\D/g, "");
-}
 
 export interface VehicleEnquiryFormProps {
   item: VehicleEnquiryItemPayload;
@@ -70,6 +73,16 @@ export default function VehicleEnquiryForm({
     setStatusMessage("");
 
     const phoneDigits = digitsOnly(phone);
+    if (!isValidName(firstName) || !isValidName(lastName)) {
+      setStatus("error");
+      setStatusMessage("Please enter a valid first and last name.");
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setStatus("error");
+      setStatusMessage("Please enter a valid email address.");
+      return;
+    }
     if (phoneDigits.length !== 10) {
       setStatus("error");
       setStatusMessage(
@@ -201,8 +214,9 @@ export default function VehicleEnquiryForm({
               autoComplete="given-name"
               value={firstName}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setFirstName(e.target.value)
+                setFirstName(sanitizeNameInput(e.target.value))
               }
+              pattern="[A-Za-z][A-Za-z '\\-]*"
             />
           </div>
           <div className="col-md-6">
@@ -224,8 +238,9 @@ export default function VehicleEnquiryForm({
               autoComplete="family-name"
               value={lastName}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setLastName(e.target.value)
+                setLastName(sanitizeNameInput(e.target.value))
               }
+              pattern="[A-Za-z][A-Za-z '\\-]*"
             />
           </div>
         </div>
@@ -275,8 +290,10 @@ export default function VehicleEnquiryForm({
             placeholder=""
             value={phone}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setPhone(e.target.value)
+                setPhone(sanitizePhoneInput(e.target.value))
             }
+              pattern="[0-9]{10}"
+              maxLength={10}
           />
         </div>
 

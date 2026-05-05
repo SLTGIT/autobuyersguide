@@ -1,6 +1,13 @@
 "use client";
 
 import { submitLead } from "@/lib/leads/submit-lead-client";
+import {
+  digitsOnly,
+  isValidEmail,
+  isValidName,
+  sanitizeNameInput,
+  sanitizePhoneInput,
+} from "@/lib/forms/validation";
 import "@/app/contact/contact.css";
 import { useCallback, useState, ChangeEvent, FormEvent } from "react";
 import { SELL_MY_CAR_MAKES, sellMyCarMakeLabel } from "./sell-my-car-makes";
@@ -37,10 +44,6 @@ const emptyForm: FormFields = {
   rego: "",
   comments: "",
 };
-
-function digitsOnly(value: string): string {
-  return value.replace(/\D/g, "");
-}
 
 /** Parses km from user input (digits only); null if invalid or out of range. */
 function parseOdometerKm(raw: string): number | null {
@@ -87,7 +90,13 @@ export default function SellMyCarValuationForm() {
       setStatusMessage("");
     }
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let nextValue = value;
+    if (name === "firstName" || name === "lastName") {
+      nextValue = sanitizeNameInput(value);
+    } else if (name === "phone") {
+      nextValue = sanitizePhoneInput(value);
+    }
+    setFormData((prev) => ({ ...prev, [name]: nextValue }));
   };
 
   const dismissSuccess = useCallback(() => {
@@ -98,15 +107,12 @@ export default function SellMyCarValuationForm() {
   const validateStep1 = (): boolean => {
     setStatus("idle");
     setStatusMessage("");
-    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+    if (!isValidName(formData.firstName) || !isValidName(formData.lastName)) {
       setStatus("error");
-      setStatusMessage("Please enter your first and last name.");
+      setStatusMessage("Please enter a valid first and last name.");
       return false;
     }
-    if (
-      !formData.email.trim() ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
-    ) {
+    if (!isValidEmail(formData.email)) {
       setStatus("error");
       setStatusMessage("Please enter a valid email address.");
       return false;
@@ -308,6 +314,7 @@ export default function SellMyCarValuationForm() {
                   placeholder="First name"
                   required
                   autoComplete="given-name"
+                  pattern="[A-Za-z][A-Za-z '\\-]*"
                   value={formData.firstName}
                   onChange={handleChange}
                 />
@@ -324,6 +331,7 @@ export default function SellMyCarValuationForm() {
                   placeholder="Last name"
                   required
                   autoComplete="family-name"
+                  pattern="[A-Za-z][A-Za-z '\\-]*"
                   value={formData.lastName}
                   onChange={handleChange}
                 />
@@ -360,6 +368,8 @@ export default function SellMyCarValuationForm() {
                 placeholder=""
                 required
                 autoComplete="tel"
+                pattern="[0-9]{10}"
+                maxLength={10}
                 value={formData.phone}
                 onChange={handleChange}
               />
@@ -447,7 +457,7 @@ export default function SellMyCarValuationForm() {
               <input
                 id="smc-odo"
                 name="odometer"
-                type="text"
+                type="number"
                 inputMode="numeric"
                 className="form-control smc-form-control"
                 placeholder="e.g. 125000"

@@ -2,6 +2,12 @@
 
 import { submitLead } from "@/lib/leads/submit-lead-client";
 import {
+  digitsOnly,
+  isValidName,
+  sanitizeNameInput,
+  sanitizePhoneInput,
+} from "@/lib/forms/validation";
+import {
   useCallback,
   useEffect,
   useId,
@@ -11,10 +17,6 @@ import {
 } from "react";
 import Link from "next/link";
 import styles from "./TextUsWidget.module.scss";
-
-function digitsOnly(value: string): string {
-  return value.replace(/\D/g, "");
-}
 
 function splitFullName(full: string): { firstName: string; lastName: string } {
   const t = full.trim();
@@ -51,7 +53,7 @@ export default function TextUsWidget() {
   const [submittedPhoneDigits, setSubmittedPhoneDigits] = useState("");
 
   const phoneDigits = useMemo(() => digitsOnly(phone), [phone]);
-  const nameOk = fullName.trim().length > 0;
+  const nameOk = isValidName(fullName);
   const phoneOk = phoneDigits.length === 10;
 
   const reset = useCallback(() => {
@@ -117,7 +119,7 @@ export default function TextUsWidget() {
     setError("");
 
     if (!nameOk) {
-      setError("Please enter your name.");
+      setError("Please enter a valid name.");
       return;
     }
     if (!phoneOk) {
@@ -246,7 +248,9 @@ export default function TextUsWidget() {
                           name="name"
                           autoComplete="name"
                           value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
+                          onChange={(e) =>
+                            setFullName(sanitizeNameInput(e.target.value))
+                          }
                           disabled={loading}
                         />
                         <i
@@ -273,8 +277,12 @@ export default function TextUsWidget() {
                           autoComplete="tel-national"
                           placeholder=""
                           value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
+                          onChange={(e) =>
+                            setPhone(sanitizePhoneInput(e.target.value))
+                          }
                           disabled={loading}
+                          pattern="[0-9]{10}"
+                          maxLength={10}
                         />
                         <i
                           className={`bi bi-check-circle-fill ${styles.check} ${phoneOk ? styles.checkVisible : ""}`}

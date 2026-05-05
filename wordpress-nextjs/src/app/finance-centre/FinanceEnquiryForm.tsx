@@ -2,6 +2,12 @@
 
 import { submitLead } from "@/lib/leads/submit-lead-client";
 import {
+  isValidEmail,
+  isValidName,
+  sanitizeNameInput,
+  sanitizePhoneInput,
+} from "@/lib/forms/validation";
+import {
   useState,
   useCallback,
   ChangeEvent,
@@ -105,6 +111,18 @@ export default function FinanceEnquiryForm() {
 
     const phoneDigits = digitsOnly(phone);
     const budgetDigits = digitsOnly(budget);
+    if (!isValidName(firstName) || !isValidName(lastName)) {
+      setStatus("error");
+      setStatusMessage("Please enter a valid first and last name.");
+      setLoading(false);
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setStatus("error");
+      setStatusMessage("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
     if (!budgetDigits) {
       setStatus("error");
       setStatusMessage("Please enter your vehicle budget.");
@@ -292,7 +310,8 @@ export default function FinanceEnquiryForm() {
                     autoComplete="given-name"
                     placeholder="First name"
                     value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    onChange={(e) => setFirstName(sanitizeNameInput(e.target.value))}
+                    pattern="[A-Za-z][A-Za-z '\\-]*"
                   />
                 </div>
                 <div className="col-md-6">
@@ -314,7 +333,8 @@ export default function FinanceEnquiryForm() {
                     autoComplete="family-name"
                     placeholder="Last name"
                     value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    onChange={(e) => setLastName(sanitizeNameInput(e.target.value))}
+                    pattern="[A-Za-z][A-Za-z '\\-]*"
                   />
                 </div>
               </div>
@@ -336,7 +356,9 @@ export default function FinanceEnquiryForm() {
                   autoComplete="tel"
                   placeholder=""
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(sanitizePhoneInput(e.target.value))}
+                  pattern="[0-9]{10}"
+                  maxLength={10}
                 />
               </div>
 

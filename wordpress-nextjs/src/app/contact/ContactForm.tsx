@@ -1,6 +1,13 @@
 "use client";
 
 import { submitLead } from "@/lib/leads/submit-lead-client";
+import {
+  digitsOnly,
+  isValidEmail,
+  isValidName,
+  sanitizeNameInput,
+  sanitizePhoneInput,
+} from "@/lib/forms/validation";
 import { useState, ChangeEvent, FormEvent, useCallback } from "react";
 
 type FormDataType = {
@@ -45,9 +52,16 @@ export default function ContactForm() {
       setStatus("idle");
       setStatusMessage("");
     }
+    const { name, value } = e.target;
+    let nextValue = value;
+    if (name === "firstName" || name === "lastName") {
+      nextValue = sanitizeNameInput(value);
+    } else if (name === "phone") {
+      nextValue = sanitizePhoneInput(value);
+    }
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: nextValue,
     });
   };
 
@@ -57,12 +71,31 @@ export default function ContactForm() {
     setStatus("idle");
     setStatusMessage("");
 
+    if (!isValidName(formData.firstName) || !isValidName(formData.lastName)) {
+      setStatus("error");
+      setStatusMessage("Please enter a valid first and last name.");
+      setLoading(false);
+      return;
+    }
+    if (!isValidEmail(formData.email)) {
+      setStatus("error");
+      setStatusMessage("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+    if (digitsOnly(formData.phone).length !== 10) {
+      setStatus("error");
+      setStatusMessage("Please enter a valid 10-digit Australian mobile number.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const data = await submitLead({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
-        email: formData.email,
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        phone: digitsOnly(formData.phone),
+        email: formData.email.trim(),
         message: formData.message,
         form_type: formData.enquiryType,
         budget: "",
@@ -175,6 +208,7 @@ export default function ContactForm() {
                 className="form-control cs-contact-form__control"
                 required
                 autoComplete="given-name"
+                pattern="[A-Za-z][A-Za-z '\\-]*"
                 value={formData.firstName}
                 onChange={handleChange}
               />
@@ -197,6 +231,7 @@ export default function ContactForm() {
                 className="form-control cs-contact-form__control"
                 required
                 autoComplete="family-name"
+                pattern="[A-Za-z][A-Za-z '\\-]*"
                 value={formData.lastName}
                 onChange={handleChange}
               />
@@ -236,7 +271,7 @@ export default function ContactForm() {
               inputMode="numeric"
               className="form-control cs-contact-form__control"
               required
-              pattern="[0-9]{10}"
+                pattern="[0-9]{10}"
               maxLength={10}
               autoComplete="tel"
               placeholder=""
