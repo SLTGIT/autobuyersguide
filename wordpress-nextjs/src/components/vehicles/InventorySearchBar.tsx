@@ -2,10 +2,18 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState, useEffect } from "react";
+import {
+  parseInventorySearchParams,
+  urlSearchParamsToRecord,
+  mergeInventoryFiltersWithPathAugment,
+  inventoryListingQueryHref,
+} from "@/lib/inventory/query";
+import { useInventorySearchUrl } from "@/components/vehicles/InventorySearchUrlContext";
 
 export default function InventorySearchBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { pathAugment } = useInventorySearchUrl();
   const [q, setQ] = useState(searchParams.get("q") ?? "");
 
   useEffect(() => {
@@ -13,11 +21,12 @@ export default function InventorySearchBar() {
   }, [searchParams]);
 
   const apply = (nextQ: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (nextQ.trim()) params.set("q", nextQ.trim());
-    else params.delete("q");
-    params.delete("page");
-    router.push(`/search?${params.toString()}`);
+    const base = mergeInventoryFiltersWithPathAugment(
+      parseInventorySearchParams(urlSearchParamsToRecord(searchParams)),
+      pathAugment,
+    );
+    const next = { ...base, q: nextQ.trim(), page: 1 };
+    router.push(inventoryListingQueryHref(next));
   };
 
   const onSubmit = (e: FormEvent) => {

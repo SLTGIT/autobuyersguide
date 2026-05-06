@@ -1,30 +1,39 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import type { InventorySort } from "@/types/inventory";
+import type { InventoryFilterState, InventorySort } from "@/types/inventory";
+import {
+  parseInventorySearchParams,
+  urlSearchParamsToRecord,
+  mergeInventoryFiltersWithPathAugment,
+  inventoryListingQueryHref,
+} from "@/lib/inventory/query";
+import { useInventorySearchUrl } from "@/components/vehicles/InventorySearchUrlContext";
 
 interface InventoryToolbarProps {
   total: number;
   sort: InventorySort;
-  view: "grid" | "list";
 }
 
 export default function InventoryToolbar({
   total,
   sort,
-  view,
 }: InventoryToolbarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { pathAugment, resultsView, setResultsView } = useInventorySearchUrl();
 
-  const setParam = (updates: Record<string, string | undefined>) => {
-    const params = new URLSearchParams(searchParams.toString());
-    for (const [k, v] of Object.entries(updates)) {
-      if (v === undefined || v === "") params.delete(k);
-      else params.set(k, v);
-    }
-    params.delete("page");
-    router.push(`/search?${params.toString()}`);
+  const setSort = (nextSort: InventorySort) => {
+    const base = mergeInventoryFiltersWithPathAugment(
+      parseInventorySearchParams(urlSearchParamsToRecord(searchParams)),
+      pathAugment,
+    );
+    const next: InventoryFilterState = {
+      ...base,
+      sort: nextSort,
+      page: 1,
+    };
+    router.push(inventoryListingQueryHref(next));
   };
 
   return (
@@ -40,7 +49,7 @@ export default function InventoryToolbar({
             className="inventory-sort-select"
             value={sort}
             onChange={(e) =>
-              setParam({ sort: e.target.value || undefined })
+              setSort((e.target.value || "best") as InventorySort)
             }
             aria-label="Sort by"
           >
@@ -55,9 +64,9 @@ export default function InventoryToolbar({
         <div className="inventory-view-toggle" role="group" aria-label="View mode">
           <button
             type="button"
-            className={`inventory-view-btn ${view === "grid" ? "is-active" : ""}`}
-            onClick={() => setParam({ view: "grid" })}
-            aria-pressed={view === "grid"}
+            className={`inventory-view-btn ${resultsView === "grid" ? "is-active" : ""}`}
+            onClick={() => setResultsView("grid")}
+            aria-pressed={resultsView === "grid"}
             title="Grid view"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -66,9 +75,9 @@ export default function InventoryToolbar({
           </button>
           <button
             type="button"
-            className={`inventory-view-btn ${view === "list" ? "is-active" : ""}`}
-            onClick={() => setParam({ view: "list" })}
-            aria-pressed={view === "list"}
+            className={`inventory-view-btn ${resultsView === "list" ? "is-active" : ""}`}
+            onClick={() => setResultsView("list")}
+            aria-pressed={resultsView === "list"}
             title="List view"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>

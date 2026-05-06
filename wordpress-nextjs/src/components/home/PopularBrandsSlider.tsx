@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   parseInventorySearchParams,
-  serializeInventoryFilters,
+  inventoryListingQueryHref,
 } from "@/lib/inventory/query";
 import { brandLogoPublicPathFromSlug } from "@/lib/inventory/brand-logo";
 import { mergeFeaturedBrandsWithApi } from "@/lib/inventory/featured-brands";
@@ -19,11 +19,11 @@ type BrandRow = {
 
 function makeBrandHref(makeLower: string): string {
   const base = parseInventorySearchParams({});
-  return `/search?${serializeInventoryFilters({
+  return inventoryListingQueryHref({
     ...base,
     make: makeLower,
     page: 1,
-  })}`;
+  });
 }
 
 function BrandLogo({ logoSlug, label }: { logoSlug: string; label: string }) {

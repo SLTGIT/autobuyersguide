@@ -1,5 +1,12 @@
 import type { DealerVehicle } from "@/types/inventory";
 import type { InventoryFilterState, InventorySort } from "@/types/inventory";
+import { slugifyInventoryPart } from "@/lib/inventory/slug";
+import {
+  mergePathAugmentIntoFilters,
+  pathSlugForInventoryListing,
+  serializeOmitKeysForPathFacet,
+} from "@/lib/inventory/search-path-slugs";
+import { resolveMakeModelFromPathSlugs } from "@/lib/inventory/search-make-model-paths";
 
 function toStr(v: string | string[] | undefined): string {
   if (v === undefined) return "";
@@ -36,13 +43,16 @@ export function parseInventorySearchParams(
     ? (sortRaw as InventorySort)
     : "best";
 
-  const view = toStr(raw.view) === "grid" ? "grid" : "list";
+  /** List/grid is client-only (not in the URL). */
+  const view: "grid" | "list" = "list";
 
   const makeRaw = toStr(raw.make).trim();
+  const modelRaw = toStr(raw.model).trim();
   return {
     q: toStr(raw.q),
     condition: toStr(raw.condition),
     make: makeRaw ? makeRaw.toLowerCase() : "",
+    model: modelRaw ? modelRaw.toLowerCase() : "",
     bodyType: toStrArray(raw.bodyType),
     fuelType: toStrArray(raw.fuelType),
     bodyColour: toStrArray(raw.bodyColour),
@@ -83,6 +93,8 @@ export function filterDealerVehicles(
       f.make &&
       norm(v.Make).toLowerCase() !== f.make.toLowerCase()
     )
+      return false;
+    if (f.model.trim() && norm(v.Model).toLowerCase() !== f.model.trim().toLowerCase())
       return false;
     if (f.bodyType.length > 0) {
       const b = norm(v.BodyType);
@@ -248,6 +260,7 @@ export function urlSearchParamsToRecord(
 export type InventoryFacetOmit =
   | "condition"
   | "make"
+  | "model"
   | "bodyType"
   | "fuelType"
   | "bodyColour"
@@ -266,6 +279,7 @@ export function omitInventoryFilters(
   const n = { ...f };
   if (omit.includes("condition")) n.condition = "";
   if (omit.includes("make")) n.make = "";
+  if (omit.includes("model")) n.model = "";
   if (omit.includes("bodyType")) n.bodyType = [];
   if (omit.includes("fuelType")) n.fuelType = [];
   if (omit.includes("bodyColour")) n.bodyColour = [];
@@ -285,24 +299,128 @@ export function omitInventoryFilters(
 }
 
 /** Serialize filters to a query string (no leading `?`). */
-export function serializeInventoryFilters(f: InventoryFilterState): string {
+export function serializeInventoryFilters(
+  f: InventoryFilterState,
+  opts?: { omitMake?: boolean; omitKeys?: Set<string> },
+): string {
+  const omit = opts?.omitKeys ?? new Set<string>();
+  const skipMake = Boolean(opts?.omitMake) || omit.has("make");
   const p = new URLSearchParams();
   const q = f.q.trim();
   if (q) p.set("q", q);
   if (f.condition) p.set("condition", f.condition);
-  if (f.make) p.set("make", f.make.trim().toLowerCase());
-  for (const bt of f.bodyType) p.append("bodyType", bt);
-  for (const ft of f.fuelType) p.append("fuelType", ft);
-  for (const c of f.bodyColour) p.append("bodyColour", c);
-  for (const d of f.driveType) p.append("driveType", d);
-  for (const t of f.transmission) p.append("transmission", t);
-  for (const ty of f.type) p.append("type", ty);
-  if (f.minPrice !== null) p.set("minPrice", String(f.minPrice));
-  if (f.maxPrice !== null) p.set("maxPrice", String(f.maxPrice));
-  if (f.minYear !== null) p.set("minYear", String(f.minYear));
-  if (f.maxYear !== null) p.set("maxYear", String(f.maxYear));
+  if (f.make && !skipMake) p.set("make", f.make.trim().toLowerCase());
+  if (f.model.trim() && !omit.has("model"))
+    p.set("model", f.model.trim().toLowerCase());
+  if (!omit.has("bodyType")) {
+    for (const bt of f.bodyType) p.append("bodyType", bt);
+  }
+  if (!omit.has("fuelType")) {
+    for (const ft of f.fuelType) p.append("fuelType", ft);
+  }
+  if (!omit.has("bodyColour")) {
+    for (const c of f.bodyColour) p.append("bodyColour", c);
+  }
+  if (!omit.has("driveType")) {
+    for (const d of f.driveType) p.append("driveType", d);
+  }
+  if (!omit.has("transmission")) {
+    for (const t of f.transmission) p.append("transmission", t);
+  }
+  if (!omit.has("type")) {
+    for (const ty of f.type) p.append("type", ty);
+  }
+  if (!omit.has("minPrice") && f.minPrice !== null)
+    p.set("minPrice", String(f.minPrice));
+  if (!omit.has("maxPrice") && f.maxPrice !== null)
+    p.set("maxPrice", String(f.maxPrice));
+  if (!omit.has("minYear") && f.minYear !== null)
+    p.set("minYear", String(f.minYear));
+  if (!omit.has("maxYear") && f.maxYear !== null)
+    p.set("maxYear", String(f.maxYear));
   if (f.sort !== "best") p.set("sort", f.sort);
-  if (f.view !== "grid") p.set("view", f.view);
   if (f.page > 1) p.set("page", String(f.page));
   return p.toString();
+}
+
+/**
+ * When the URL is `/search/{slug}?…`, query string may omit dimensions that
+ * are implied by the path (make or a single inventory facet).
+ */
+export function mergeInventoryFiltersWithPathAugment(
+  filters: InventoryFilterState,
+  pathAugment: Partial<InventoryFilterState> | null,
+): InventoryFilterState {
+  if (!pathAugment || Object.keys(pathAugment).length === 0) return filters;
+  return mergePathAugmentIntoFilters(filters, pathAugment);
+}
+
+/**
+ * When the URL is `/search/{makeSlug}?…`, query string may omit `make`;
+ * merge the path-derived make into filter state for parsing + navigation.
+ */
+export function mergeInventoryFiltersWithPathMake(
+  filters: InventoryFilterState,
+  pathMakeFilter: string | null,
+): InventoryFilterState {
+  if (!pathMakeFilter?.trim()) return filters;
+  return mergeInventoryFiltersWithPathAugment(filters, {
+    make: pathMakeFilter.trim().toLowerCase(),
+  });
+}
+
+/**
+ * Canonical inventory listing URL: `/search/{slug}` when make or a single
+ * facet is set (slug matches feed-derived path rules), otherwise `/search?…`.
+ * Query-only `/search?make=` still parses correctly; this href prefers the path form.
+ */
+export function inventoryListingHref(
+  f: InventoryFilterState,
+  vehicles?: DealerVehicle[],
+): string {
+  const makeTrimmed = f.make?.trim();
+  if (makeTrimmed) {
+    const makeSlug = slugifyInventoryPart(makeTrimmed);
+    if (!makeSlug) {
+      const qs = serializeInventoryFilters(f);
+      return qs ? `/search?${qs}` : "/search";
+    }
+    const modelTrimmed = f.model?.trim();
+    if (modelTrimmed) {
+      const modelSlug = slugifyInventoryPart(modelTrimmed);
+      if (modelSlug) {
+        const pathOk =
+          !vehicles ||
+          resolveMakeModelFromPathSlugs(makeSlug, modelSlug, vehicles) !== null;
+        if (pathOk) {
+          const omitKeys = new Set(["make", "model"]);
+          const qs = serializeInventoryFilters(f, {
+            omitMake: true,
+            omitKeys,
+          });
+          return qs
+            ? `/search/${makeSlug}/${modelSlug}?${qs}`
+            : `/search/${makeSlug}/${modelSlug}`;
+        }
+      }
+    }
+    const qs = serializeInventoryFilters(f, { omitMake: true });
+    return qs ? `/search/${makeSlug}?${qs}` : `/search/${makeSlug}`;
+  }
+
+  const facetPath = pathSlugForInventoryListing(f, vehicles);
+  if (facetPath) {
+    const omitKeys = serializeOmitKeysForPathFacet(facetPath.facet);
+    const qs = serializeInventoryFilters(f, { omitKeys });
+    return qs ? `/search/${facetPath.slug}?${qs}` : `/search/${facetPath.slug}`;
+  }
+
+  const qs = serializeInventoryFilters(f);
+  return qs ? `/search?${qs}` : "/search";
+}
+
+/** UI-first href that always stays on `/search?...` query-string format. */
+export function inventoryListingQueryHref(f: InventoryFilterState): string {
+  const qs = serializeInventoryFilters(f);
+  return qs ? `/search?${qs}` : "/search";
 }

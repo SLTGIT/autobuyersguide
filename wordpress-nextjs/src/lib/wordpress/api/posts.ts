@@ -9,6 +9,26 @@ import { fetchAPI } from './client';
 /**
  * Fetch posts with optional filtering and pagination
  */
+/**
+ * Paginate through all published posts (for sitemaps, feeds, etc.).
+ * Stops when a page returns fewer than `per_page` items or after `maxPages` (safety cap).
+ */
+export async function getAllPosts(options?: {
+  per_page?: number;
+  maxPages?: number;
+}): Promise<WPPost[]> {
+  const perPage = options?.per_page ?? 100;
+  const maxPages = options?.maxPages ?? 500;
+  const all: WPPost[] = [];
+  for (let page = 1; page <= maxPages; page++) {
+    const batch = await getPosts({ per_page: perPage, page });
+    if (!batch.length) break;
+    all.push(...batch);
+    if (batch.length < perPage) break;
+  }
+  return all;
+}
+
 export async function getPosts(params: {
     per_page?: number;
     page?: number;

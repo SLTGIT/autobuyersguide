@@ -3,7 +3,7 @@ import type { InventoryFilterState } from "@/types/inventory";
 import {
   filterDealerVehicles,
   parseInventorySearchParams,
-  serializeInventoryFilters,
+  inventoryListingQueryHref,
 } from "./query";
 
 const emptyFilters: InventoryFilterState = parseInventorySearchParams({});
@@ -150,8 +150,7 @@ function buildSearchHref(
     f.bodyType = bodies.length ? bodies : [...(cat.fallbackFilter.bodyType ?? [])];
   }
 
-  const qs = serializeInventoryFilters(f);
-  return qs ? `/search?${qs}` : "/search";
+  return inventoryListingQueryHref(f);
 }
 
 /** Only show a body-type tile when at least this many used vehicles match. */

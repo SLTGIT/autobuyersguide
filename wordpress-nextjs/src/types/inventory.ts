@@ -80,6 +80,8 @@ export interface FilterOptionCount {
 export interface InventoryFacets {
   conditions: FilterOptionCount[];
   makes: FilterOptionCount[];
+  /** Models for the selected make (empty when no make selected). */
+  models: FilterOptionCount[];
   bodyTypes: FilterOptionCount[];
   fuelTypes: FilterOptionCount[];
   colours: FilterOptionCount[];
@@ -92,6 +94,8 @@ export interface InventoryFilterState {
   q: string;
   condition: string; // "" | Used | New
   make: string;
+  /** Single model filter; lowercase for matching feed `Model`. */
+  model: string;
   bodyType: string[];
   fuelType: string[];
   bodyColour: string[];

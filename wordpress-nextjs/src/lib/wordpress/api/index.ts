@@ -7,7 +7,7 @@
 export { fetchAPI, getAPIUrl, API_URL } from './client';
 
 // Posts
-export { getPosts, getPostBySlug, getPostById } from './posts';
+export { getPosts, getAllPosts, getPostBySlug, getPostById } from './posts';
 
 // Pages
 export { getPages, getPageBySlug, getPageById } from './pages';

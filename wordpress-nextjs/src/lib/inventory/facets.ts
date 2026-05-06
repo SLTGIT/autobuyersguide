@@ -46,6 +46,15 @@ export function buildInventoryFacets(
   const makeBase = filterDealerVehicles(all, omitInventoryFilters(f, ["make"]));
   const makes = mergeMakeFacetOptions(countByField(makeBase, "Make"));
 
+  let models: FilterOptionCount[] = [];
+  if (f.make.trim()) {
+    const modelBase = filterDealerVehicles(
+      all,
+      omitInventoryFilters(f, ["model"]),
+    );
+    models = mergeMakeFacetOptions(countByField(modelBase, "Model"));
+  }
+
   const bodyTypes = mapToOptions(
     countByField(
       filterDealerVehicles(all, omitInventoryFilters(f, ["bodyType"])),
@@ -86,6 +95,7 @@ export function buildInventoryFacets(
   return {
     conditions,
     makes,
+    models,
     bodyTypes,
     fuelTypes,
     colours,

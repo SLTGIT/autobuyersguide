@@ -2,7 +2,15 @@
  * Shared JSON-LD helpers and Car Sales Brisbane / Statewide Auto Group entities.
  */
 
-import type { DealerVehicle, VehicleListing } from "@/types/inventory";
+import type {
+  DealerVehicle,
+  InventoryFilterState,
+  VehicleListing,
+} from "@/types/inventory";
+import {
+  inventoryListingHref,
+  parseInventorySearchParams,
+} from "@/lib/inventory/query";
 import {
   listingDisplayNumericPriceAud,
   parseInventoryOdometerKm,
@@ -317,6 +325,7 @@ export function vehicleVdpBreadcrumbListItems(
   canonicalPageUrl: string,
   listing: VehicleListing,
   v: DealerVehicle,
+  inventoryVehicles?: DealerVehicle[],
 ): { name: string; item: string }[] {
   const siteOrigin = upgradeHttpToHttpsUrl(origin);
   const canonicalPage = upgradeHttpToHttpsUrl(canonicalPageUrl);
@@ -329,8 +338,14 @@ export function vehicleVdpBreadcrumbListItems(
 
   const make = (v.Make?.trim() || listing.make || "").trim();
   const model = (v.Model?.trim() || listing.model || "").trim();
+  const searchFilters: InventoryFilterState = {
+    ...parseInventorySearchParams({}),
+    make: make.toLowerCase(),
+    page: 1,
+  };
+  if (model) searchFilters.model = model.toLowerCase();
   const makeHref = make
-    ? `${siteOrigin}/search?make=${encodeURIComponent(make.toLowerCase())}`
+    ? `${siteOrigin}${inventoryListingHref(searchFilters, inventoryVehicles)}`
     : `${siteOrigin}/search`;
 
   const modelCrumbName =
@@ -355,11 +370,18 @@ export function vehicleVdpBreadcrumbJsonLd(
   origin: string,
   listing: VehicleListing,
   v: DealerVehicle,
+  inventoryVehicles?: DealerVehicle[],
 ) {
   const canonicalPage = upgradeHttpToHttpsUrl(pageUrl);
   return breadcrumbJsonLd(
     canonicalPage,
-    vehicleVdpBreadcrumbListItems(origin, canonicalPage, listing, v),
+    vehicleVdpBreadcrumbListItems(
+      origin,
+      canonicalPage,
+      listing,
+      v,
+      inventoryVehicles,
+    ),
   );
 }
 
@@ -624,6 +646,8 @@ export type VehicleVdpCarListingJsonLdInput = {
   /** Vehicle summary for structured data (e.g. meta description). */
   description: string;
   dealerPhoneE164: string;
+  /** Inventory feed for canonical `/search/{make}/{model}` breadcrumb URLs. */
+  inventoryVehicles?: DealerVehicle[];
   /** FAQ items for FAQPage rich results (optional). */
   faqs?: { question: string; answer: string }[];
 };
@@ -806,7 +830,13 @@ export function vehicleVdpCarListingGraphJsonLd(
 
   const breadcrumbs = breadcrumbJsonLd(
     productUrl,
-    vehicleVdpBreadcrumbListItems(siteOrigin, productUrl, listing, v),
+    vehicleVdpBreadcrumbListItems(
+      siteOrigin,
+      productUrl,
+      listing,
+      v,
+      input.inventoryVehicles,
+    ),
     { idFragment: "breadcrumbs" },
   );
 

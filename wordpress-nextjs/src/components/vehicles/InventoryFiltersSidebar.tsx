@@ -9,9 +9,11 @@ import type {
 } from "@/types/inventory";
 import {
   parseInventorySearchParams,
-  serializeInventoryFilters,
   urlSearchParamsToRecord,
+  mergeInventoryFiltersWithPathAugment,
+  inventoryListingQueryHref,
 } from "@/lib/inventory/query";
+import { useInventorySearchUrl } from "@/components/vehicles/InventorySearchUrlContext";
 import RangeSlider from "./RangeSlider";
 
 interface InventoryFiltersSidebarProps {
@@ -25,8 +27,7 @@ interface InventoryFiltersSidebarProps {
 }
 
 function navigate(router: ReturnType<typeof useRouter>, f: InventoryFilterState) {
-  const qs = serializeInventoryFilters(f);
-  router.push(qs ? `/search?${qs}` : "/search");
+  router.push(inventoryListingQueryHref(f));
 }
 
 function clearFilterDimensions(f: InventoryFilterState): InventoryFilterState {
@@ -35,6 +36,7 @@ function clearFilterDimensions(f: InventoryFilterState): InventoryFilterState {
     q: "",
     condition: "",
     make: "",
+    model: "",
     bodyType: [],
     fuelType: [],
     bodyColour: [],
@@ -55,11 +57,15 @@ export default function InventoryFiltersSidebar({
 }: InventoryFiltersSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { pathAugment } = useInventorySearchUrl();
 
   const current = useMemo(
     () =>
-      parseInventorySearchParams(urlSearchParamsToRecord(searchParams)),
-    [searchParams]
+      mergeInventoryFiltersWithPathAugment(
+        parseInventorySearchParams(urlSearchParamsToRecord(searchParams)),
+        pathAugment,
+      ),
+    [searchParams, pathAugment],
   );
 
   const [open, setOpen] = useState<Record<string, boolean>>({
@@ -96,7 +102,17 @@ export default function InventoryFiltersSidebar({
       out.push({
         id: "make",
         label: current.make,
-        onRemove: () => push({ ...base, make: "" }),
+        onRemove: () => push({ ...base, make: "", model: "" }),
+      });
+    }
+    if (current.model.trim()) {
+      const label =
+        facets.models.find((m) => m.value === current.model.trim())?.label ??
+        current.model;
+      out.push({
+        id: "model",
+        label,
+        onRemove: () => push({ ...base, model: "" }),
       });
     }
     for (const v of current.bodyType) {
@@ -193,10 +209,11 @@ export default function InventoryFiltersSidebar({
       });
     }
     return out;
-  }, [bounds, current, push]);
+  }, [bounds, current, facets.models, push]);
 
   const totalCondition = facets.conditions.reduce((a, o) => a + o.count, 0);
   const totalMakes = facets.makes.reduce((a, o) => a + o.count, 0);
+  const totalModels = facets.models.reduce((a, o) => a + o.count, 0);
 
   const toggleInArray = (
     arr: string[],
@@ -252,7 +269,7 @@ export default function InventoryFiltersSidebar({
         )}
       </div>
 
-      <div className="inventory-filter-block">
+      {/* <div className="inventory-filter-block">
         <label className="inventory-filter-label" htmlFor="inv-condition">
           Used cars ({totalCondition.toLocaleString("en-AU")})
         </label>
@@ -275,7 +292,7 @@ export default function InventoryFiltersSidebar({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
 
       <div className="inventory-filter-block">
         <label className="inventory-filter-label" htmlFor="inv-make">
@@ -290,6 +307,7 @@ export default function InventoryFiltersSidebar({
               ...current,
               page: 1,
               make: e.target.value,
+              model: "",
             })
           }
         >
@@ -301,6 +319,33 @@ export default function InventoryFiltersSidebar({
           ))}
         </select>
       </div>
+
+      {facets.models.length > 0 ? (
+        <div className="inventory-filter-block">
+          <label className="inventory-filter-label" htmlFor="inv-model">
+            Models ({totalModels.toLocaleString("en-AU")})
+          </label>
+          <select
+            id="inv-model"
+            className="inventory-select"
+            value={current.model}
+            onChange={(e) =>
+              push({
+                ...current,
+                page: 1,
+                model: e.target.value,
+              })
+            }
+          >
+            <option value="">All models</option>
+            {facets.models.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label} ({o.count.toLocaleString("en-AU")})
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
 
       <Accordion
         id="bodyColour"

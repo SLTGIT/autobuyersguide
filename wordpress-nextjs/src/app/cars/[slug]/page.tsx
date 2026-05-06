@@ -5,6 +5,10 @@ import { loadVehicleVdpBySlug } from "@/lib/openai/loadVehicleVdpBySlug";
 import { formatVehicleVdpBrowserTitle } from "@/lib/openai/vehicleVdpCopy";
 import { dealerVehicleToListing } from "@/lib/inventory/transform";
 import { buildVehicleSlug } from "@/lib/inventory/slug";
+import {
+  inventoryListingQueryHref,
+  parseInventorySearchParams,
+} from "@/lib/inventory/query";
 import { getSimilarVehicles } from "@/lib/inventory/similar";
 import type { DealerVehicle } from "@/types/inventory";
 import type { VehicleImage } from "@/types/vehicle";
@@ -166,9 +170,21 @@ export default async function VehicleDetailPage({
   const catalogLabel = condLower === "new" ? "New Cars" : "Used Cars";
   const breadcrumbMake = (v.Make?.trim() || listing.make || "").trim();
   const breadcrumbModel = (v.Model?.trim() || listing.model || "").trim();
-  const breadcrumbMakeHref = breadcrumbMake
-    ? `/search?make=${encodeURIComponent(breadcrumbMake.toLowerCase())}`
-    : "/search";
+  const breadcrumbMakeHref =
+    breadcrumbMake && breadcrumbModel
+      ? inventoryListingQueryHref({
+          ...parseInventorySearchParams({}),
+          make: breadcrumbMake.toLowerCase(),
+          model: breadcrumbModel.toLowerCase(),
+          page: 1,
+        })
+      : breadcrumbMake
+        ? inventoryListingQueryHref({
+            ...parseInventorySearchParams({}),
+            make: breadcrumbMake.toLowerCase(),
+            page: 1,
+          })
+        : "/search";
   const breadcrumbCurrent =
     breadcrumbModel ||
     (headline.length > 70 ? `${headline.slice(0, 67)}…` : headline);
@@ -189,6 +205,7 @@ export default async function VehicleDetailPage({
     canonicalPageUrl: pageUrlHttps,
     description: ai.metaDescription,
     dealerPhoneE164: dealerPhoneToE164Au(dealerPhone),
+    inventoryVehicles: allVehicles,
     faqs: ai.faqs,
   });
 

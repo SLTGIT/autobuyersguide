@@ -6,7 +6,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   parseInventorySearchParams,
-  serializeInventoryFilters,
+  inventoryListingQueryHref,
 } from "@/lib/inventory/query";
 import type { InventoryFilterState } from "@/types/inventory";
 import styles from "./SearchForm.module.scss";
@@ -47,8 +47,7 @@ export default function SearchForm({ embedded = false }: SearchFormProps) {
     const model = String(fd.get("model") ?? "");
     const location = String(fd.get("location") ?? "");
     const f = buildSearchState(activeTab, make, model, location);
-    const qs = serializeInventoryFilters(f);
-    router.push(qs ? `/search?${qs}` : "/search");
+    router.push(inventoryListingQueryHref(f));
   };
 
   const sectionClass = embedded

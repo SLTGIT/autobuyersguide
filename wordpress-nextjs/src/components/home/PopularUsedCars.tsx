@@ -6,7 +6,7 @@ import { dominantUsedCondition } from "@/lib/inventory/popular-body-types";
 import {
   filterDealerVehicles,
   parseInventorySearchParams,
-  serializeInventoryFilters,
+  inventoryListingQueryHref,
 } from "@/lib/inventory/query";
 import { dealerVehicleToListing } from "@/lib/inventory/transform";
 import { vehicleCardHeadline } from "@/lib/inventory/card-display";
@@ -60,13 +60,12 @@ function categoryHref(
   filters: CardDef["filters"]
 ): string {
   const base = parseInventorySearchParams({});
-  const qs = serializeInventoryFilters({
+  return inventoryListingQueryHref({
     ...base,
     condition,
     page: 1,
     ...filters,
   });
-  return qs ? `/search?${qs}` : "/search";
 }
 
 function filterStateForCard(
