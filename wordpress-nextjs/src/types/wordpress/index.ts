@@ -5,7 +5,7 @@
 
 // Core content types
 export type { WPPost } from './post';
-export type { WPPage } from './page';
+export type { WPPage, WPPageACFFields } from './page';
 export type { WPUser } from './user';
 
 // Taxonomy types

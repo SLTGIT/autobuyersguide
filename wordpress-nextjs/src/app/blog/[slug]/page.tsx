@@ -40,6 +40,65 @@ function normalizeFaqItems(
     .filter(Boolean) as { question: string; answer: string }[];
 }
 
+function parseFaqField(rawFaq: unknown): { question: string; answer: string }[] {
+  if (!rawFaq) return [];
+
+  // Supports ACF textarea containing JSON, array values, or FAQPage.mainEntity.
+  if (typeof rawFaq === "string") {
+    const trimmed = rawFaq.trim();
+    if (!trimmed) return [];
+    try {
+      return parseFaqField(JSON.parse(trimmed));
+    } catch {
+      return [];
+    }
+  }
+
+  if (Array.isArray(rawFaq)) {
+    return normalizeFaqItems(rawFaq);
+  }
+
+  if (typeof rawFaq !== "object") {
+    return [];
+  }
+
+  const obj = rawFaq as Record<string, unknown>;
+  if (Array.isArray(obj.mainEntity)) {
+    return normalizeFaqItems(
+      obj.mainEntity.map((entity) => {
+        if (!entity || typeof entity !== "object") return null;
+        const e = entity as Record<string, unknown>;
+        return {
+          question: e.name,
+          answer:
+            (e.acceptedAnswer as Record<string, unknown> | undefined)?.text ?? "",
+        };
+      }).filter(Boolean),
+    );
+  }
+
+  return [];
+}
+
+function blogFaqPageJsonLd(
+  pageUrl: string,
+  faqs: { question: string; answer: string }[],
+): Record<string, unknown> | null {
+  if (!faqs.length) return null;
+  return {
+    "@type": "FAQPage",
+    "@id": `${pageUrl}#faqs`,
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: f.answer,
+      },
+    })),
+  };
+}
+
 /* SEO Metadata */
 export async function generateMetadata({
   params,
@@ -78,6 +137,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
   const excerpt = stripHtml(post.excerpt.rendered);
   const imageUrl = featuredImage?.source_url as string | undefined;
   const authorName = author?.name as string | undefined;
+  const faqItems = parseFaqField(post.acf?.faq);
 
   const blogPosting: Record<string, unknown> = {
     "@type": "BlogPosting",
@@ -96,6 +156,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
     ? { "@type": "Person", name: authorName }
     : { "@id": `${origin}/#organization` };
   if (excerpt) blogPosting.description = excerpt;
+  const faqPage = blogFaqPageJsonLd(articleHttps, faqItems);
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),
     webSiteJsonLd(origin),
@@ -114,6 +175,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
       description: excerpt || headline,
     }),
     blogPosting,
+    faqPage,
     breadcrumbJsonLd(articleHttps, [
       { name: "Home", item: `${origin}/` },
       { name: "Blog", item: blogCanonicalHttps },

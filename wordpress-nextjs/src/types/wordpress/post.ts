@@ -38,6 +38,9 @@ export interface WPPost {
     'wp:featuredmedia'?: any[];
     'wp:term'?: any[][];
   };
-  acf?: any;
+  acf?: {
+    faq?: unknown;
+    [key: string]: unknown;
+  };
   yoast_head_json?: any;
 }

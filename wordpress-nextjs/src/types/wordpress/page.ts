@@ -2,6 +2,12 @@
  * WordPress Page Type Definition
  */
 
+/** ACF keys must match the field "Name" (API key) in WordPress, not the label. */
+export interface WPPageACFFields {
+  heading?: string;
+  paragraph?: string;
+}
+
 export interface WPPage {
   id: number;
   date: string;
@@ -35,6 +41,6 @@ export interface WPPage {
     author?: any[];
     'wp:featuredmedia'?: any[];
   };
-  acf?: any;
+  acf?: WPPageACFFields;
   yoast_head_json?: any;
 }

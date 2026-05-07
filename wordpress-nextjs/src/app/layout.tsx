@@ -13,6 +13,11 @@ import {
   absoluteOgLogoUrl,
   normalizePublicSiteBase,
 } from "@/lib/site-url";
+import { getCustomSettings } from "@/lib/wordpress/api/settings";
+
+// export const dynamic = 'force-dynamic';
+
+// export const revalidate = 86400; // 1 day
 
 const manrope = Manrope({ subsets: ["latin"] });
 
@@ -25,8 +30,8 @@ const siteOrigin = rawSite
 const title = "Quality Used Cars Brisbane | Expert Finance & Sourcing";
 const description =
   "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.";
-const GTM_ID = "GTM-W397LKXC";
-const GA_MEASUREMENT_ID = "G-JYCTQ8RYJQ";
+const FALLBACK_GTM_ID = "GTM-W397LKXC";
+const FALLBACK_GA_MEASUREMENT_ID = "G-JYCTQ8RYJQ";
 
 const ogLogoAbsolute = absoluteOgLogoUrl(siteOrigin);
 
@@ -72,43 +77,57 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const customSettings = await getCustomSettings();
+
+  const gtmId = customSettings?.google_tag_manager_id || FALLBACK_GTM_ID;
+  const gaMeasurementId =
+    customSettings?.google_analytics_id || FALLBACK_GA_MEASUREMENT_ID;
+
   return (
     <html lang="en">
       <body className={manrope.className}>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="ga4-script" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_MEASUREMENT_ID}');
-          `}
-        </Script>
-        <Script id="gtm-script" strategy="afterInteractive">
-          {`
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','${GTM_ID}');
-          `}
-        </Script>
-        <noscript>
-          <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          />
-        </noscript>
+        {gaMeasurementId ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-script" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaMeasurementId}');
+              `}
+            </Script>
+          </>
+        ) : null}
+        {gtmId ? (
+          <>
+            <Script id="gtm-script" strategy="afterInteractive">
+              {`
+                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer','${gtmId}');
+              `}
+            </Script>
+            <noscript>
+              <iframe
+                src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+                height="0"
+                width="0"
+                style={{ display: "none", visibility: "hidden" }}
+              />
+            </noscript>
+          </>
+        ) : null}
         <ClientImports />
         <Layout>{children}</Layout>
       </body>

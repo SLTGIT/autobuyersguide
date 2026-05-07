@@ -4,7 +4,12 @@
  */
 
 import { WPPage } from '@/types/wordpress';
+import { normalizePageAcf } from '../acf';
 import { fetchAPI } from './client';
+
+function withNormalizedAcf(page: WPPage): WPPage {
+    return { ...page, acf: normalizePageAcf(page.acf as unknown) };
+}
 
 /**
  * Fetch pages with optional filtering and pagination
@@ -27,7 +32,8 @@ export async function getPages(params: {
     queryParams.append('_embed', '1');
 
     const query = queryParams.toString();
-    return fetchAPI<WPPage[]>(`/wp/v2/pages${query ? `?${query}` : ''}`);
+    const pages = await fetchAPI<WPPage[]>(`/wp/v2/pages${query ? `?${query}` : ''}`);
+    return pages.map(withNormalizedAcf);
 }
 
 /**
@@ -35,12 +41,13 @@ export async function getPages(params: {
  */
 export async function getPageBySlug(slug: string): Promise<WPPage | null> {
     const pages = await fetchAPI<WPPage[]>(`/wp/v2/pages?slug=${slug}&_embed=1`);
-    return pages.length > 0 ? pages[0] : null;
+    return pages.length > 0 ? withNormalizedAcf(pages[0]) : null;
 }
 
 /**
  * Fetch a single page by ID
  */
 export async function getPageById(id: number): Promise<WPPage> {
-    return fetchAPI<WPPage>(`/wp/v2/pages/${id}?_embed=1`);
+    const page = await fetchAPI<WPPage>(`/wp/v2/pages/${id}?_embed=1`);
+    return withNormalizedAcf(page);
 }

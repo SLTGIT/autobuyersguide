@@ -13,6 +13,7 @@ import {
     webPageJsonLd,
     webSiteJsonLd,
 } from '@/lib/json-ld';
+import './cms-page.scss';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,6 +43,9 @@ export default async function DynamicPage(props: PageProps) {
     if (!page) {
         notFound();
     }
+
+    const acfHeading = page.acf?.heading?.trim();
+    const acfParagraph = page.acf?.paragraph?.trim();
 
     const path = `/${params.slug}`;
     const { currentUrl } = await getCurrentUrlAndRoute(path);
@@ -91,11 +95,27 @@ export default async function DynamicPage(props: PageProps) {
             <JsonLd data={jsonLd} />
             <article className="cms-page__article">
                 {/* Header */}
-                <header className="cms-page__header">
+                {/* <header className="cms-page__header">
                     <h1 dangerouslySetInnerHTML={{ __html: page.title.rendered }} />
-                </header>
+                </header> */}
 
-                {/* Featured Image */}
+                {(acfHeading || acfParagraph) && (
+                    <section className="cms-page__acf" aria-label="Page introduction">
+                        {acfHeading && (
+                            <h2
+                                className="cms-page__acf-heading"
+                                dangerouslySetInnerHTML={{ __html: acfHeading }}
+                            />
+                        )}
+                        {acfParagraph && (
+                            <div
+                                className="cms-page__acf-paragraph"
+                                dangerouslySetInnerHTML={{ __html: acfParagraph }}
+                            />
+                        )}
+                    </section>
+                )}
+
                 {page._embedded?.['wp:featuredmedia']?.[0]?.source_url && (
                     <div className="cms-page__featured-image">
                         <img
@@ -106,10 +126,10 @@ export default async function DynamicPage(props: PageProps) {
                 )}
 
                 {/* Content */}
-                <div
+                {/* <div
                     className="cms-page__content"
                     dangerouslySetInnerHTML={{ __html: page.content.rendered }}
-                />
+                /> */}
             </article>
         </div>
     );

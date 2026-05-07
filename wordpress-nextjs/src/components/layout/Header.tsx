@@ -2,14 +2,26 @@ import "./Header.scss";
 import HeaderNavbar from "./HeaderNavbar";
 import GoogleRatingStars from "@/components/GoogleRatingStars";
 import { CAR_SALES_BRISBANE_GOOGLE_MAPS_URL, formatReviewSummaryLine, getGoogleReviews } from "@/lib/google-reviews";
+import { getCustomSettings } from "@/lib/wordpress/api/settings";
 
 const FALLBACK_SCORE = 4.8;
 const FALLBACK_LINE = "4.8 RATING OUT OF 240 REVIEWS";
+const FALLBACK_FACEBOOK_URL = "https://www.facebook.com/share/1DREXJCBhb/?mibextid=wwXIfr";
+const FALLBACK_INSTAGRAM_URL =
+  "https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr";
+const FALLBACK_TIKTOK_URL = "https://www.tiktok.com/@carsalesbrisbane?_r=1&_t=ZS-95OLtLR1kfQ";
 
 export default async function Header() {
   const summary = await getGoogleReviews();
+  const settings = await getCustomSettings();
   const score = summary?.averageScore ?? FALLBACK_SCORE;
   const summaryLine = summary ? formatReviewSummaryLine(summary) : FALLBACK_LINE;
+  const facebookUrl = settings?.facebook_url || FALLBACK_FACEBOOK_URL;
+  const instagramUrl = settings?.instagram_url || FALLBACK_INSTAGRAM_URL;
+  const tiktokUrl = settings?.tiktok_url || FALLBACK_TIKTOK_URL;
+  const youtubeUrl = settings?.youtube_url || "";
+  const xUrl = settings?.x_url || "";
+  const linkedinUrl = settings?.linkedin_url || "";
 
   return (
     <header className="sticky-top cs-header">
@@ -39,19 +51,35 @@ export default async function Header() {
             <span>0418908870</span>
           </a>
           <span className="d-inline-flex align-items-center gap-3">
-            <a href="https://www.facebook.com/share/1DREXJCBhb/?mibextid=wwXIfr" target="_blank" aria-label="Facebook">
+            <a href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
               <i className="bi bi-facebook"></i>
             </a>
             <a
-              href="https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr"
+              href={instagramUrl}
               target="_blank"
+              rel="noopener noreferrer"
               aria-label="Instagram"
             >
               <i className="bi bi-instagram"></i>
             </a>
-            <a href="https://www.tiktok.com/@carsalesbrisbane?_r=1&_t=ZS-95OLtLR1kfQ" target="_blank" aria-label="TikTok">
+            <a href={tiktokUrl} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
               <i className="bi bi-tiktok"></i>
             </a>
+            {youtubeUrl ? (
+              <a href={youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                <i className="bi bi-youtube"></i>
+              </a>
+            ) : null}
+            {xUrl ? (
+              <a href={xUrl} target="_blank" rel="noopener noreferrer" aria-label="X">
+                <i className="bi bi-twitter-x"></i>
+              </a>
+            ) : null}
+            {linkedinUrl ? (
+              <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                <i className="bi bi-linkedin"></i>
+              </a>
+            ) : null}
           </span>
         </div>
       </div>

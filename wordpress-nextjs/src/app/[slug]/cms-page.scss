@@ -1,0 +1,59 @@
+.cms-page {
+  &__article {
+    max-width: 48rem;
+    margin-inline: auto;
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  &__header {
+    margin-bottom: 1rem;
+  }
+
+  &__acf {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  &__acf-heading {
+    font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0 0 0.75rem;
+    color: var(--bs-body-color, #212529);
+  }
+
+  &__acf-paragraph {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin: 0;
+    color: var(--bs-secondary-color, #495057);
+
+    p {
+      margin-bottom: 0.75rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &__featured-image {
+    margin-bottom: 1.5rem;
+
+    img {
+      width: 100%;
+      height: auto;
+      border-radius: var(--border-radius, 0.25rem);
+    }
+  }
+
+  &__content {
+    font-size: 1rem;
+    line-height: 1.65;
+
+    > *:first-child {
+      margin-top: 0;
+    }
+  }
+}

@@ -1,9 +1,14 @@
 import Image from "next/image";
 import GoogleRatingStars from "@/components/GoogleRatingStars";
 import { CAR_SALES_BRISBANE_GOOGLE_MAPS_URL, getGoogleReviews, stripLeadingStarEmojis } from "@/lib/google-reviews";
+import { getCustomSettings } from "@/lib/wordpress/api/settings";
 
 const FALLBACK_SCORE = 4.8;
 const MAX_REVIEWS = 5;
+const FALLBACK_FACEBOOK_URL = "https://www.facebook.com/share/1DREXJCBhb/?mibextid=wwXIfr";
+const FALLBACK_INSTAGRAM_URL =
+  "https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr";
+const FALLBACK_TIKTOK_URL = "https://www.tiktok.com/@carsalesbrisbane?_r=1&_t=ZS-95OLtLR1kfQ";
 
 function formatReviewDate(isoDate: string): string {
   const d = new Date(`${isoDate}T12:00:00`);
@@ -13,9 +18,16 @@ function formatReviewDate(isoDate: string): string {
 
 export default async function ContactInfo() {
   const summary = await getGoogleReviews();
+  const settings = await getCustomSettings();
   const score = summary?.averageScore ?? FALLBACK_SCORE;
   const reviewCount = summary?.reviewCount;
   const reviews = summary?.reviews.slice(0, MAX_REVIEWS) ?? [];
+  const facebookUrl = settings?.facebook_url || FALLBACK_FACEBOOK_URL;
+  const instagramUrl = settings?.instagram_url || FALLBACK_INSTAGRAM_URL;
+  const tiktokUrl = settings?.tiktok_url || FALLBACK_TIKTOK_URL;
+  const youtubeUrl = settings?.youtube_url || "";
+  const xUrl = settings?.x_url || "";
+  const linkedinUrl = settings?.linkedin_url || "";
 
   return (
     <section className="py-5 bg-white cs-visit-section">
@@ -117,9 +129,10 @@ export default async function ContactInfo() {
                     <div className="d-flex gap-3">
                       <a
                         className="cs-social-btn cs-social-facebook"
-                        href="https://www.facebook.com/share/1DREXJCBhb/?mibextid=wwXIfr"
+                        href={facebookUrl}
                         aria-label="Facebook"
                         target="_blank"
+                        rel="noopener noreferrer"
                       >
                         <img
                           alt="Facebook"
@@ -134,9 +147,10 @@ export default async function ContactInfo() {
                       </a>
                       <a
                         className="cs-social-btn cs-social-instagram"
-                        href="https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr"
+                        href={instagramUrl}
                         aria-label="Instagram"
                         target="_blank"
+                        rel="noopener noreferrer"
                       >
                         <img
                           alt="Instagram"
@@ -151,9 +165,10 @@ export default async function ContactInfo() {
                       </a>
                       <a
                         className="cs-social-btn cs-social-tiktok"
-                        href="https://www.tiktok.com/@carsalesbrisbane?_r=1&_t=ZS-95OLtLR1kfQ"
+                        href={tiktokUrl}
                         aria-label="TikTok"
                         target="_blank"
+                        rel="noopener noreferrer"
                       >
                         <img
                           alt="TikTok"
@@ -166,6 +181,39 @@ export default async function ContactInfo() {
                           src="/assets/images/tiktok.svg"
                         />
                       </a>
+                      {youtubeUrl ? (
+                        <a
+                          className="cs-social-btn"
+                          href={youtubeUrl}
+                          aria-label="YouTube"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <i className="bi bi-youtube"></i>
+                        </a>
+                      ) : null}
+                      {xUrl ? (
+                        <a
+                          className="cs-social-btn"
+                          href={xUrl}
+                          aria-label="X"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <i className="bi bi-twitter-x"></i>
+                        </a>
+                      ) : null}
+                      {linkedinUrl ? (
+                        <a
+                          className="cs-social-btn"
+                          href={linkedinUrl}
+                          aria-label="LinkedIn"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <i className="bi bi-linkedin"></i>
+                        </a>
+                      ) : null}
                     </div>
                   </div>
                 </div>
