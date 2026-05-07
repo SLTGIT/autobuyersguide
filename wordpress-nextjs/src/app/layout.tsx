@@ -26,6 +26,7 @@ const title = "Quality Used Cars Brisbane | Expert Finance & Sourcing";
 const description =
   "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.";
 const GTM_ID = "GTM-W397LKXC";
+const GA_MEASUREMENT_ID = "G-JYCTQ8RYJQ";
 
 const ogLogoAbsolute = absoluteOgLogoUrl(siteOrigin);
 
@@ -79,6 +80,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={manrope.className}>
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-script" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          `}
+        </Script>
         <Script id="gtm-script" strategy="afterInteractive">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
