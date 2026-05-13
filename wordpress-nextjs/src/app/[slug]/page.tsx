@@ -13,6 +13,17 @@ import {
     webPageJsonLd,
     webSiteJsonLd,
 } from '@/lib/json-ld';
+import {
+    mergeInventoryFiltersWithPathAugment,
+    parseInventorySearchParams,
+} from '@/lib/inventory/query';
+import {
+    cmsSrpPathAugmentFromFilters,
+    fetchCmsSrpPageBySlug,
+    inventoryFiltersFromCmsSrpApi,
+    resolveCmsSrpSeoCopy,
+} from '@/lib/cms-srp/cms-srp-page';
+import SearchPageView from '@/app/search/SearchPageView';
 import './cms-page.scss';
 
 export const dynamic = 'force-dynamic';
@@ -21,12 +32,21 @@ interface PageProps {
     params: Promise<{
         slug: string;
     }>;
+    searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const params = await props.params;
-    const page = await getPageBySlug(params.slug);
+    const srp = await fetchCmsSrpPageBySlug(params.slug);
+    if (srp) {
+        const { documentTitle, documentDescription } = resolveCmsSrpSeoCopy(srp);
+        return mergeSiteUrlMetadata(
+            { title: documentTitle, description: documentDescription },
+            `/${params.slug}`,
+        );
+    }
 
+    const page = await getPageBySlug(params.slug);
     if (!page) {
         return {
             title: 'Page Not Found',
@@ -38,6 +58,35 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 
 export default async function DynamicPage(props: PageProps) {
     const params = await props.params;
+    const rawSearchParams = await props.searchParams;
+
+    const srp = await fetchCmsSrpPageBySlug(params.slug);
+    if (srp) {
+        const baseFilters = inventoryFiltersFromCmsSrpApi(srp.filters);
+        const pathAugment = cmsSrpPathAugmentFromFilters(baseFilters);
+        const fromQuery = parseInventorySearchParams(rawSearchParams ?? {});
+        const filters = mergeInventoryFiltersWithPathAugment(
+            fromQuery,
+            pathAugment,
+        );
+        const makeForCrumb = srp.filters.make?.trim();
+        const { listingJsonLd } = resolveCmsSrpSeoCopy(srp);
+        return (
+            <SearchPageView
+                filters={filters}
+                pathAugment={pathAugment}
+                pathHeroLabel={null}
+                customHero={{
+                    heading: stripHtml(srp.hero_heading),
+                    description: stripHtml(srp.hero_description),
+                    breadcrumbCurrent: makeForCrumb || undefined,
+                }}
+                listingSeo={listingJsonLd}
+                canonicalPathname={`/${params.slug}`}
+            />
+        );
+    }
+
     const page = await getPageBySlug(params.slug);
 
     if (!page) {
@@ -94,11 +143,6 @@ export default async function DynamicPage(props: PageProps) {
         <div className="cms-page">
             <JsonLd data={jsonLd} />
             <article className="cms-page__article">
-                {/* Header */}
-                {/* <header className="cms-page__header">
-                    <h1 dangerouslySetInnerHTML={{ __html: page.title.rendered }} />
-                </header> */}
-
                 {(acfHeading || acfParagraph) && (
                     <section className="cms-page__acf" aria-label="Page introduction">
                         {acfHeading && (
@@ -124,12 +168,6 @@ export default async function DynamicPage(props: PageProps) {
                         />
                     </div>
                 )}
-
-                {/* Content */}
-                {/* <div
-                    className="cms-page__content"
-                    dangerouslySetInnerHTML={{ __html: page.content.rendered }}
-                /> */}
             </article>
         </div>
     );

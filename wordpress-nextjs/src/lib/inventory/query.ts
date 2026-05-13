@@ -424,3 +424,20 @@ export function inventoryListingQueryHref(f: InventoryFilterState): string {
   const qs = serializeInventoryFilters(f);
   return qs ? `/search?${qs}` : "/search";
 }
+
+/**
+ * When `basePathname` is set (e.g. CMS SRP at `/use-car-hyundai`), inventory links
+ * stay on that path with a query string; otherwise use {@link inventoryListingQueryHref}.
+ */
+export function inventoryListingHrefForContext(
+  basePathname: string | null | undefined,
+  f: InventoryFilterState,
+): string {
+  const trimmed = basePathname?.trim();
+  if (trimmed) {
+    const path = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+    const qs = serializeInventoryFilters(f);
+    return qs ? `${path}?${qs}` : path;
+  }
+  return inventoryListingQueryHref(f);
+}

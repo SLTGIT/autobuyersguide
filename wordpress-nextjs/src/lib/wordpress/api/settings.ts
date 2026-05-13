@@ -59,7 +59,7 @@ export async function getCustomSettings(): Promise<WPCustomSettings | null> {
     try {
         const rootEndpoint = getApiRootEndpoint();
         const response = await fetch(`${rootEndpoint}/custom/v1/settings`, {
-            cache: 'no-store',
+            next: { revalidate: 300 },
         });
 
         if (!response.ok) {

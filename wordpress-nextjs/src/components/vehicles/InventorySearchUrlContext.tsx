@@ -19,6 +19,11 @@ type InventorySearchUrlContextValue = {
    * from the query string (make, a single facet, year, or price bucket).
    */
   pathAugment: Partial<InventoryFilterState> | null;
+  /**
+   * When set (e.g. CMS SRP at `/my-slug`), filter navigation uses this pathname + query
+   * instead of `/search?…`.
+   */
+  listingBasePathname: string | null;
   /** Grid vs list layout — not reflected in the URL; persisted in sessionStorage. */
   resultsView: "grid" | "list";
   setResultsView: (v: "grid" | "list") => void;
@@ -27,15 +32,18 @@ type InventorySearchUrlContextValue = {
 const InventorySearchUrlContext =
   createContext<InventorySearchUrlContextValue>({
     pathAugment: null,
+    listingBasePathname: null,
     resultsView: "list",
     setResultsView: () => {},
   });
 
 export function InventorySearchUrlProvider({
   pathAugment,
+  listingBasePathname = null,
   children,
 }: {
   pathAugment: Partial<InventoryFilterState> | null;
+  listingBasePathname?: string | null;
   children: ReactNode;
 }) {
   const [resultsView, setResultsViewState] = useState<"grid" | "list">("list");
@@ -63,10 +71,11 @@ export function InventorySearchUrlProvider({
   const value = useMemo(
     () => ({
       pathAugment,
+      listingBasePathname: listingBasePathname?.trim() || null,
       resultsView,
       setResultsView,
     }),
-    [pathAugment, resultsView, setResultsView],
+    [pathAugment, listingBasePathname, resultsView, setResultsView],
   );
 
   return (

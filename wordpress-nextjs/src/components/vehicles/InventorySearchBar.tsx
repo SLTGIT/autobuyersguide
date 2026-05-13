@@ -6,14 +6,14 @@ import {
   parseInventorySearchParams,
   urlSearchParamsToRecord,
   mergeInventoryFiltersWithPathAugment,
-  inventoryListingQueryHref,
+  inventoryListingHrefForContext,
 } from "@/lib/inventory/query";
 import { useInventorySearchUrl } from "@/components/vehicles/InventorySearchUrlContext";
 
 export default function InventorySearchBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { pathAugment } = useInventorySearchUrl();
+  const { pathAugment, listingBasePathname } = useInventorySearchUrl();
   const [q, setQ] = useState(searchParams.get("q") ?? "");
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function InventorySearchBar() {
       pathAugment,
     );
     const next = { ...base, q: nextQ.trim(), page: 1 };
-    router.push(inventoryListingQueryHref(next));
+    router.push(inventoryListingHrefForContext(listingBasePathname, next));
   };
 
   const onSubmit = (e: FormEvent) => {

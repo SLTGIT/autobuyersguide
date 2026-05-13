@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useState } from "react";
 import HeaderSearch from "./HeaderSearch";
 
@@ -17,7 +18,11 @@ export default function HeaderNavbar() {
   return (
     <nav className="navbar navbar-expand-lg">
       <div className="container py-2">
-        <a className="navbar-brand d-flex align-items-center gap-3" href="/">
+        <Link
+          className="navbar-brand d-flex align-items-center gap-3"
+          href="/"
+          onClick={closeNav}
+        >
           {/* <span className="cs-brand-badge d-inline-flex align-items-center justify-content-center text-white fw-bold">
             CSB
           </span>
@@ -28,7 +33,7 @@ export default function HeaderNavbar() {
             </small>
           </span> */}
           <img src="/assets/images/carsalesbrisbane_logo.webp" alt="Car Sales Brisbane" width={150} className="img-fluid rounded-3" />
-        </a>
+        </Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -46,45 +51,45 @@ export default function HeaderNavbar() {
           <HeaderSearch />
           <ul className="navbar-nav ms-auto align-items-lg-center cs-main-nav">
             <li className="nav-item">
-              <a className="nav-link text-dark" href="/" onClick={closeNav}>
+              <Link className="nav-link text-dark" href="/" onClick={closeNav}>
                 Home
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a
+              <Link
                 className="nav-link text-dark"
                 href="/search"
                 onClick={closeNav}
               >
                 Used Cars for sale
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a
+              <Link
                 className="nav-link text-dark"
                 href="/sell-my-car"
                 onClick={closeNav}
               >
                 Sell My Car
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a
+              <Link
                 className="nav-link text-dark"
                 href="/finance-centre"
                 onClick={closeNav}
               >
                 Finance Pre-Approval
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a
+              <Link
                 className="nav-link text-dark"
                 href="/blog"
                 onClick={closeNav}
               >
                 Blog
-              </a>
+              </Link>
             </li>
             <li className="nav-item dropdown">
               <a
@@ -99,40 +104,40 @@ export default function HeaderNavbar() {
               </a>
               <ul className="dropdown-menu dropdown-menu-end">
                 <li>
-                  <a
+                  <Link
                     className="dropdown-item"
                     href="/about-us"
                     onClick={closeNav}
                   >
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     className="dropdown-item"
                     href="/contact"
                     onClick={closeNav}
                   >
                     Contact
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     className="dropdown-item"
                     href="/terms-of-service"
                     onClick={closeNav}
                   >
                     Terms of Service
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     className="dropdown-item"
                     href="/privacy-policy"
                     onClick={closeNav}
                   >
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </li>

@@ -6,7 +6,7 @@ import {
   parseInventorySearchParams,
   urlSearchParamsToRecord,
   mergeInventoryFiltersWithPathAugment,
-  inventoryListingQueryHref,
+  inventoryListingHrefForContext,
 } from "@/lib/inventory/query";
 import { useInventorySearchUrl } from "@/components/vehicles/InventorySearchUrlContext";
 
@@ -21,7 +21,8 @@ export default function InventoryToolbar({
 }: InventoryToolbarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { pathAugment, resultsView, setResultsView } = useInventorySearchUrl();
+  const { pathAugment, resultsView, setResultsView, listingBasePathname } =
+    useInventorySearchUrl();
 
   const setSort = (nextSort: InventorySort) => {
     const base = mergeInventoryFiltersWithPathAugment(
@@ -33,7 +34,7 @@ export default function InventoryToolbar({
       sort: nextSort,
       page: 1,
     };
-    router.push(inventoryListingQueryHref(next));
+    router.push(inventoryListingHrefForContext(listingBasePathname, next));
   };
 
   return (

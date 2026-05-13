@@ -11,6 +11,7 @@ import {
   priceYearBounds,
   PER_PAGE,
   inventoryListingQueryHref,
+  inventoryListingHrefForContext,
 } from "@/lib/inventory/query";
 import type { InventoryFilterState } from "@/types/inventory";
 import JsonLd from "@/components/JsonLd";
@@ -50,6 +51,12 @@ function SidebarFallback() {
   );
 }
 
+export type SearchPageCustomHero = {
+  heading: string;
+  description: string;
+  breadcrumbCurrent?: string;
+};
+
 export type SearchPageViewProps = {
   filters: InventoryFilterState;
   /** Path-derived filter fields when URL is `/search/{slug}` without those params. */
@@ -58,6 +65,22 @@ export type SearchPageViewProps = {
   pathHeroLabel?: string | null;
   /** When URL is `/search/{make}/{model}`, extra breadcrumb before the current page title. */
   pathBreadcrumb?: MakeModelPathResolution["breadcrumb"] | null;
+  /** CMS SRP: full hero copy and optional breadcrumb label (defaults to heading). */
+  customHero?: SearchPageCustomHero | null;
+  /**
+   * When set (e.g. CMS `meta` title/description), used for JSON-LD `WebPage` / `CollectionPage` name and description.
+   * On-page hero still uses {@link customHero}.
+   */
+  listingSeo?: { title: string; description: string } | null;
+  /**
+   * When set (e.g. CMS SRP), JSON-LD uses this pathname for the current page URL (`getCurrentUrlAndRoute`).
+   * Inventory filter/sort/pagination links use {@link listingBasePathname} instead (typically `/search`).
+   */
+  canonicalPathname?: string | null;
+  /**
+   * Base pathname for filter navigation + pagination (`/{path}?…`). When omitted or null, links use `/search?…`.
+   */
+  listingBasePathname?: string | null;
 };
 
 export default async function SearchPageView({
@@ -65,6 +88,10 @@ export default async function SearchPageView({
   pathAugment,
   pathHeroLabel,
   pathBreadcrumb,
+  customHero,
+  listingSeo,
+  canonicalPathname,
+  listingBasePathname,
 }: SearchPageViewProps) {
   const all = await fetchDealerInventory();
   const bounds = priceYearBounds(all);
@@ -75,7 +102,12 @@ export default async function SearchPageView({
   const totalPages = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
 
   if (filters.page > totalPages) {
-    redirect(inventoryListingQueryHref({ ...filters, page: totalPages }));
+    redirect(
+      inventoryListingHrefForContext(listingBasePathname ?? null, {
+        ...filters,
+        page: totalPages,
+      }),
+    );
   }
 
   const pageSlice = sorted.slice(
@@ -92,18 +124,40 @@ export default async function SearchPageView({
     });
   }
 
-  const searchPath = inventoryListingQueryHref(filters);
-  const { currentUrl } = await getCurrentUrlAndRoute(searchPath);
+  const pathForCurrentUrl = (() => {
+    const c = canonicalPathname?.trim();
+    if (c) return c.startsWith("/") ? c : `/${c}`;
+    return inventoryListingQueryHref(filters);
+  })();
+
+  const { currentUrl } = await getCurrentUrlAndRoute(pathForCurrentUrl);
   const currentUrlHttps = upgradeHttpToHttpsUrl(currentUrl);
   const origin = new URL(currentUrlHttps).origin;
 
   const hero = pathHeroLabel?.trim() ?? "";
-  const listTitle = hero
-    ? `Used ${hero} for Sale in Brisbane | Car Sales Brisbane and Statewide Auto Group`
-    : "Used Cars for Sale in Brisbane | Car Sales Brisbane and Statewide Auto Group";
-  const listDescription = hero
-    ? `Browse used ${hero} vehicles, 4x4s, and SUVs with finance-first options from our Ormiston hub.`
-    : "Explore used cars, 4x4s, SUVs, and work-ready vehicles with finance-first options from our Ormiston hub.";
+  const customHeading = customHero?.heading?.trim() ?? "";
+  const customDescription = customHero?.description?.trim() ?? "";
+  const hasCustomHero = Boolean(customHeading);
+
+  const hasListingSeo = Boolean(listingSeo);
+  const listTitle = hasListingSeo
+    ? listingSeo!.title
+    : hasCustomHero
+      ? customHeading
+      : hero
+        ? `Used ${hero} for Sale in Brisbane | Car Sales Brisbane and Statewide Auto Group`
+        : "Used Cars for Sale in Brisbane | Car Sales Brisbane and Statewide Auto Group";
+  const listDescription = hasListingSeo
+    ? listingSeo!.description.trim() || listingSeo!.title
+    : hasCustomHero
+      ? customDescription || customHeading
+      : hero
+        ? `Browse used ${hero} vehicles, 4x4s, and SUVs with finance-first options from our Ormiston hub.`
+        : "Explore used cars, 4x4s, SUVs, and work-ready vehicles with finance-first options from our Ormiston hub.";
+
+  const breadcrumbCurrentCustom = hasCustomHero
+    ? customHero?.breadcrumbCurrent?.trim() || customHeading
+    : "";
 
   const itemListElement =
     pageSlice.length > 0
@@ -128,16 +182,28 @@ export default async function SearchPageView({
         },
         { name: pathBreadcrumb.current, item: currentUrlHttps },
       ]
-    : hero
+    : breadcrumbCurrentCustom
       ? [
           { name: "Home", item: `${origin}/` },
           { name: "Search", item: `${origin}/search` },
-          { name: hero, item: currentUrlHttps },
+          {
+            name:
+              breadcrumbCurrentCustom.length > 90
+                ? `${breadcrumbCurrentCustom.slice(0, 87)}…`
+                : breadcrumbCurrentCustom,
+            item: currentUrlHttps,
+          },
         ]
-      : [
-          { name: "Home", item: `${origin}/` },
-          { name: "Search", item: currentUrlHttps },
-        ];
+      : hero
+        ? [
+            { name: "Home", item: `${origin}/` },
+            { name: "Search", item: `${origin}/search` },
+            { name: hero, item: currentUrlHttps },
+          ]
+        : [
+            { name: "Home", item: `${origin}/` },
+            { name: "Search", item: currentUrlHttps },
+          ];
 
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),
@@ -169,12 +235,17 @@ export default async function SearchPageView({
     breadcrumbJsonLd(currentUrlHttps, breadcrumbItems),
   );
 
-  const heroTitle = hero
-    ? `Browse used ${hero} for sale in Brisbane`
-    : "Browse Used Cars for Sale in Brisbane";
+  const heroTitle = hasCustomHero
+    ? customHeading
+    : hero
+      ? `Browse used ${hero} for sale in Brisbane`
+      : "Browse Used Cars for Sale in Brisbane";
 
   return (
-    <InventorySearchUrlProvider pathAugment={pathAugment}>
+    <InventorySearchUrlProvider
+      pathAugment={pathAugment}
+      listingBasePathname={listingBasePathname ?? null}
+    >
       <JsonLd data={jsonLd} />
       <section className="cs-page-hero search-page-hero py-3 py-md-2">
         <div className="container py-lg-2">
@@ -183,7 +254,9 @@ export default async function SearchPageView({
               <h1 className="search-page-hero-title fw-bold mb-2 cs-title-tight">
                 {heroTitle}
               </h1>
-              <p className="search-page-hero-lead mb-0">{listDescription}</p>
+              <p className="search-page-hero-lead mb-0">
+                {hasCustomHero ? customDescription || customHeading : listDescription}
+              </p>
             </div>
             <div className="col-lg-5" />
           </div>
@@ -210,6 +283,16 @@ export default async function SearchPageView({
                 </span>
                 <span className="inventory-breadcrumb-current">
                   {pathBreadcrumb.current}
+                </span>
+              </>
+            ) : breadcrumbCurrentCustom ? (
+              <>
+                <Link href="/search">Search</Link>
+                <span className="inventory-breadcrumb-sep" aria-hidden>
+                  /
+                </span>
+                <span className="inventory-breadcrumb-current">
+                  {customHero?.breadcrumbCurrent?.trim() || customHeading}
                 </span>
               </>
             ) : hero ? (
@@ -269,6 +352,7 @@ export default async function SearchPageView({
                   <InventoryPagination
                     filters={filters}
                     totalPages={totalPages}
+                    listingBasePathname={listingBasePathname ?? null}
                   />
                 </>
               )}

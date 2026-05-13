@@ -11,7 +11,7 @@ import {
   parseInventorySearchParams,
   urlSearchParamsToRecord,
   mergeInventoryFiltersWithPathAugment,
-  inventoryListingQueryHref,
+  inventoryListingHrefForContext,
 } from "@/lib/inventory/query";
 import { useInventorySearchUrl } from "@/components/vehicles/InventorySearchUrlContext";
 import RangeSlider from "./RangeSlider";
@@ -26,8 +26,12 @@ interface InventoryFiltersSidebarProps {
   };
 }
 
-function navigate(router: ReturnType<typeof useRouter>, f: InventoryFilterState) {
-  router.push(inventoryListingQueryHref(f));
+function navigate(
+  router: ReturnType<typeof useRouter>,
+  listingBasePathname: string | null,
+  f: InventoryFilterState,
+) {
+  router.push(inventoryListingHrefForContext(listingBasePathname, f));
 }
 
 function clearFilterDimensions(f: InventoryFilterState): InventoryFilterState {
@@ -57,7 +61,7 @@ export default function InventoryFiltersSidebar({
 }: InventoryFiltersSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { pathAugment } = useInventorySearchUrl();
+  const { pathAugment, listingBasePathname } = useInventorySearchUrl();
 
   const current = useMemo(
     () =>
@@ -83,8 +87,9 @@ export default function InventoryFiltersSidebar({
     setOpen((s) => ({ ...s, [key]: !s[key] }));
 
   const push = useCallback(
-    (next: InventoryFilterState) => navigate(router, next),
-    [router]
+    (next: InventoryFilterState) =>
+      navigate(router, listingBasePathname, next),
+    [router, listingBasePathname],
   );
 
   const chips = useMemo(() => {

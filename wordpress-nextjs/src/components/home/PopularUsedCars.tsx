@@ -21,7 +21,7 @@ type CardDef = {
   filters: Partial<
     Pick<
       InventoryFilterState,
-      "maxPrice" | "q" | "bodyType" | "driveType"
+      "maxPrice" | "bodyType" | "driveType"
     >
   >;
 };
@@ -34,7 +34,8 @@ const CARDS: CardDef[] = [
     image:
       "https://d2s8i866417m9.cloudfront.net/photo/31928718/photo/thumb-ee3aca47fd5d427e2c1c06d01773bd6f.jpg",
     alt: "Used Cars Under 15k Brisbane category image from Statewide Auto Group",
-    filters: { maxPrice: 15000, q: "brisbane" },
+    // ?maxPrice=15000
+    filters: { maxPrice: 15000, },
   },
   {
     title: "Used 4x4s & Utes Brisbane",
@@ -43,7 +44,8 @@ const CARDS: CardDef[] = [
     image:
       "https://d2s8i866417m9.cloudfront.net/photo/32428698/photo/thumb-232954f40d5f21bf8a4fa35d6daa7a7a.jpg",
     alt: "Used 4x4s and Utes Brisbane category image from Statewide Auto Group",
-    filters: { q: "ute brisbane" },
+    // ?driveType=4WD,4x4
+    filters: { driveType: ["4WD", "4x4"] },
   },
   {
     title: "Used SUVs for Brisbane Families",
@@ -51,18 +53,15 @@ const CARDS: CardDef[] = [
     image:
       "https://d2s8i866417m9.cloudfront.net/photo/21458119/photo/thumb-cd1212b187aac661b7e12bbff1a7acf0.jpg",
     alt: "Used SUVs for Brisbane Families category image from Statewide Auto Group",
-    filters: { q: "suv brisbane" },
+    // ?bodyType=SUV,MPV
+    filters: { bodyType: ["SUV"] },
   },
 ];
 
-function categoryHref(
-  condition: string,
-  filters: CardDef["filters"]
-): string {
+function categoryHref(filters: CardDef["filters"]): string {
   const base = parseInventorySearchParams({});
   return inventoryListingQueryHref({
     ...base,
-    condition,
     page: 1,
     ...filters,
   });
@@ -108,7 +107,7 @@ export default async function PopularUsedCars() {
         </div>
         <div className="row g-4 mt-1">
           {CARDS.map((card) => {
-            const href = categoryHref(condition, card.filters);
+            const href = categoryHref(card.filters);
             const matched = filterDealerVehicles(
               vehicles,
               filterStateForCard(condition, card.filters)
