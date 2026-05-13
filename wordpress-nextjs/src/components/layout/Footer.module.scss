@@ -112,3 +112,19 @@
         }
     }
 }
+.poweredBy {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--light-color);
+}
+.provider {
+    font-weight: 600;
+    color: var(--primary-color);
+    text-decoration: underline;
+    cursor: pointer;
+    &:hover {
+        color: var(--primary-color-dark);
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}
