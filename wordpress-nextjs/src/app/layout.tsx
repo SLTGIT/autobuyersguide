@@ -32,6 +32,7 @@ const description =
   "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.";
 const FALLBACK_GTM_ID = "GTM-W397LKXC";
 const FALLBACK_GA_MEASUREMENT_ID = "G-JYCTQ8RYJQ";
+const ADDITIONAL_GA_MEASUREMENT_IDS = "G-L5D4TXEDEM";
 
 const ogLogoAbsolute = absoluteOgLogoUrl(siteOrigin);
 
@@ -103,6 +104,19 @@ export default async function RootLayout({
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
                 gtag('config', '${gaMeasurementId}');
+              `}
+            </Script>
+
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${ADDITIONAL_GA_MEASUREMENT_IDS}`}
+              strategy="afterInteractive"
+            />
+            <Script id="additional-ga4-script" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${ADDITIONAL_GA_MEASUREMENT_IDS}');
               `}
             </Script>
           </>
