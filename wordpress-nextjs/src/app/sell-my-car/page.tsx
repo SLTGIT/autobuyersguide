@@ -41,7 +41,7 @@ export default async function SellMyCarPage() {
     webSiteJsonLd(origin),
     webPageJsonLd({
       pageUrl,
-      name: "Sell My Car Car Sales Brisbane and Statewide Auto Group",
+      name: "Sell My Car Car Sales Brisbane Used Car Dealership",
       description:
         "Sell your car today with no pressure and get a competitive offer. Get an obligation-free car valuation at Car Sales Brisbane and Statewide Auto Group.",
     }),

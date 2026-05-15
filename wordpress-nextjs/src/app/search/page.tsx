@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { currentUrl, currentRoute } = await getCurrentUrlAndRoute("/search");
   return {
     title:
-      "Used Cars for Sale in Brisbane | Car Sales Brisbane and Statewide Auto Group",
+      "Used Cars for Sale in Brisbane | Car Sales Brisbane Used Car Dealership",
     description:
       "Explore used cars, 4x4s, SUVs, and work-ready vehicles with finance-first options from our Ormiston hub.",
     ...siteUrlMetadataFields(currentUrl, currentRoute),

@@ -15,7 +15,7 @@ import "./about.css";
 export async function generateMetadata(): Promise<Metadata> {
   const { currentUrl, currentRoute } = await getCurrentUrlAndRoute("/about-us");
   return {
-    title: "About Car Sales Brisbane and Statewide Auto Group",
+    title: "About Car Sales Brisbane Used Car Dealership",
     description:
       "Car Sales Brisbane is a digital showroom designed to connect Brisbane buyers with the used vehicle range, finance support, and local team behind Statewide Auto Group.",
     ...siteUrlMetadataFields(currentUrl, currentRoute),

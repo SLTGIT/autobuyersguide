@@ -15,7 +15,7 @@ import ContactInfo from "@/components/ContactInfo";
 export async function generateMetadata(): Promise<Metadata> {
   const { currentUrl, currentRoute } = await getCurrentUrlAndRoute("/contact");
   return {
-    title: "Contact Car Sales Brisbane and Statewide Auto Group",
+    title: "Contact Car Sales Brisbane Used Car Dealership",
     description:
       // not more than 152 characters
       "Contact Car Sales Brisbane team at Ormiston for used cars, finance pre-approval, sell-my-car enquiries, and Brisbane delivery support.",
@@ -32,7 +32,7 @@ export default async function Contact() {
     webSiteJsonLd(origin),
     webPageJsonLd({
       pageUrl,
-      name: "Contact Car Sales Brisbane and Statewide Auto Group",
+      name: "Contact Car Sales Brisbane Used Car Dealership",
       description:
         "Contact Car Sales Brisbane team at Ormiston for used cars, finance pre-approval, sell-my-car enquiries, and Brisbane delivery support.",
       types: ["ContactPage"],
