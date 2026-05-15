@@ -8,6 +8,10 @@ import {
 } from "@/lib/inventory/query";
 import { resolveSearchPathSlug } from "@/lib/inventory/search-path-slugs";
 import { mergeSiteUrlMetadata } from "@/lib/site-url";
+import {
+  cmsSrpMetadataForSlug,
+  renderCmsSrpSearchPage,
+} from "@/lib/cms-srp/render-cms-srp-search";
 import SearchPageView from "../SearchPageView";
 
 interface SearchMakePageProps {
@@ -28,6 +32,10 @@ export async function generateMetadata({
 }: SearchMakePageProps): Promise<Metadata> {
   const { make } = await params;
   const slug = make.trim().toLowerCase();
+  const cmsMeta = await cmsSrpMetadataForSlug(slug);
+  if (cmsMeta) {
+    return mergeSiteUrlMetadata(cmsMeta, `/search/${slug}`);
+  }
   const vehicles: DealerVehicle[] = await fetchDealerInventory().catch(() => []);
   const resolved = resolveSearchPathSlug(slug, vehicles);
   if (!resolved) {
@@ -56,12 +64,14 @@ export default async function SearchByMakePage({
 }: SearchMakePageProps) {
   const { make } = await params;
   const slug = make.trim().toLowerCase();
+  const raw = await searchParams;
+  const cmsSrp = await renderCmsSrpSearchPage(slug, raw ?? {});
+  if (cmsSrp) return cmsSrp;
 
   const vehicles: DealerVehicle[] = await fetchDealerInventory().catch(() => []);
   const resolved = resolveSearchPathSlug(slug, vehicles);
   if (!resolved) notFound();
 
-  const raw = await searchParams;
   const fromQuery = parseInventorySearchParams(raw);
   const filters = mergeInventoryFiltersWithPathAugment(
     fromQuery,

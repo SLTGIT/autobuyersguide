@@ -1,35 +1,80 @@
-import { Metadata } from 'next';
-import { WPPost, WPPage } from '@/types/wordpress';
+import { Metadata } from "next";
+import { stripHtml } from "@/lib/json-ld";
+import { WPPost, WPPage } from "@/types/wordpress";
 
-export function getMetadata(item: WPPost | WPPage, fallbackTitle?: string): Metadata {
+type YoastHeadJson = {
+  title?: string;
+  description?: string;
+  og_title?: string;
+  og_description?: string;
+  og_image?: { url: string; width?: number; height?: number; alt?: string }[];
+};
+
+function yoastFrom(item: WPPost | WPPage): YoastHeadJson | null {
+  const raw = item.yoast_head_json;
+  if (!raw || typeof raw !== "object") return null;
+  return raw as YoastHeadJson;
+}
+
+/** Yoast SEO title + meta description when present on the REST item. */
+export function getYoastSeoCopy(
+  item: WPPost | WPPage,
+): { title: string; description: string } | null {
+  const yoast = yoastFrom(item);
+  if (!yoast) return null;
+
+  const title = stripHtml(String(yoast.title ?? "")).trim();
+  const description = stripHtml(
+    String(yoast.og_description ?? yoast.description ?? ""),
+  ).trim();
+
+  if (!title && !description) return null;
+  return { title, description };
+}
+
+export function getMetadata(
+  item: WPPost | WPPage,
+  fallbackTitle?: string,
+): Metadata {
   if (!item) {
-    return { title: fallbackTitle || 'Not Found' };
+    return { title: fallbackTitle || "Not Found" };
   }
 
-  const yoast = item.yoast_head_json;
-  
+  const yoast = yoastFrom(item);
+  const pageTitle = stripHtml(item.title.rendered);
+  const excerptPlain = stripHtml(item.excerpt?.rendered ?? "").slice(0, 160);
+
   if (yoast) {
+    const yoastTitle = stripHtml(String(yoast.title ?? "")).trim();
+    const yoastDescription = stripHtml(
+      String(yoast.og_description ?? yoast.description ?? ""),
+    ).trim();
+    const ogTitle = stripHtml(String(yoast.og_title ?? yoast.title ?? "")).trim();
+
     return {
-      title: ((yoast.title || item.title.rendered) + ' Car Sales Brisbane').trim(),
-      description: yoast.og_description || yoast.description || item.excerpt?.rendered?.replace(/<[^>]*>/g, '').slice(0, 160),
+      title: yoastTitle || pageTitle,
+      description:
+        yoastDescription ||
+        excerptPlain ||
+        `Read more about ${pageTitle}`,
       openGraph: {
-        title: yoast.og_title || yoast.title,
-        description: yoast.og_description || yoast.description,
-        images: yoast.og_image
-          ? yoast.og_image.map((img: { url: string; width?: number; height?: number; alt?: string }) => ({
+        title: ogTitle || yoastTitle || pageTitle,
+        description: yoastDescription || excerptPlain || undefined,
+        images: yoast.og_image?.length
+          ? yoast.og_image.map((img) => ({
               url: img.url,
               width: img.width,
               height: img.height,
-              alt: img.alt?.trim() || item.title.rendered,
+              alt: img.alt?.trim() || pageTitle,
             }))
           : [],
       },
     };
   }
 
-  // Fallback to basic fields
   return {
-    title: `${item.title.rendered}  Car Sales Brisbane`,
-    description: item.excerpt?.rendered?.replace(/<[^>]*>/g, '').slice(0, 160) || `Read more about ${item.title.rendered}`,
+    title: `${pageTitle} | Car Sales Brisbane`,
+    description:
+      excerptPlain || `Read more about ${pageTitle}`,
   };
 }
