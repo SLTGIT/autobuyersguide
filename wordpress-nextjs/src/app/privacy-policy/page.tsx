@@ -15,9 +15,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const { currentUrl, currentRoute } =
     await getCurrentUrlAndRoute("/privacy-policy");
   return {
-    title: "Privacy Policy Car Sales Brisbane and Statewide Auto Group",
+    title: "Used Car Sales Brisbane Privacy Policy",
     description:
-      "How Car Sales Brisbane and Statewide Auto Group collect, use, disclose, and protect your personal information under the Australian Privacy Principles.",
+      "How Car Sales Brisbane collect, use, disclose, and protect your personal information under the Australian Privacy Principles.",
     ...siteUrlMetadataFields(currentUrl, currentRoute),
   };
 }
@@ -31,9 +31,9 @@ export default async function PrivacyPolicy() {
     webSiteJsonLd(origin),
     webPageJsonLd({
       pageUrl,
-      name: "Privacy Policy Car Sales Brisbane and Statewide Auto Group",
+      name: "Privacy Policy Car Sales Brisbane",
       description:
-        "How Car Sales Brisbane and Statewide Auto Group collect, use, disclose, and protect your personal information under the Australian Privacy Principles.",
+        "How Car Sales Brisbane collect, use, disclose, and protect your personal information under the Australian Privacy Principles.",
     }),
     breadcrumbJsonLd(pageUrl, [
       { name: "Home", item: `${origin}/` },
@@ -50,7 +50,7 @@ export default async function PrivacyPolicy() {
         <section className="space-y-3">
           <h2 className="text-xl font-semibold">We respect your privacy</h2>
           <p>
-            Statewide Auto Group respects your right to privacy and is committed
+            Car Sales Brisbane respects your right to privacy and is committed
             to safeguarding the privacy of our customers and website visitors.
             We adhere to the Australian Privacy Principles contained in the
             Privacy Act 1988 (Cth). This policy sets out how we collect and
@@ -85,7 +85,7 @@ export default async function PrivacyPolicy() {
 
         <section className="space-y-3">
           <h2>
-            What kinds of information does Statewide Auto Group collect?
+            What kinds of information does Car Sales Brisbane collect?
           </h2>
           <p>We may collect and hold the following information from you:</p>
           <ul className="list-disc space-y-2 pl-6">
@@ -143,7 +143,7 @@ export default async function PrivacyPolicy() {
         <section className="space-y-3">
           <h2>Do we disclose your personal information to anybody?</h2>
           <p>
-            Statewide Auto Group may disclose your personal information in
+            Car Sales Brisbane may disclose your personal information in
             certain circumstances. We may disclose your personal information to:
           </p>
           <ul className="list-disc space-y-2 pl-6">
@@ -182,7 +182,7 @@ export default async function PrivacyPolicy() {
         <section className="space-y-3">
           <h2>How we collect your personal information</h2>
           <p>
-            Statewide Auto Group collects personal information from you in a
+            Car Sales Brisbane collects personal information from you in a
             variety of ways, including when you interact with us electronically
             or in person, when you access our website and when we provide our
             services to you. We may receive personal information from third
@@ -194,7 +194,7 @@ export default async function PrivacyPolicy() {
         <section className="space-y-3">
           <h2>Is my personal information secure?</h2>
           <p>
-            Statewide Auto Group is committed to ensuring that the information
+            Car Sales Brisbane is committed to ensuring that the information
             you provide to us is secure. In order to prevent unauthorised access
             or disclosure, we have put in place suitable physical, electronic
             and managerial procedures to safeguard and secure information and
@@ -214,12 +214,12 @@ export default async function PrivacyPolicy() {
 
         <section className="space-y-3">
           <h2>
-            Can I access the personal information Statewide Auto Group holds
+            Can I access the personal information Car Sales Brisbane holds
             about me?
           </h2>
           <p>
             In line with the Privacy Act, you can request access to any of the
-            personal information we hold about you by contacting Statewide Auto
+            personal information we hold about you by contacting Car Sales Brisbane
             Group. If you would like to access the information we hold on you,
             please contact us on{" "}
             <a href="tel:0418908870" className="text-decoration-underline">

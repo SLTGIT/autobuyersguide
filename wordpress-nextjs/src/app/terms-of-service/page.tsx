@@ -15,9 +15,9 @@ export async function generateMetadata(): Promise<Metadata> {
     "/terms-of-service"
   );
   return {
-    title: "Terms of Service Car Sales Brisbane and Statewide Auto Group",
+    title: "Used Car Sales Brisbane Terms of Service",
     description:
-      "Terms of use for the Statewide Auto Group website, including disclaimers, vehicle information, copyright, and acceptable use.",
+      "Terms of use for the Car Sales Brisbane website, including disclaimers, vehicle information, copyright, and acceptable use.",
     ...siteUrlMetadataFields(currentUrl, currentRoute),
   };
 }
@@ -31,9 +31,9 @@ export default async function TermsOfService() {
     webSiteJsonLd(origin),
     webPageJsonLd({
       pageUrl,
-      name: "Terms of Service Car Sales Brisbane and Statewide Auto Group",
+      name: "Terms of Service Car Sales Brisbane",
       description:
-        "Terms of use for the Statewide Auto Group website, including disclaimers, vehicle information, copyright, and acceptable use.",
+        "Terms of use for the Car Sales Brisbane website, including disclaimers, vehicle information, copyright, and acceptable use.",
     }),
     breadcrumbJsonLd(pageUrl, [
       { name: "Home", item: `${origin}/` },
