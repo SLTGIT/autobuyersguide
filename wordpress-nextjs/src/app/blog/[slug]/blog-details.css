@@ -55,3 +55,17 @@
 .cs-faq-item + .cs-faq-item {
   margin-top: 1rem;
 }
+
+
+@media screen and (max-width: 768px) {
+  .cs-feature-img {
+    object-fit: fill;
+    height: auto;
+
+  }
+}
+
+/* Sticky site header: keep breadcrumb visible below it when scrolling into view */
+#blog-breadcrumb {
+  scroll-margin-top: 15rem;
+}

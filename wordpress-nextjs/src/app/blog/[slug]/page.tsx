@@ -16,6 +16,7 @@ import {
   webSiteJsonLd,
 } from "@/lib/json-ld";
 import "./blog-details.css";
+import { BlogPostScrollToBreadcrumb } from "./BlogPostScrollToBreadcrumb";
 
 interface BlogPostProps {
   params: Promise<{
@@ -188,9 +189,10 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
   return (
     <div className="bg-white min-vh-100">
+      <BlogPostScrollToBreadcrumb slug={slug} />
       <JsonLd data={jsonLd} />
       <div className="container pt-4">
-        <nav aria-label="breadcrumb">
+        <nav id="blog-breadcrumb" aria-label="breadcrumb">
           <ol className="breadcrumb mb-3">
             <li className="breadcrumb-item">
               <Link href="/">Home</Link>
