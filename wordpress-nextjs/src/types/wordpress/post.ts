@@ -40,6 +40,7 @@ export interface WPPost {
   };
   acf?: {
     faq?: unknown;
+    hero_section?: string;
     [key: string]: unknown;
   };
   yoast_head_json?: any;

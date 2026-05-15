@@ -41,7 +41,9 @@ function normalizeFaqItems(
     .filter(Boolean) as { question: string; answer: string }[];
 }
 
-function parseFaqField(rawFaq: unknown): { question: string; answer: string }[] {
+function parseFaqField(
+  rawFaq: unknown,
+): { question: string; answer: string }[] {
   if (!rawFaq) return [];
 
   // Supports ACF textarea containing JSON, array values, or FAQPage.mainEntity.
@@ -66,15 +68,18 @@ function parseFaqField(rawFaq: unknown): { question: string; answer: string }[] 
   const obj = rawFaq as Record<string, unknown>;
   if (Array.isArray(obj.mainEntity)) {
     return normalizeFaqItems(
-      obj.mainEntity.map((entity) => {
-        if (!entity || typeof entity !== "object") return null;
-        const e = entity as Record<string, unknown>;
-        return {
-          question: e.name,
-          answer:
-            (e.acceptedAnswer as Record<string, unknown> | undefined)?.text ?? "",
-        };
-      }).filter(Boolean),
+      obj.mainEntity
+        .map((entity) => {
+          if (!entity || typeof entity !== "object") return null;
+          const e = entity as Record<string, unknown>;
+          return {
+            question: e.name,
+            answer:
+              (e.acceptedAnswer as Record<string, unknown> | undefined)?.text ??
+              "",
+          };
+        })
+        .filter(Boolean),
     );
   }
 
@@ -139,6 +144,10 @@ export default async function BlogPost({ params }: BlogPostProps) {
   const imageUrl = featuredImage?.source_url as string | undefined;
   const authorName = author?.name as string | undefined;
   const faqItems = parseFaqField(post.acf?.faq);
+  const heroHtml =
+    typeof post.acf?.hero_section === "string"
+      ? post.acf.hero_section.trim()
+      : "";
 
   const blogPosting: Record<string, unknown> = {
     "@type": "BlogPosting",
@@ -189,9 +198,9 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
   return (
     <div className="bg-white min-vh-100">
-      <BlogPostScrollToBreadcrumb slug={slug} />
       <JsonLd data={jsonLd} />
-      <div className="container pt-4">
+      <BlogPostScrollToBreadcrumb slug={slug} />
+      {/* <div className="container pt-4">
         <nav id="blog-breadcrumb" aria-label="breadcrumb">
           <ol className="breadcrumb mb-3">
             <li className="breadcrumb-item">
@@ -205,7 +214,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
             </li>
           </ol>
         </nav>
-      </div>
+      </div> */}
       {/* <div className="container pt-4">
         Back Link
         <Link
@@ -215,12 +224,31 @@ export default async function BlogPost({ params }: BlogPostProps) {
           ← Back to Blog
         </Link>
       </div> */}
+
+      {/* Post Hero Section */}
+      {heroHtml ? (
+        <section
+          className="cs-page-hero py-3"
+          dangerouslySetInnerHTML={{
+            __html: repairWpRenderedHtml(heroHtml),
+          }}
+        />
+      ) : null}
+
       {/* Post Content */}
-      <div
-        dangerouslySetInnerHTML={{
-          __html: repairWpRenderedHtml(post.content.rendered),
-        }}
-      />
+      <section className="py-5">
+        <div className="container">
+          <div className="row g-5">
+            <div className="col-lg-8">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: repairWpRenderedHtml(post.content.rendered),
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Footer Navigation */}
       {/* <div className="container">
