@@ -302,9 +302,9 @@ export default function SellMyCarValuationForm() {
           </div>
         </div>
 
-        <h2 className="smc-form-title mb-4">
+        <p className="smc-form-title mb-4">
           Enquire now for your vehicle price.
-        </h2>
+        </p>
 
         {step === 1 ? (
           <>

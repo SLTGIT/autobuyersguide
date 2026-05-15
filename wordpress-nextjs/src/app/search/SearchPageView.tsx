@@ -250,7 +250,7 @@ export default async function SearchPageView({
       <section className="cs-page-hero search-page-hero py-3 py-md-2">
         <div className="container py-lg-2">
           <div className="row g-3 g-lg-4 align-items-center">
-            <div className="col-lg-7 py-5">
+            <div className="col-lg-10 py-5">
               <h1 className="search-page-hero-title fw-bold mb-2 cs-title-tight">
                 {heroTitle}
               </h1>
@@ -258,7 +258,7 @@ export default async function SearchPageView({
                 {hasCustomHero ? customDescription || customHeading : listDescription}
               </p>
             </div>
-            <div className="col-lg-5" />
+            {/* <div className="col-lg-5" /> */}
           </div>
         </div>
       </section>

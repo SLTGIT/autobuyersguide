@@ -179,10 +179,12 @@ export default async function FinanceCentre() {
           <div className="row g-4">
             <div className="col-md-4">
               <article className="cs-card h-100 p-4">
-                <span className="cs-trust-icon">
-                  <i className="bi bi-cash-stack"></i>
-                </span>
-                <h3 className="h5 fw-bold">No-Deposit Finance</h3>
+                <div className="d-flex gap-3 align-items-center">
+                  <span className="cs-trust-icon">
+                    <i className="bi bi-cash-stack"></i>
+                  </span>
+                  <h3 className="h5 fw-bold">No-Deposit Finance</h3>
+                </div>
                 <p className="text-secondary mb-0">
                   Finance options for approved applicants from our Ormiston hub.
                 </p>
@@ -190,10 +192,12 @@ export default async function FinanceCentre() {
             </div>
             <div className="col-md-4">
               <article className="cs-card h-100 p-4">
-                <span className="cs-trust-icon">
-                  <i className="bi bi-briefcase"></i>
-                </span>
-                <h3 className="h5 fw-bold">ABN Specialist</h3>
+                <div className="d-flex gap-3 align-items-center">
+                  <span className="cs-trust-icon">
+                    <i className="bi bi-briefcase"></i>
+                  </span>
+                  <h3 className="h5 fw-bold">ABN Specialist</h3>
+                </div>
                 <p className="text-secondary mb-0">
                   Specialist ABN and low-doc support for Brisbane tradies.
                 </p>
@@ -201,10 +205,12 @@ export default async function FinanceCentre() {
             </div>
             <div className="col-md-4">
               <article className="cs-card h-100 p-4">
-                <span className="cs-trust-icon">
-                  <i className="bi bi-truck"></i>
-                </span>
-                <h3 className="h5 fw-bold">QLD Delivery</h3>
+                <div className="d-flex gap-3 align-items-center">
+                  <span className="cs-trust-icon">
+                    <i className="bi bi-truck"></i>
+                  </span>
+                  <h3 className="h5 fw-bold">QLD Delivery</h3>
+                </div>
                 <p className="text-secondary mb-0">
                   Delivery support from Brisbane to regional Queensland.
                 </p>

@@ -69,3 +69,20 @@
 #blog-breadcrumb {
   scroll-margin-top: 15rem;
 }
+
+.blog-related-thumb {
+  width: 80px;
+  height: 80px;
+}
+
+.blog-related-item:hover .fw-semibold {
+  color: var(--cs-primary, #0078ff) !important;
+}
+
+@media (min-width: 992px) {
+  .blog-related-sidebar {
+    position: sticky;
+    top: 7rem;
+    align-self: flex-start;
+  }
+}

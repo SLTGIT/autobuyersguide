@@ -157,7 +157,7 @@ export default function ContactForm() {
   return (
     <div className="cs-contact-form">
       <div className="cs-panel p-4 p-lg-5 shadow-sm">
-        <h2 className="cs-contact-form__title mb-0">Send an enquiry</h2>
+        <p className="cs-contact-form__title mb-0">Send an enquiry</p>
         <p className="text-secondary mt-2 mb-4">
           Fill in the form below and our team will respond as soon as we can.
         </p>

@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getPostBySlug } from "@/lib/wordpress";
+import { getPostBySlug, getPosts } from "@/lib/wordpress";
+import RelatedPostsSidebar from "@/components/blog/RelatedPostsSidebar";
+import type { WPPost } from "@/types/wordpress";
 import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
 import { getMetadata } from "@/lib/wordpress/seo";
 import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from "@/lib/site-url";
@@ -86,6 +88,30 @@ function parseFaqField(
   return [];
 }
 
+const RELATED_POSTS_LIMIT = 4;
+
+async function getRelatedPosts(current: WPPost): Promise<WPPost[]> {
+  const fetchAndFilter = async (categories?: number[]) => {
+    const posts = await getPosts({
+      per_page: RELATED_POSTS_LIMIT + 1,
+      categories,
+      orderby: "date",
+      order: "desc",
+    });
+    return posts.filter((p) => p.id !== current.id);
+  };
+
+  let related = await fetchAndFilter(
+    current.categories?.length ? current.categories : undefined,
+  );
+
+  if (related.length < RELATED_POSTS_LIMIT && current.categories?.length) {
+    related = await fetchAndFilter();
+  }
+
+  return related.slice(0, RELATED_POSTS_LIMIT);
+}
+
 function blogFaqPageJsonLd(
   pageUrl: string,
   faqs: { question: string; answer: string }[],
@@ -148,6 +174,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
     typeof post.acf?.hero_section === "string"
       ? post.acf.hero_section.trim()
       : "";
+  const relatedPosts = await getRelatedPosts(post);
 
   const blogPosting: Record<string, unknown> = {
     "@type": "BlogPosting",
@@ -245,6 +272,9 @@ export default async function BlogPost({ params }: BlogPostProps) {
                   __html: repairWpRenderedHtml(post.content.rendered),
                 }}
               />
+            </div>
+            <div className="col-lg-4">
+              <RelatedPostsSidebar posts={relatedPosts} />
             </div>
           </div>
         </div>

@@ -208,7 +208,7 @@ export default function FinanceEnquiryForm() {
       <div className="row g-4 g-xl-5 align-items-start">
         <div className="col-lg-8">
           <div className="cs-panel p-4 p-lg-5 shadow-sm">
-            <h2 className="cs-contact-form__title mb-0">Finance application</h2>
+            <p className="cs-contact-form__title mb-0">Finance application</p>
             <p className="text-secondary mt-2 mb-4">
               Complete the form below — fields marked with{" "}
               <span className="cs-contact-form__req">*</span> are required.

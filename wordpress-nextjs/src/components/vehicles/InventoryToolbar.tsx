@@ -41,7 +41,7 @@ export default function InventoryToolbar({
     <div className="inventory-toolbar">
       <p className="inventory-toolbar-count">
         <strong>{total.toLocaleString("en-AU")}</strong>
-        <span> new and used vehicles found in Australia</span>
+        <span> used vehicles found</span>
       </p>
       <div className="inventory-toolbar-actions">
         <label className="inventory-sort-wrap">
