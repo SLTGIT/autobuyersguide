@@ -81,6 +81,8 @@ export type SearchPageViewProps = {
    * Base pathname for filter navigation + pagination (`/{path}?…`). When omitted or null, links use `/search?…`.
    */
   listingBasePathname?: string | null;
+  /** WordPress page HTML for `/search` hero (`cs-page-hero search-page-hero`). */
+  wpHeroHtml?: string | null;
 };
 
 export default async function SearchPageView({
@@ -92,6 +94,7 @@ export default async function SearchPageView({
   listingSeo,
   canonicalPathname,
   listingBasePathname,
+  wpHeroHtml,
 }: SearchPageViewProps) {
   const all = await fetchDealerInventory();
   const bounds = priceYearBounds(all);
@@ -235,11 +238,16 @@ export default async function SearchPageView({
     breadcrumbJsonLd(currentUrlHttps, breadcrumbItems),
   );
 
+  const wpHero = wpHeroHtml?.trim() ?? "";
+  const showWpHero = Boolean(wpHero) && !hasCustomHero;
+
   const heroTitle = hasCustomHero
     ? customHeading
     : hero
       ? `Browse used ${hero} for sale in Brisbane`
-      : "Browse Used Cars for Sale in Brisbane";
+      : hasListingSeo
+        ? listingSeo!.title
+        : "Browse Used Cars for Sale in Brisbane";
 
   return (
     <InventorySearchUrlProvider
@@ -247,6 +255,9 @@ export default async function SearchPageView({
       listingBasePathname={listingBasePathname ?? null}
     >
       <JsonLd data={jsonLd} />
+      {showWpHero ? (
+        <div dangerouslySetInnerHTML={{ __html: wpHero }} />
+      ) : (
       <section className="cs-page-hero search-page-hero py-3 py-md-2">
         <div className="container py-lg-2">
           <div className="row g-3 g-lg-4 align-items-center">
@@ -262,6 +273,7 @@ export default async function SearchPageView({
           </div>
         </div>
       </section>
+      )}
       <div className="vehicles-page inventory-srp">
         <div className="vehicles-container inventory-srp-inner">
           <nav className="inventory-breadcrumb" aria-label="Breadcrumb">

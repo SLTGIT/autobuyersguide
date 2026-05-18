@@ -1161,14 +1161,14 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 
 .inventory-card-title-block {
     margin-bottom: 0.65rem;
+
+    .inventory-card-used-badge {
+        display: inline-block;
+        margin-bottom: 0.5rem;
+    }
 }
 
 .inventory-card-used-badge {
-    position: absolute;
-    top: 0.65rem;
-    left: 0.65rem;
-    z-index: 2;
-    pointer-events: none;
     font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -1179,7 +1179,6 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     color: #fff;
     background: rgba(17, 24, 39, 0.78);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
 }
 
 .inventory-card-headline-link {
@@ -2891,26 +2890,6 @@ button.vdp-cta {
     font-size: 0.85rem;
 }
 
-.vdp-similar-badge {
-    position: absolute;
-    top: 0.5rem;
-    left: 0.5rem;
-    padding: 0.2rem 0.5rem;
-    font-size: 0.65rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    border-radius: 4px;
-    color: #fff;
-}
-
-.vdp-similar-badge.is-used {
-    background: var(--cs-primary, #{$cs-primary});
-}
-
-.vdp-similar-badge.is-new {
-    background: #198754;
-}
-
 .vdp-similar-card-body {
     display: flex;
     flex-direction: column;
@@ -2918,8 +2897,17 @@ button.vdp-cta {
     min-height: 0;
 }
 
-.vdp-similar-card-title {
+.vdp-similar-card-title-block {
     margin: 0.75rem 0.85rem 0.35rem;
+
+    .inventory-card-used-badge {
+        display: inline-block;
+        margin-bottom: 0.5rem;
+    }
+}
+
+.vdp-similar-card-title {
+    margin: 0;
     font-size: 0.9rem;
     font-weight: 700;
     line-height: 1.35;

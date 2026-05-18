@@ -1,5 +1,6 @@
 import type { DealerVehicle } from "@/types/inventory";
 import type { InventoryFilterState } from "@/types/inventory";
+import { DEFAULT_INVENTORY_SORT } from "@/types/inventory";
 import { slugifyInventoryPart } from "@/lib/inventory/slug";
 import {
   isSearchMakePathAllowed,
@@ -380,7 +381,7 @@ export function pathSlugForInventoryListing(
 ): PathSlugForListing | null {
   if (f.make.trim()) return null;
 
-  if (f.q.trim() || f.condition || f.sort !== "best") {
+  if (f.q.trim() || f.condition || f.sort !== DEFAULT_INVENTORY_SORT) {
     return null;
   }
 

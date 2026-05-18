@@ -1,78 +1,62 @@
-import { Metadata } from "next";
-export const dynamic = "force-dynamic";
-import { getSiteSettings } from "@/lib/wordpress";
-import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getPageBySlug } from "@/lib/wordpress";
+import { getMetadata, getYoastSeoCopy } from "@/lib/wordpress/seo";
+import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
+import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from "@/lib/site-url";
 import JsonLd from "@/components/JsonLd";
 import {
   autoDealerJsonLd,
   jsonLdGraph,
   organizationJsonLd,
+  stripHtml,
   upgradeHttpToHttpsUrl,
   webPageJsonLd,
   webSiteJsonLd,
 } from "@/lib/json-ld";
 import HomeBanner from "@/components/home/HomeBanner";
 import PopularCarTypes from "@/components/home/PopularCarTypes";
-import PopularBrandsSlider from "@/components/home/PopularBrandsSlider";
-import InfoBlocks from "@/components/home/InfoBlocks";
-import LatestBlogPosts from "@/components/home/LatestBlogPosts";
 import PopularUsedCars from "@/components/home/PopularUsedCars";
+import LatestBlogPosts from "@/components/home/LatestBlogPosts";
 import VisitUs from "@/components/home/VisitUs";
+import "./[slug]/cms-page.scss";
 
+export const dynamic = "force-dynamic";
+
+const HOME_SLUG = "home";
 const HOME_PATH = "/";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const siteSettings = await getSiteSettings();
-  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute(HOME_PATH);
-  return {
-    // title: siteSettings?.title || 'Home | Statewide Auto Group',
-    title: "Quality Used Cars Brisbane | Expert Finance & Sourcing",
-    description:
-      siteSettings?.description ||
-      "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.",
-    ...siteUrlMetadataFields(currentUrl, currentRoute),
-    // openGraph: {
-    //   title: "Quality Used Cars Brisbane | Expert Finance & Sourcing",
-    //   description:
-    //     "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.",
-    //   url: currentUrl,
-    //   siteName: "Car Sales Brisbane",
-    //   locale: "en_AU",
-    //   type: "website",
-    //   images: [
-    //     {
-    //       url: '/carsalesbrisbane_logo.png',
-    //       width: 1200,
-    //       height: 630,
-    //       alt: "Car Sales Brisbane Logo",
-    //     },
-    //   ],
-    // },
-    // twitter: {
-    //   card: "summary_large_image",
-    //   title: "Quality Used Cars Brisbane | Expert Finance & Sourcing",
-    //   description:
-    //     "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.",
-    //   images: ["/carsalesbrisbane_logo.png"],
-    // },
-  };
-  
+  const page = await getPageBySlug(HOME_SLUG);
+  if (!page) {
+    return mergeSiteUrlMetadata({ title: "Home" }, HOME_PATH);
+  }
+  return mergeSiteUrlMetadata(getMetadata(page), HOME_PATH);
 }
 
 export default async function Home() {
+  const page = await getPageBySlug(HOME_SLUG);
+  if (!page) {
+    notFound();
+  }
+
   const { currentUrl } = await getCurrentUrlAndRoute(HOME_PATH);
   const pageUrl = upgradeHttpToHttpsUrl(currentUrl);
   const origin = new URL(pageUrl).origin;
-  const homeDescription =
-    "Access premium used 4x4s, SUVs, and commercial vehicles. Based in Ormiston, we provide $0 deposit finance and statewide delivery from Brisbane to Cairns.";
+  const yoastSeo = getYoastSeoCopy(page);
+  const headline = stripHtml(page.title.rendered);
+  const excerpt = stripHtml(page.excerpt?.rendered || "");
+  const seoTitle = yoastSeo?.title || headline;
+  const seoDescription = yoastSeo?.description || excerpt || headline;
+
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),
     webSiteJsonLd(origin, { includeSearchAction: true }),
     autoDealerJsonLd(origin),
     webPageJsonLd({
       pageUrl,
-      name: "Quality Used Cars Brisbane | Expert Finance & Sourcing",
-      description: homeDescription,
+      name: seoTitle,
+      description: seoDescription,
     }),
   );
 
@@ -80,14 +64,18 @@ export default async function Home() {
     <>
       <JsonLd data={jsonLd} />
       <HomeBanner />
-      {/* <SearchForm /> */}
-      {/* <CitySearchSlider /> */}
       <PopularCarTypes />
-      {/* <PopularBrandsSlider /> */}
       <PopularUsedCars />
       <LatestBlogPosts />
-      {/* <InfoBlocks /> */}
       <VisitUs />
+      {page.content?.rendered?.trim() ? (
+        <div
+          className=""
+          dangerouslySetInnerHTML={{
+            __html: repairWpRenderedHtml(page.content.rendered),
+          }}
+        />
+      ) : null}
     </>
   );
 }

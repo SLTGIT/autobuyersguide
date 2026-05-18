@@ -1,6 +1,10 @@
 /* .cs-page-hero {
     background: var(--cs-primary);
   } */
+
+  p {
+    margin: 0;
+  }
   
   .cs-panel,
   .cs-card {

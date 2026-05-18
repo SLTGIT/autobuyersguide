@@ -1,68 +1,78 @@
 import type { Metadata } from "next";
-import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import { notFound } from "next/navigation";
+import { getPageBySlug } from "@/lib/wordpress";
+import { getMetadata, getYoastSeoCopy } from "@/lib/wordpress/seo";
+import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
+import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from "@/lib/site-url";
 import JsonLd from "@/components/JsonLd";
 import {
   breadcrumbJsonLd,
   jsonLdGraph,
   organizationJsonLd,
+  stripHtml,
   upgradeHttpToHttpsUrl,
   webPageJsonLd,
   webSiteJsonLd,
 } from "@/lib/json-ld";
 import ContactForm from "./ContactForm";
-import "./contact.css";
 import ContactInfo from "@/components/ContactInfo";
+import "../[slug]/cms-page.scss";
+import "./contact.css";
+
+export const dynamic = "force-dynamic";
+
+const CONTACT_SLUG = "contact";
+const CONTACT_PATH = "/contact";
+
 export async function generateMetadata(): Promise<Metadata> {
-  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute("/contact");
-  return {
-    title: "Contact Car Sales Brisbane Used Car Dealership",
-    description:
-      // not more than 152 characters
-      "Contact Car Sales Brisbane team at Ormiston for used cars, finance pre-approval, sell-my-car enquiries, and Brisbane delivery support.",
-    ...siteUrlMetadataFields(currentUrl, currentRoute),
-  };
+  const page = await getPageBySlug(CONTACT_SLUG);
+  if (!page) {
+    return mergeSiteUrlMetadata({ title: "Contact" }, CONTACT_PATH);
+  }
+  return mergeSiteUrlMetadata(getMetadata(page), CONTACT_PATH);
 }
 
-export default async function Contact() {
-  const { currentUrl } = await getCurrentUrlAndRoute("/contact");
+export default async function ContactPage() {
+  const page = await getPageBySlug(CONTACT_SLUG);
+  if (!page) {
+    notFound();
+  }
+
+  const { currentUrl } = await getCurrentUrlAndRoute(CONTACT_PATH);
   const pageUrl = upgradeHttpToHttpsUrl(currentUrl);
   const origin = new URL(pageUrl).origin;
+  const yoastSeo = getYoastSeoCopy(page);
+  const headline = stripHtml(page.title.rendered);
+  const excerpt = stripHtml(page.excerpt?.rendered || "");
+  const seoTitle = yoastSeo?.title || headline;
+  const seoDescription = yoastSeo?.description || excerpt || headline;
+
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),
     webSiteJsonLd(origin),
     webPageJsonLd({
       pageUrl,
-      name: "Contact Car Sales Brisbane Used Car Dealership",
-      description:
-        "Contact Car Sales Brisbane team at Ormiston for used cars, finance pre-approval, sell-my-car enquiries, and Brisbane delivery support.",
+      name: seoTitle,
+      description: seoDescription,
       types: ["ContactPage"],
     }),
     breadcrumbJsonLd(pageUrl, [
       { name: "Home", item: `${origin}/` },
-      { name: "Contact", item: pageUrl },
+      { name: headline, item: pageUrl },
     ]),
   );
 
   return (
     <>
       <JsonLd data={jsonLd} />
-      <section className="cs-page-hero py-5">
-        <div className="container py-lg-4">
-          <div className="row g-4 align-items-center">
-            <div className="col-lg-7">
-              {/* <span className="badge cs-hero-chip cs-pill px-3 py-2 mb-3">
-                Contact Us
-              </span> */}
-              <h1 className="display-5 fw-bold mb-3 cs-title-tight">
-                Contact Us
-              </h1>
-              <p className="lead mb-0">
-                Get in touch with us. We'd love to hear from you!
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {page.content?.rendered?.trim() ? (
+        <div
+          className=""
+          dangerouslySetInnerHTML={{
+            __html: repairWpRenderedHtml(page.content.rendered),
+          }}
+        />
+      ) : null}
 
       <section className="py-5 bg-light border-top border-bottom border-light-subtle">
         <div className="container">

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getPosts, getCategories } from "@/lib/wordpress";
-import { getCurrentUrlAndRoute, siteUrlMetadataFields } from "@/lib/site-url";
+import { notFound } from "next/navigation";
+import { getPageBySlug, getPosts, getCategories } from "@/lib/wordpress";
+import { getMetadata, getYoastSeoCopy } from "@/lib/wordpress/seo";
+import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
+import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from "@/lib/site-url";
 import type { WPPost, WPCategory } from "@/types/wordpress";
 import BlogCard from "@/components/blog/BlogCard";
 import JsonLd from "@/components/JsonLd";
@@ -12,7 +15,13 @@ import {
   upgradeHttpToHttpsUrl,
   webSiteJsonLd,
 } from "@/lib/json-ld";
+import "../[slug]/cms-page.scss";
 import "./blog.css";
+
+export const dynamic = "force-dynamic";
+
+const BLOG_SLUG = "blog";
+const BLOG_PATH = "/blog";
 
 function blogListingPath(page: number, categoryId: number | undefined): string {
   const sp = new URLSearchParams();
@@ -23,13 +32,11 @@ function blogListingPath(page: number, categoryId: number | undefined): string {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { currentUrl, currentRoute } = await getCurrentUrlAndRoute("/blog");
-  return {
-    title: "Used Car Guides for Brisbane Buyers | Car Sales Brisbane",
-    description:
-      "Read Brisbane used car guides covering car finance, used 4x4s, family SUVs, cheap cars, and first-time buyer tips from Car Sales Brisbane.",
-    ...siteUrlMetadataFields(currentUrl, currentRoute),
-  };
+  const page = await getPageBySlug(BLOG_SLUG);
+  if (!page) {
+    return mergeSiteUrlMetadata({ title: "Blog" }, BLOG_PATH);
+  }
+  return mergeSiteUrlMetadata(getMetadata(page), BLOG_PATH);
 }
 
 interface BlogPageProps {
@@ -40,6 +47,11 @@ interface BlogPageProps {
 }
 
 export default async function Blog({ searchParams }: BlogPageProps) {
+  const cmsPage = await getPageBySlug(BLOG_SLUG);
+  if (!cmsPage) {
+    notFound();
+  }
+
   const params = await searchParams;
   const currentPage = parseInt(params.page || "1");
   const categoryFilter = params.category
@@ -74,29 +86,31 @@ export default async function Blog({ searchParams }: BlogPageProps) {
   const [{ currentUrl: listingPageUrl }, { currentUrl: blogCanonicalUrl }] =
     await Promise.all([
       getCurrentUrlAndRoute(listingPath),
-      getCurrentUrlAndRoute("/blog"),
+      getCurrentUrlAndRoute(BLOG_PATH),
     ]);
   const listingPageHttps = upgradeHttpToHttpsUrl(listingPageUrl);
   const blogCanonicalHttps = upgradeHttpToHttpsUrl(blogCanonicalUrl);
   const origin = new URL(listingPageHttps).origin;
   const blogEntityId = `${blogCanonicalHttps}#blog`;
 
-  const pageTitle = "Used Car Guides for Brisbane Buyers | Car Sales Brisbane";
-  const pageDescription =
-    "Read Brisbane used car guides covering car finance, used 4x4s, family SUVs, cheap cars, and first-time buyer tips from Car Sales Brisbane.";
+  const yoastSeo = getYoastSeoCopy(cmsPage);
+  const headline = stripHtml(cmsPage.title.rendered);
+  const excerpt = stripHtml(cmsPage.excerpt?.rendered || "");
+  const pageTitle = yoastSeo?.title || headline;
+  const pageDescription = yoastSeo?.description || excerpt || headline;
 
   const blogPostingSchemas: Record<string, unknown>[] = posts.map((post) => {
-    const headline = stripHtml(post.title.rendered);
+    const postHeadline = stripHtml(post.title.rendered);
     const imageUrl = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url as
       | string
       | undefined;
     const authorName = post._embedded?.author?.[0]?.name as string | undefined;
-    const excerpt = stripHtml(post.excerpt.rendered);
+    const postExcerpt = stripHtml(post.excerpt.rendered);
     const articleUrl = upgradeHttpToHttpsUrl(`${origin}/blog/${post.slug}`);
     const blogPosting: Record<string, unknown> = {
       "@type": "BlogPosting",
       "@id": `${articleUrl}#article`,
-      headline,
+      headline: postHeadline,
       url: articleUrl,
       datePublished: post.date,
       dateModified: post.modified,
@@ -109,7 +123,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
     blogPosting.author = authorName
       ? { "@type": "Person", name: authorName }
       : { "@id": `${origin}/#organization` };
-    if (excerpt) blogPosting.description = excerpt;
+    if (postExcerpt) blogPosting.description = postExcerpt;
     return blogPosting;
   });
 
@@ -125,7 +139,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
     {
       "@type": "Blog",
       "@id": blogEntityId,
-      name: "Used Car Guides for Brisbane Buyers",
+      name: pageTitle,
       description: pageDescription,
       url: blogCanonicalHttps,
       inLanguage: "en-AU",
@@ -164,7 +178,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
         {
           "@type": "ListItem",
           position: 2,
-          name: "Blog",
+          name: headline,
           item: listingPageHttps,
         },
       ],
@@ -175,28 +189,17 @@ export default async function Blog({ searchParams }: BlogPageProps) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <section className="cs-page-hero py-5">
-        <div className="container py-lg-4">
-          <div className="row g-4 align-items-center">
-            <div className="col-lg-7">
-              {/* <span className="badge cs-hero-chip cs-pill px-3 py-2 mb-3">
-                Car Sales Brisbane Blog
-              </span> */}
-              <h1 className="display-5 fw-bold mb-3 cs-title-tight">
-                Used Car Guides for Brisbane Buyers
-              </h1>
-              <p className="lead mb-0">
-                Explore guides on car finance, used cars under $15000, cheap
-                cars for sale Brisbane buyers can compare, family SUVs, and the
-                best used 4x4s and utes for sale in Brisbane.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {cmsPage.content?.rendered?.trim() ? (
+        <div
+          className=""
+          dangerouslySetInnerHTML={{
+            __html: repairWpRenderedHtml(cmsPage.content.rendered),
+          }}
+        />
+      ) : null}
+
       <section className="bg-white">
         <div className="container py-5">
-          {/* API Error */}
           {apiError && (
             <div className="alert alert-warning text-center mb-4">
               <strong>Note:</strong> Unable to connect to WordPress API. Please
@@ -204,7 +207,6 @@ export default async function Blog({ searchParams }: BlogPageProps) {
             </div>
           )}
 
-          {/* Blog Posts Grid */}
           <div className="container">
             {posts.length > 0 ? (
               <>
@@ -219,7 +221,6 @@ export default async function Blog({ searchParams }: BlogPageProps) {
                   ))}
                 </div>
 
-                {/* Pagination */}
                 {(hasNextPage || hasPrevPage) && (
                   <div className="d-flex justify-content-center align-items-center gap-2 mt-5">
                     {hasPrevPage && (

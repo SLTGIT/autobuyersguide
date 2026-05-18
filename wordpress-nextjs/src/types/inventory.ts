@@ -118,3 +118,6 @@ export type InventorySort =
   | "year-desc"
   | "year-asc"
   | "odometer-asc";
+
+/** Default SRP sort; omitted from listing URLs when unchanged. */
+export const DEFAULT_INVENTORY_SORT: InventorySort = "year-desc";

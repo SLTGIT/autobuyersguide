@@ -1,5 +1,9 @@
 import type { DealerVehicle } from "@/types/inventory";
-import type { InventoryFilterState, InventorySort } from "@/types/inventory";
+import {
+  DEFAULT_INVENTORY_SORT,
+  type InventoryFilterState,
+  type InventorySort,
+} from "@/types/inventory";
 import { slugifyInventoryPart } from "@/lib/inventory/slug";
 import {
   mergePathAugmentIntoFilters,
@@ -41,7 +45,7 @@ export function parseInventorySearchParams(
   const sortRaw = toStr(raw.sort).toLowerCase();
   const sort = SORTS.includes(sortRaw as InventorySort)
     ? (sortRaw as InventorySort)
-    : "best";
+    : DEFAULT_INVENTORY_SORT;
 
   /** List/grid is client-only (not in the URL). */
   const view: "grid" | "list" = "list";
@@ -338,7 +342,7 @@ export function serializeInventoryFilters(
     p.set("minYear", String(f.minYear));
   if (!omit.has("maxYear") && f.maxYear !== null)
     p.set("maxYear", String(f.maxYear));
-  if (f.sort !== "best") p.set("sort", f.sort);
+  if (f.sort !== DEFAULT_INVENTORY_SORT) p.set("sort", f.sort);
   if (f.page > 1) p.set("page", String(f.page));
   return p.toString();
 }

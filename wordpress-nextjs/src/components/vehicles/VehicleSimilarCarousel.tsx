@@ -71,7 +71,10 @@ export default function VehicleSimilarCarousel({ items }: VehicleSimilarCarousel
         </div>
       </div>
       <div className="vdp-similar-scroller" ref={scrollerRef} role="list">
-        {items.map((car) => (
+        {items.map((car) => {
+          const isUsed = car.condition.trim().toLowerCase() === "used";
+
+          return (
           <article key={car.slug} className="vdp-similar-card" role="listitem">
             <Link href={`/cars/${car.slug}`} className="vdp-similar-card-link">
               <div className="vdp-similar-card-media">
@@ -86,16 +89,16 @@ export default function VehicleSimilarCarousel({ items }: VehicleSimilarCarousel
                 ) : (
                   <div className="vdp-similar-card-placeholder">No image</div>
                 )}
-                <span
-                  className={`vdp-similar-badge ${
-                    car.condition.toLowerCase() === "new" ? "is-new" : "is-used"
-                  }`}
-                >
-                  {car.condition}
-                </span>
               </div>
               <div className="vdp-similar-card-body">
-                <h3 className="vdp-similar-card-title">{similarCardHeadline(car)}</h3>
+                <div className="vdp-similar-card-title-block">
+                  {isUsed ? (
+                    <span className="inventory-card-used-badge">Used</span>
+                  ) : null}
+                  <h3 className="vdp-similar-card-title">
+                    {similarCardHeadline(car)}
+                  </h3>
+                </div>
                 <div className="vdp-similar-card-tags-wrap">
                   {car.tags.length > 0 ? (
                     <ul className="vdp-similar-card-tags mb-1">
@@ -122,7 +125,8 @@ export default function VehicleSimilarCarousel({ items }: VehicleSimilarCarousel
               </div>
             </Link>
           </article>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

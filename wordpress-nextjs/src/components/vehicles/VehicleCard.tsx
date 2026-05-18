@@ -41,9 +41,12 @@ export default function VehicleCard({
     .filter(Boolean)
     .join(" ");
 
+  const usedBadge = isUsed ? (
+    <span className="inventory-card-used-badge">Used</span>
+  ) : null;
+
   const imageWrap = (
     <div className="inventory-card-image-wrap">
-      {isUsed ? <span className="inventory-card-used-badge">Used</span> : null}
       <Link href={href} className="inventory-card-media-link">
         {listing.featured_image ? (
           <Image
@@ -76,6 +79,7 @@ export default function VehicleCard({
         {imageWrap}
         <div className="inventory-card-list-main">
           <div className="inventory-card-title-block inventory-card-title-block--list">
+            {usedBadge}
             <Link
               href={href}
               className="inventory-card-headline-link inventory-card-headline-link--list"
@@ -192,6 +196,7 @@ export default function VehicleCard({
       <div className="inventory-card-body">
         <div className="inventory-card-main">
           <div className="inventory-card-title-block">
+            {usedBadge}
             <Link href={href} className="inventory-card-headline-link">
               <h3 className="inventory-card-headline">{headline}</h3>
             </Link>

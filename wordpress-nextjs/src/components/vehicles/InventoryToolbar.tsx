@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import type { InventoryFilterState, InventorySort } from "@/types/inventory";
+import { DEFAULT_INVENTORY_SORT } from "@/types/inventory";
 import {
   parseInventorySearchParams,
   urlSearchParamsToRecord,
@@ -50,7 +51,7 @@ export default function InventoryToolbar({
             className="inventory-sort-select"
             value={sort}
             onChange={(e) =>
-              setSort((e.target.value || "best") as InventorySort)
+              setSort((e.target.value || DEFAULT_INVENTORY_SORT) as InventorySort)
             }
             aria-label="Sort by"
           >
