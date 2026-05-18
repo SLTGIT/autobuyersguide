@@ -64,7 +64,7 @@ export default function Footer() {
       <div className="copyright-text">
         <div className="copyright-text-container">
           <div className="copyright-text-content text-center">
-            <p className=" mb-1 text-white-50 fs-6 fw-normal">
+            <p className=" mb-1 text-white-50 fw-normal">
               Car Sales Brisbane - Car Dealership in Australia - Copyright
               &copy; {currentYear} All rights reserved.
             </p>
