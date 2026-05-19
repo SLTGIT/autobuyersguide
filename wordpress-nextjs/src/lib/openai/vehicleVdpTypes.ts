@@ -75,6 +75,8 @@ export interface VehicleVdpAiBreakdownCard {
 export interface VehicleVdpAiContent {
   heroBadge: string;
   heroLead: string;
+  /** Short feature pills for "Key highlights" (from comments/description). */
+  highlightChips: string[];
   overviewParagraphs: string[];
   /** Core listing fields — same card as "Car details" on the reference VDP. */
   carDetailsRows: VehicleVdpAiSpecRow[];
@@ -84,6 +86,9 @@ export interface VehicleVdpAiContent {
   featureItems: VehicleVdpAiFeatureItem[];
   quickBuyer: VehicleVdpAiQuickBuyer;
   dealerBreakdownCards: VehicleVdpAiBreakdownCard[];
+  /** Full rewritten dealer comments (paragraphs + optional feature bullets). */
+  dealerCommentsParagraphs: string[];
+  dealerCommentsBullets: string[];
   faqs: VehicleVdpAiFaq[];
   goodNextStep: string;
   /** Unique segment before ` | Car Sales Brisbane` (HTML `<title>`); filled by AI + server fallback. */

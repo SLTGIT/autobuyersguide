@@ -20,8 +20,7 @@ export interface SimilarCarItem {
 }
 
 function similarCardHeadline(car: SimilarCarItem): string {
-  const y =
-    car.year != null && car.year > 0 ? String(car.year) : "";
+  const y = car.year != null && car.year > 0 ? String(car.year) : "";
   const mk = car.make?.trim();
   const md = car.model?.trim();
   const parts = [y, mk, md].filter(Boolean);
@@ -31,22 +30,33 @@ function similarCardHeadline(car: SimilarCarItem): string {
 
 interface VehicleSimilarCarouselProps {
   items: SimilarCarItem[];
+  /** Narrower cards + layout tweaks when rendered in the VDP right sidebar. */
+  variant?: "carousel" | "sidebar";
 }
 
-export default function VehicleSimilarCarousel({ items }: VehicleSimilarCarouselProps) {
+export default function VehicleSimilarCarousel({
+  items,
+  variant = "carousel",
+}: VehicleSimilarCarouselProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const isSidebar = variant === "sidebar";
 
   const scrollBy = (dir: -1 | 1) => {
     const el = scrollerRef.current;
     if (!el) return;
-    const w = el.clientWidth * 0.85;
-    el.scrollBy({ left: dir * w, behavior: "smooth" });
+    const card = el.querySelector<HTMLElement>(".vdp-similar-card");
+    const gap = isSidebar ? 12 : 16;
+    const step = card ? card.offsetWidth + gap : el.clientWidth * 0.85;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
   };
 
   if (items.length === 0) return null;
 
   return (
-    <section className="vdp-similar" aria-labelledby="vdp-similar-heading">
+    <section
+      className={`vdp-similar${isSidebar ? " vdp-similar--sidebar" : ""}`}
+      aria-labelledby="vdp-similar-heading"
+    >
       <div className="vdp-similar-head">
         <h2 id="vdp-similar-heading" className="vdp-similar-title">
           Similar cars in stock
@@ -56,7 +66,7 @@ export default function VehicleSimilarCarousel({ items }: VehicleSimilarCarousel
             type="button"
             className="vdp-carousel-btn"
             onClick={() => scrollBy(-1)}
-            aria-label="Previous"
+            aria-label="Previous similar vehicle"
           >
             ‹
           </button>
@@ -64,17 +74,14 @@ export default function VehicleSimilarCarousel({ items }: VehicleSimilarCarousel
             type="button"
             className="vdp-carousel-btn"
             onClick={() => scrollBy(1)}
-            aria-label="Next"
+            aria-label="Next similar vehicle"
           >
             ›
           </button>
         </div>
       </div>
       <div className="vdp-similar-scroller" ref={scrollerRef} role="list">
-        {items.map((car) => {
-          const isUsed = car.condition.trim().toLowerCase() === "used";
-
-          return (
+        {items.map((car) => (
           <article key={car.slug} className="vdp-similar-card" role="listitem">
             <Link href={`/cars/${car.slug}`} className="vdp-similar-card-link">
               <div className="vdp-similar-card-media">
@@ -92,9 +99,6 @@ export default function VehicleSimilarCarousel({ items }: VehicleSimilarCarousel
               </div>
               <div className="vdp-similar-card-body">
                 <div className="vdp-similar-card-title-block">
-                  {isUsed ? (
-                    <span className="inventory-card-used-badge">Used</span>
-                  ) : null}
                   <h3 className="vdp-similar-card-title">
                     {similarCardHeadline(car)}
                   </h3>
@@ -125,8 +129,7 @@ export default function VehicleSimilarCarousel({ items }: VehicleSimilarCarousel
               </div>
             </Link>
           </article>
-          );
-        })}
+        ))}
       </div>
     </section>
   );

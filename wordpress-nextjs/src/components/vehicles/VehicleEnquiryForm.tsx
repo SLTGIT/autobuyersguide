@@ -303,7 +303,7 @@ export default function VehicleEnquiryForm({
           </div>
         </div>
 
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label className="cs-contact-form__label" htmlFor={`${idPrefix}-msg`}>
             Comments
             <span className="cs-contact-form__req" aria-hidden>
@@ -322,9 +322,9 @@ export default function VehicleEnquiryForm({
               setComments(e.target.value)
             }
           />
-        </div>
+        </div> */}
 
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label
             className="cs-contact-form__label"
             htmlFor={`${idPrefix}-dealer`}
@@ -351,7 +351,7 @@ export default function VehicleEnquiryForm({
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
 
         <div className="form-check cs-contact-form__subscribe mb-4">
           <input

@@ -147,8 +147,6 @@ export default async function VehicleDetailPage({
 
   const dealerPhone = process.env.NEXT_PUBLIC_DEALER_PHONE || "0418 908 870";
   const telHref = `tel:${dealerPhone.replace(/\s/g, "")}`;
-  const financeHref = "/finance-centre";
-
   const enquiryItemImage = absoluteAssetUrl(featured, shareUrl);
   const enquiryItem = {
     image: enquiryItemImage,
@@ -169,25 +167,13 @@ export default async function VehicleDetailPage({
     condLower === "new" ? "/search?condition=New" : "/search?condition=Used";
   const catalogLabel = condLower === "new" ? "New Cars" : "Used Cars";
   const breadcrumbMake = (v.Make?.trim() || listing.make || "").trim();
-  const breadcrumbModel = (v.Model?.trim() || listing.model || "").trim();
-  const breadcrumbMakeHref =
-    breadcrumbMake && breadcrumbModel
-      ? inventoryListingQueryHref({
-          ...parseInventorySearchParams({}),
-          make: breadcrumbMake.toLowerCase(),
-          model: breadcrumbModel.toLowerCase(),
-          page: 1,
-        })
-      : breadcrumbMake
-        ? inventoryListingQueryHref({
-            ...parseInventorySearchParams({}),
-            make: breadcrumbMake.toLowerCase(),
-            page: 1,
-          })
-        : "/search";
-  const breadcrumbCurrent =
-    breadcrumbModel ||
-    (headline.length > 70 ? `${headline.slice(0, 67)}…` : headline);
+  const breadcrumbMakeHref = breadcrumbMake
+    ? inventoryListingQueryHref({
+        ...parseInventorySearchParams({}),
+        make: breadcrumbMake.toLowerCase(),
+        page: 1,
+      })
+    : "/search";
 
   const priceMain =
     listing.show_drive_away && listing.drive_away_price
@@ -228,11 +214,9 @@ export default async function VehicleDetailPage({
         catalogLabel={catalogLabel}
         breadcrumbMake={breadcrumbMake}
         breadcrumbMakeHref={breadcrumbMakeHref}
-        breadcrumbCurrent={breadcrumbCurrent}
         telHref={telHref}
         dealerPhone={dealerPhone}
         enquiryItem={enquiryItem}
-        financeHref={financeHref}
         similarItems={similar}
       />
     </>

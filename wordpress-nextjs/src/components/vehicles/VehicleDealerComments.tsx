@@ -75,7 +75,13 @@ function renderBlock(block: DealerCommentBlock, key: number, paraIndex: number) 
   }
 }
 
-export default function VehicleDealerComments({ text }: { text: string }) {
+export default function VehicleDealerComments({
+  text,
+  hideHeading = false,
+}: {
+  text: string;
+  hideHeading?: boolean;
+}) {
   const blocks = parseDealerCommentsBlocks(text);
   if (blocks.length === 0) return null;
 
@@ -83,11 +89,16 @@ export default function VehicleDealerComments({ text }: { text: string }) {
   return (
     <section
       className="inventory-vdp-comments vdp-dealer-comments dealer-comments"
-      aria-labelledby="dealer-comments-heading"
+      aria-labelledby={hideHeading ? undefined : "dealer-comments-heading"}
     >
-      <h2 id="dealer-comments-heading" className="vdp-section-heading dealer-comments__heading">
-        Dealer comments
-      </h2>
+      {hideHeading ? null : (
+        <h2
+          id="dealer-comments-heading"
+          className="vdp-section-heading dealer-comments__heading"
+        >
+          Dealer comments
+        </h2>
+      )}
       <div className="inventory-vdp-comments-body dealer-comments__body">
         {blocks.map((block, i) => {
           if (block.type === "paragraph") {

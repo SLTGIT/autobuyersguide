@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { unstable_cache } from "next/cache";
+import { parseDealerCommentsBlocks } from "@/lib/inventory/dealer-comments";
 import { splitVehicleDescription } from "@/lib/inventory/transform";
 import type {
   VehicleVdpAiBreakdownCard,
@@ -20,6 +21,7 @@ import {
 } from "./vehicleVdpDisplayUtils";
 
 const VDP_AI_REVALIDATE_SEC = 2592000; //  1 month
+const VDP_MAX_FAQS = 6;
 
 /** Hero pill should summarise year/condition/body/fuel — not warranty marketing. */
 function sanitizeHeroBadgeForDisplay(badge: string): string {
@@ -338,35 +340,162 @@ function parseFaq(o: unknown): VehicleVdpAiFaq | null {
   return { question: q, answer: a };
 }
 
-/** Warranty + on-vehicle spec questions belong in spec cards / dealer chat, not this FAQ list. */
+/** Exclude only warranty marketing FAQs; listing-specific spec Q&A is allowed. */
 function shouldExcludeVdpFaqQuestion(question: string): boolean {
-  const s = question.trim();
-  const t = s.toLowerCase();
-  if (/\bwarranty\b|\bwarranties\b/i.test(t)) return true;
-  if (/\btowing\b|\btow\s+rating\b|\btow\s+capacity\b|\bmax(imum)?\s+tow\b/i.test(t))
-    return true;
-  if (/\bhow much\b[^?.]{0,40}\b(tow|pull|haul)\b/i.test(t)) return true;
-  if (
-    /\b(fuel economy|fuel consumption|l\/100|litres per 100)\b/i.test(t) &&
-    /\b(this|that|the)\s+(vehicle|car|model|truck|ute|van|suv)\b/i.test(t)
-  )
-    return true;
-  if (
-    /\b(what|how)\s+(is|are)\s+the\s+(towing|payload|gvm|dimensions?|wheelbase|engine|torque|power|kw|kerb|tare)\b/i.test(
-      t
-    )
-  )
-    return true;
-  if (
-    /\b(payload|gvm|kerb|tare|dimensions?|wheelbase)\b/i.test(t) &&
-    /\b(this|that|the)\s+(vehicle|car|model|truck|ute|van|suv)\b/i.test(t)
-  )
-    return true;
-  return false;
+  const t = question.trim().toLowerCase();
+  return /\bwarranty\b|\bwarranties\b/i.test(t);
+}
+
+function parseStringList(raw: unknown, max = 24): string[] {
+  if (!Array.isArray(raw)) return [];
+  const out: string[] = [];
+  for (const item of raw) {
+    if (typeof item !== "string") continue;
+    const t = item.trim();
+    if (t && !out.includes(t)) out.push(t);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+function listingCommentSourceText(snapshot: VehicleVdpSnapshot): string {
+  const comments = snapshot.comments.trim();
+  const description = snapshot.description.trim();
+  if (comments && description && comments !== description) {
+    return `${comments}\n\n${description}`;
+  }
+  return comments || description;
+}
+
+/** Full structured copy from raw feed (fallback when AI output is too thin). */
+export function buildDealerCommentsFromRawListing(snapshot: VehicleVdpSnapshot): {
+  dealerCommentsParagraphs: string[];
+  dealerCommentsBullets: string[];
+} {
+  const source = listingCommentSourceText(snapshot);
+  if (!source) {
+    return {
+      dealerCommentsParagraphs: [
+        "Contact Car Sales Brisbane for the dealer's full comments on this vehicle.",
+      ],
+      dealerCommentsBullets: [],
+    };
+  }
+
+  const blocks = parseDealerCommentsBlocks(source);
+  const paragraphs: string[] = [];
+  const bullets: string[] = [];
+
+  for (const block of blocks) {
+    switch (block.type) {
+      case "paragraph":
+        if (block.text.trim()) paragraphs.push(block.text.trim());
+        break;
+      case "featureList":
+        for (const item of block.items) {
+          const t = item.trim();
+          if (t && !bullets.includes(t)) bullets.push(t);
+        }
+        break;
+      case "badges":
+        for (const item of block.items) {
+          const t = item.trim();
+          if (t && !bullets.includes(t)) bullets.push(t);
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  if (!paragraphs.length && !bullets.length) {
+    const split = splitVehicleDescription(source);
+    return {
+      dealerCommentsParagraphs: split.length ? split : [source],
+      dealerCommentsBullets: [],
+    };
+  }
+
+  return {
+    dealerCommentsParagraphs: paragraphs,
+    dealerCommentsBullets: bullets.slice(0, 24),
+  };
+}
+
+/** Prefer full AI rewrite; fall back to raw listing if AI trimmed too much. */
+export function resolveDealerCommentsContent(
+  content: VehicleVdpAiContent,
+  snapshot: VehicleVdpSnapshot
+): Pick<VehicleVdpAiContent, "dealerCommentsParagraphs" | "dealerCommentsBullets"> {
+  const raw = buildDealerCommentsFromRawListing(snapshot);
+  const aiParagraphs = content.dealerCommentsParagraphs
+    .map((p) => p.trim())
+    .filter(Boolean);
+  const aiBullets = content.dealerCommentsBullets
+    .map((b) => b.trim())
+    .filter(Boolean);
+
+  const sourceLen = listingCommentSourceText(snapshot).length;
+  const aiLen = aiParagraphs.join("").length + aiBullets.join("").length;
+  const minChars = sourceLen >= 280 ? Math.floor(sourceLen * 0.5) : 0;
+
+  const useAi =
+    aiParagraphs.length > 0 && (sourceLen < 280 || aiLen >= minChars);
+
+  if (useAi) {
+    return {
+      dealerCommentsParagraphs: aiParagraphs.slice(0, 12),
+      dealerCommentsBullets: aiBullets.slice(0, 24),
+    };
+  }
+
+  return raw;
+}
+
+function parseHighlightChips(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const out: string[] = [];
+  for (const item of raw) {
+    if (typeof item !== "string") continue;
+    const t = item.trim();
+    if (t && !out.includes(t)) out.push(t);
+    if (out.length >= 20) break;
+  }
+  return out;
+}
+
+function deriveHighlightChipsFromFeatures(
+  items: VehicleVdpAiFeatureItem[]
+): string[] {
+  const chips: string[] = [];
+  for (const it of items) {
+    const label = it.label.trim();
+    const value = it.value.trim();
+    const chip =
+      label && value && !/^equipment$/i.test(label)
+        ? `${label}: ${value}`
+        : value || label;
+    if (chip && chip.length <= 72 && !chips.includes(chip)) chips.push(chip);
+    if (chips.length >= 16) break;
+  }
+  return chips;
+}
+
+function ensureHighlightChips(content: VehicleVdpAiContent): string[] {
+  if (content.highlightChips.length >= 4) return content.highlightChips.slice(0, 20);
+  const derived = deriveHighlightChipsFromFeatures(content.featureItems);
+  const merged = [...content.highlightChips];
+  for (const c of derived) {
+    if (!merged.includes(c)) merged.push(c);
+    if (merged.length >= 16) break;
+  }
+  return merged;
 }
 
 function filterExcludedVdpFaqs(faqs: VehicleVdpAiFaq[]): VehicleVdpAiFaq[] {
-  return faqs.filter((f) => !shouldExcludeVdpFaqQuestion(f.question));
+  return faqs
+    .filter((f) => !shouldExcludeVdpFaqQuestion(f.question))
+    .slice(0, VDP_MAX_FAQS);
 }
 
 function parseBreakdown(o: unknown): VehicleVdpAiBreakdownCard | null {
@@ -506,9 +635,28 @@ export function parseVehicleVdpAiContent(raw: unknown): VehicleVdpAiContent | nu
   if (Array.isArray(faqsRaw)) {
     for (const f of faqsRaw) {
       const faq = parseFaq(f);
-      if (faq) faqs.push(faq);
+      if (faq) {
+        faqs.push(faq);
+        if (faqs.length >= VDP_MAX_FAQS) break;
+      }
     }
   }
+
+  const highlightChips = parseHighlightChips(
+    (raw as { highlightChips?: unknown }).highlightChips ??
+      (raw as { keyHighlights?: unknown }).keyHighlights
+  );
+
+  const dealerCommentsParagraphs = parseStringList(
+    (raw as { dealerCommentsParagraphs?: unknown }).dealerCommentsParagraphs ??
+      (raw as { optimizedDealerComments?: unknown }).optimizedDealerComments,
+    12
+  );
+  const dealerCommentsBullets = parseStringList(
+    (raw as { dealerCommentsBullets?: unknown }).dealerCommentsBullets ??
+      (raw as { dealerCommentFeatures?: unknown }).dealerCommentFeatures,
+    24
+  );
 
   const goodNextStep = (raw as { goodNextStep?: unknown }).goodNextStep;
   if (typeof goodNextStep !== "string") return null;
@@ -534,12 +682,15 @@ export function parseVehicleVdpAiContent(raw: unknown): VehicleVdpAiContent | nu
   return applyRuntimeVehicleVdpCoercion({
     heroBadge,
     heroLead,
+    highlightChips,
     overviewParagraphs: paras.length ? paras : [heroLead],
     carDetailsRows,
     engineTowingRows,
     featureItems,
     quickBuyer,
     dealerBreakdownCards,
+    dealerCommentsParagraphs,
+    dealerCommentsBullets,
     faqs,
     goodNextStep,
     metaDescription: metaStr,
@@ -570,6 +721,12 @@ function applyRuntimeVehicleVdpCoercion(
 
   const faqs = filterExcludedVdpFaqs(content.faqs);
   const heroBadge = sanitizeHeroBadgeForDisplay(content.heroBadge);
+  const highlightChips = ensureHighlightChips({
+    ...content,
+    featureItems,
+    carDetailsRows,
+    engineTowingRows,
+  });
 
   return {
     ...content,
@@ -580,6 +737,13 @@ function applyRuntimeVehicleVdpCoercion(
     carDetailsRows,
     engineTowingRows,
     faqs,
+    highlightChips,
+    dealerCommentsParagraphs: content.dealerCommentsParagraphs
+      .map((p) => p.trim())
+      .filter(Boolean),
+    dealerCommentsBullets: content.dealerCommentsBullets
+      .map((b) => b.trim())
+      .filter(Boolean),
   };
 }
 
@@ -690,9 +854,40 @@ export function fallbackVehicleVdpAiContent(
     });
   }
 
+  const highlightChips = fromComments
+    .concat(fromDesc)
+    .map((s) => s.replace(/\s+/g, " ").trim())
+    .filter((s) => s.length > 8 && s.length <= 72)
+    .slice(0, 12);
+
+  const { dealerCommentsParagraphs, dealerCommentsBullets } =
+    buildDealerCommentsFromRawListing(snapshot);
+
+  const listingFaqs: VehicleVdpAiFaq[] = [
+    {
+      question: `What equipment is mentioned for this ${snapshot.year} ${snapshot.make} ${snapshot.model}?`,
+      answer:
+        fromComments[0] ||
+        fromDesc[0] ||
+        "The dealer listing may not list every feature online. Ask for a walk-through of infotainment, safety, and comfort items when you inspect the vehicle.",
+    },
+    {
+      question: `What is the odometer on this ${snapshot.make}?`,
+      answer:
+        snapshot.odometerKm != null && snapshot.odometerKm > 0
+          ? `The listing shows ${snapshot.odometerKm.toLocaleString("en-AU")} km. Confirm the odometer reading on the compliance plate and in the service history at inspection.`
+          : "Odometer was not supplied in the feed — confirm the reading with the dealer before purchase.",
+    },
+    {
+      question: `Is this ${snapshot.condition.toLowerCase()} ${snapshot.make} still available?`,
+      answer: `Stock ${snapshot.stockNumber}. Contact Car Sales Brisbane to confirm availability, hold the vehicle, and arrange a viewing.`,
+    },
+  ];
+
   return {
     heroBadge,
     heroLead: `${snapshot.condition} ${snapshot.make} ${snapshot.model} — confirm all details with the dealer.`,
+    highlightChips,
     overviewParagraphs,
     carDetailsRows,
     engineTowingRows,
@@ -706,21 +901,14 @@ export function fallbackVehicleVdpAiContent(
       searchIntent: `${snapshot.condition} ${snapshot.make}, ${snapshot.bodyType || "car"} Brisbane.`,
     },
     dealerBreakdownCards: cards.slice(0, 3),
+    dealerCommentsParagraphs,
+    dealerCommentsBullets,
     faqs: [
-      {
-        question: `What should I check before buying this ${snapshot.make}?`,
-        answer:
-          "Review service records, inspect tyres and brakes, confirm there is no finance owing, verify the spare keys and owner’s manuals, and take a test drive on roads you normally use. A pre-purchase inspection by an independent mechanic is strongly recommended.",
-      },
+      ...listingFaqs,
       {
         question: "Can I get finance on this vehicle?",
         answer:
           "Finance is subject to lender approval, your credit profile, and the vehicle’s age and mileage. Contact the dealer for a tailored quote and to understand fees, balloon options, and early payout terms.",
-      },
-      {
-        question: "Is the advertised price negotiable?",
-        answer:
-          "Pricing policies vary by dealer and market conditions. Ask whether the price includes dealer delivery or optional extras, and request a drive-away figure in writing before you visit.",
       },
     ],
     goodNextStep:
@@ -732,13 +920,16 @@ export function fallbackVehicleVdpAiContent(
 
 const JSON_INSTRUCTION = `Return a single JSON object only (no markdown). Required keys:
 - heroBadge (string): short pill from REAL listing fields only, e.g. "2019 · Used · SUV · Diesel" (year · condition · body · fuel as available). For fuel, use a short buyer-facing label (e.g. "Petrol", "Diesel", "Hybrid") — not long DMS strings like "Petrol - Unleaded". Never output template words like "condition", "body type", "fuel", or "year" as literals. Do NOT mention warranty. heroLead (string): one-line hook under the title.
-- overviewParagraphs (array of 2 strings)
+- highlightChips (array of 8–16 strings): short buyer-facing feature pills (max ~60 chars each) extracted from listing comments/description and implied equipment — e.g. "Apple CarPlay", "Reversing camera", "Leather seats". Do not invent features not supported by the listing text; use "Usually fitted" only when the model generation commonly has it and comments are silent.
+- overviewParagraphs (array of 2 strings): brief marketing overview for Car details tab only — not the dealer comments section.
 - carDetailsRows: array of { label, value, sourceTag ("listing"|"inferred"|"mixed"), icon? }. Cover Condition, Year, Odometer, Transmission, Body, Fuel, Drive, Colour, Doors, Seats when the listing supports it; omit unknowns. Optional icon = Bootstrap Icons suffix only (e.g. speedometer2).
 - engineTowingRows: same row shape as carDetailsRows; every row MUST include non-empty "label", non-empty "value", "sourceTag", and "icon" (Bootstrap Icons suffix). Output 6–12 rows (Engine, Transmission, Cylinders, Torque, fuel economy, tank size, Payload, Braked/unbraked towing, Dimensions, Wheelbase, GVM, Compliance, etc.). Use the listing snapshot first. When the snapshot is silent on numbers, you MUST still fill these rows using your knowledge of that generation for the Australian market (match year, make, model, body type, fuel, transmission, drive from the snapshot). Mark those rows sourceTag "inferred" or "mixed". Write compact "value" text: lead with the figure or fact, then optional "— confirm with dealer" (e.g. "~9.0 L/100 km — confirm with dealer", "~3200 kg braked — confirm with dealer"). Never use the phrase "Not in listing — typical for this generation:" or "Typical for this generation:" as a prefix. Never leave value empty.
 - featureItems: array of { "label", "value", "icon" } — 10–24 rows. BOTH "label" and "value" MUST be non-empty strings on every object. Derive from listing description/comments when present; when the feed only implies equipment, add common factory features for that model generation from your knowledge (source implied in wording, e.g. "Usually fitted: … — confirm with dealer"). "label" = short category (e.g. "Climate", "Audio", "Safety"); "value" = specific spec. "icon" = distinct Bootstrap Icons suffix (volume-up, snow, bluetooth, usb-symbol, shield-check, camera-video, etc.). Do not output objects with only "icon". Do not use { "text" } without splitting into label+value unless "text" contains a colon (then split on first colon).
 - quickBuyer: { title, body, bestFor, checkFirst, searchIntent }
 - dealerBreakdownCards: exactly 3 { title, body }
-- faqs: 4–7 { question, answer } for Australian buyers: finance eligibility, inspection / pre-purchase checklist, price negotiation, delivery or trade-in, service history, rego transfer, common risks. Do NOT include FAQs about warranty, towing capacity, payload/GVM, dimensions, fuel figures, engine specs, or any other on-vehicle specification (those belong in the spec sections above). Answers 2–5 sentences; ground in listing text when possible; include one answer with a concise "top 5 things to check before you buy" list. Tell readers to confirm with the dealer when unsure.
+- dealerCommentsParagraphs (array of 4–8 strings): FULL "Comments from the dealer" body. Rewrite ALL substantive content from listing comments and description into clear Australian English. Use multiple paragraphs (each 2–5 sentences). Include every equipment item, condition note, price/payment mention, inclusion, and selling point from the source — do NOT shorten into a brief summary. Only remove hashtags, asterisk spam, duplicate lines, and shouting. Do not invent history or features. Combined length should be at least half the source text when the source is long.
+- dealerCommentsBullets (array of 0–20 strings): feature/equipment lines as bullets when the source lists them (e.g. "Apple CarPlay", "Leather seats"); empty array if none.
+- faqs: 4–6 { question, answer } about THIS listing for Australian buyers (maximum 6 items). At least half the questions must reference details from comments, description, or snapshot fields (equipment, condition, odometer, fuel, transmission, body, price cues). Include 1–2 practical buying questions (finance, inspection, availability). You MAY answer spec questions (towing, CarPlay, engine) when grounded in listing text or clearly marked "confirm with dealer" for inferred figures. Do NOT invent accident history, one-owner status, or service records not in the listing. No warranty FAQs. Answers 2–5 sentences.
 - goodNextStep (string)
 - seoTitle (string): unique segment for the HTML <title> BEFORE the site suffix (we append " | Car Sales Brisbane" server-side). Max ~52 characters in that segment only. Include year + make + model or a tight variant hook; do not include the suffix text. Aliases accepted: pageTitle, metaTitle.
 - metaDescription (string): required, 140–160 characters for <meta name="description">. Summarise condition, year, model, location or price cue from the listing, and a CTA to view photos / confirm with the dealer. Australian English.
@@ -770,7 +961,7 @@ async function fetchVehicleVdpAiFromOpenAI(
     model,
     response_format: { type: "json_object" },
     temperature: 0.45,
-    max_tokens: 5000,
+    max_tokens: 6000,
     messages: [
       {
         role: "system",
@@ -828,7 +1019,7 @@ const runCachedOpenAi = unstable_cache(
     return fetchVehicleVdpAiFromOpenAI(snapshot);
   },
   // Bump when prompt/schema changes so listings are not stuck on stale AI JSON.
-  ["vehicle-vdp-ai-openai", "v8-seo-title-desc"],
+  ["vehicle-vdp-ai-openai", "v12-faq-max-6"],
   { revalidate: VDP_AI_REVALIDATE_SEC }
 );
 
@@ -842,31 +1033,31 @@ export async function getVehicleVdpAiContent(
     const coerced = applyRuntimeVehicleVdpCoercion(
       fallbackVehicleVdpAiContent(snapshot)
     );
-    const withHero = {
-      ...coerced,
-      heroBadge: buildListingHeroBadge(coerced.heroBadge, snapshot),
-    };
-    return ensureVehicleVdpSeoFields(withHero, snapshot);
+    return ensureVehicleVdpSeoFields(finalizeVehicleVdpAiContent(coerced, snapshot), snapshot);
   }
 
   try {
     const snapshotJson = JSON.stringify(snapshot);
     const content = await runCachedOpenAi(snapshotJson);
     const coerced = applyRuntimeVehicleVdpCoercion(content);
-    const withHero = {
-      ...coerced,
-      heroBadge: buildListingHeroBadge(coerced.heroBadge, snapshot),
-    };
-    return ensureVehicleVdpSeoFields(withHero, snapshot);
+    return ensureVehicleVdpSeoFields(finalizeVehicleVdpAiContent(coerced, snapshot), snapshot);
   } catch (e) {
     console.error("[vehicleVdpCopy]", e);
     const coerced = applyRuntimeVehicleVdpCoercion(
       fallbackVehicleVdpAiContent(snapshot)
     );
-    const withHero = {
-      ...coerced,
-      heroBadge: buildListingHeroBadge(coerced.heroBadge, snapshot),
-    };
-    return ensureVehicleVdpSeoFields(withHero, snapshot);
+    return ensureVehicleVdpSeoFields(finalizeVehicleVdpAiContent(coerced, snapshot), snapshot);
   }
+}
+
+function finalizeVehicleVdpAiContent(
+  content: VehicleVdpAiContent,
+  snapshot: VehicleVdpSnapshot
+): VehicleVdpAiContent {
+  const dealerComments = resolveDealerCommentsContent(content, snapshot);
+  return {
+    ...content,
+    heroBadge: buildListingHeroBadge(content.heroBadge, snapshot),
+    ...dealerComments,
+  };
 }

@@ -499,6 +499,129 @@ function resolveVehicleOfferPriceAud(
   return null;
 }
 
+/** Google Merchant listings: AU pickup / QLD delivery + used-vehicle return policy. */
+const MERCHANT_LISTING_SHIPPING_DETAILS: Record<string, unknown> = {
+  "@type": "OfferShippingDetails",
+  shippingDestination: {
+    "@type": "DefinedRegion",
+    addressCountry: "AU",
+    addressRegion: "QLD",
+  },
+  shippingRate: {
+    "@type": "MonetaryAmount",
+    value: 0,
+    currency: "AUD",
+  },
+  deliveryTime: {
+    "@type": "ShippingDeliveryTime",
+    handlingTime: {
+      "@type": "QuantitativeValue",
+      minValue: 1,
+      maxValue: 5,
+      unitCode: "DAY",
+    },
+    transitTime: {
+      "@type": "QuantitativeValue",
+      minValue: 1,
+      maxValue: 14,
+      unitCode: "DAY",
+    },
+  },
+};
+
+const MERCHANT_LISTING_RETURN_POLICY: Record<string, unknown> = {
+  "@type": "MerchantReturnPolicy",
+  applicableCountry: "AU",
+  returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
+};
+
+function offerMerchantListingFields(): Record<string, unknown> {
+  return {
+    shippingDetails: MERCHANT_LISTING_SHIPPING_DETAILS,
+    hasMerchantReturnPolicy: MERCHANT_LISTING_RETURN_POLICY,
+  };
+}
+
+/** Product description for merchant listings (meta, feed, or synthesized). */
+export function buildVehicleListingDescription(
+  listing: VehicleListing,
+  v: DealerVehicle,
+  preferred?: string,
+): string {
+  const preferredClean = stripHtml(preferred || "").trim();
+  if (preferredClean.length >= 40) return preferredClean.slice(0, 5000);
+
+  const feedDesc = stripHtml(
+    [v.Description, v.Comments].filter(Boolean).join(" "),
+  ).trim();
+  if (feedDesc.length >= 40) return feedDesc.slice(0, 5000);
+
+  const condition = (listing.condition || "used").toLowerCase();
+  const year = listing.year || v.ManufactureYear;
+  const make = (listing.make || v.Make || "").trim();
+  const model = (listing.model || v.Model || "").trim();
+  const title = listing.title.trim();
+  const odo =
+    listing.odometer != null && listing.odometer > 0
+      ? `${Math.round(listing.odometer).toLocaleString("en-AU")} km`
+      : null;
+  const priceCue = listing.formatted_price?.trim();
+
+  const headline =
+    title || [year, make, model].filter(Boolean).join(" ").trim();
+  const vehicleLine = [
+    condition === "new" ? "New" : "Used",
+    [make, model].filter(Boolean).join(" "),
+    year ? `(${year})` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const parts = [
+    headline,
+    vehicleLine
+      ? `${vehicleLine} for sale at Car Sales Brisbane, Ormiston QLD.`
+      : "For sale at Car Sales Brisbane, Ormiston QLD.",
+    odo ? `Odometer ${odo}.` : null,
+    priceCue ? `Listed at ${priceCue}.` : null,
+    "Enquire online for finance options and Queensland-wide delivery.",
+  ].filter(Boolean);
+
+  return parts.join(" ").replace(/\s+/g, " ").trim().slice(0, 5000);
+}
+
+function buildVehicleOfferJsonLd(input: {
+  productUrl: string;
+  priceVal: number;
+  itemCondition: string;
+  sellerId: string;
+  offerId?: string;
+  priceSpecDescription?: string;
+}): Record<string, unknown> {
+  const offer: Record<string, unknown> = {
+    "@type": "Offer",
+    ...(input.offerId ? { "@id": input.offerId } : {}),
+    url: input.productUrl,
+    price: String(input.priceVal),
+    priceCurrency: "AUD",
+    availability: "https://schema.org/InStock",
+    itemCondition: input.itemCondition,
+    seller: { "@id": input.sellerId },
+    ...offerMerchantListingFields(),
+  };
+
+  if (input.priceSpecDescription) {
+    offer.priceSpecification = {
+      "@type": "PriceSpecification",
+      price: String(input.priceVal),
+      priceCurrency: "AUD",
+      description: input.priceSpecDescription,
+    };
+  }
+
+  return offer;
+}
+
 /**
  * Product + Vehicle JSON-LD for inventory / VDP (Rich Results–friendly).
  */
@@ -555,10 +678,13 @@ export function vehicleJsonLdFromInventory(
       ? String(modelYear)
       : undefined;
 
+  const description = buildVehicleListingDescription(listing, v);
+
   const node: Record<string, unknown> = {
     "@type": ["Product", "Vehicle"],
     "@id": `${productUrl}#vehicle`,
     name: listing.title,
+    description,
     url: productUrl,
     category: categoryLabel,
     itemCondition,
@@ -603,15 +729,13 @@ export function vehicleJsonLdFromInventory(
   if (driveWheel) node.driveWheelConfiguration = driveWheel;
 
   if (priceVal != null && Number.isFinite(priceVal) && priceVal > 0) {
-    node.offers = {
-      "@type": "Offer",
-      "@id": `${productUrl}#offer`,
-      url: productUrl,
-      price: String(priceVal),
-      priceCurrency: "AUD",
-      availability: "https://schema.org/InStock",
-      seller: { "@id": `${siteOrigin}/#organization` },
-    };
+    node.offers = buildVehicleOfferJsonLd({
+      productUrl,
+      priceVal,
+      itemCondition,
+      sellerId: `${siteOrigin}/#organization`,
+      offerId: `${productUrl}#offer`,
+    });
   }
 
   return Object.fromEntries(
@@ -752,7 +876,11 @@ export function vehicleVdpCarListingGraphJsonLd(
       ? Math.round(Number(listing.odometer))
       : parseInventoryOdometerKm(v.Odometer);
 
-  const desc = stripHtml(input.description || "").trim();
+  const desc = buildVehicleListingDescription(
+    listing,
+    v,
+    input.description,
+  );
   const imageList =
     images.length > 0
       ? images
@@ -761,9 +889,10 @@ export function vehicleVdpCarListingGraphJsonLd(
         : [productUrl];
 
   const car: Record<string, unknown> = {
-    "@type": "Car",
+    "@type": ["Car", "Product"],
     "@id": `${productUrl}#vehicle`,
     name: listing.title,
+    description: desc,
     url: productUrl,
     brand: { "@type": "Brand", name: makeName || "Vehicle" },
     manufacturer: { "@type": "Organization", name: makeName || "Vehicle" },
@@ -781,7 +910,6 @@ export function vehicleVdpCarListingGraphJsonLd(
   if (drivePlain) car.driveWheelConfiguration = drivePlain;
   if (fuel) car.fuelType = fuel;
   if (colour) car.color = colour;
-  if (desc) car.description = desc;
   car.image = imageList;
 
   if (odoKm != null && Number.isFinite(odoKm) && odoKm >= 0) {
@@ -798,21 +926,13 @@ export function vehicleVdpCarListingGraphJsonLd(
       : "Excludes government charges.";
 
   if (priceVal != null && Number.isFinite(priceVal) && priceVal > 0) {
-    car.offers = {
-      "@type": "Offer",
-      url: productUrl,
-      price: String(priceVal),
-      priceCurrency: "AUD",
-      availability: "https://schema.org/InStock",
+    car.offers = buildVehicleOfferJsonLd({
+      productUrl,
+      priceVal,
       itemCondition,
-      seller: { "@id": `${siteOrigin}/#dealer` },
-      priceSpecification: {
-        "@type": "PriceSpecification",
-        price: String(priceVal),
-        priceCurrency: "AUD",
-        description: priceSpecDescription,
-      },
-    };
+      sellerId: `${siteOrigin}/#dealer`,
+      priceSpecDescription,
+    });
   }
 
   const dealer: Record<string, unknown> = {
