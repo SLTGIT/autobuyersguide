@@ -6,7 +6,7 @@ import { dominantUsedCondition } from "@/lib/inventory/popular-body-types";
 import {
   filterDealerVehicles,
   parseInventorySearchParams,
-  inventoryListingQueryHref,
+  inventoryListingHref,
 } from "@/lib/inventory/query";
 import { dealerVehicleToListing } from "@/lib/inventory/transform";
 import { vehicleCardHeadline } from "@/lib/inventory/card-display";
@@ -34,8 +34,7 @@ const CARDS: CardDef[] = [
     image:
       "https://d2s8i866417m9.cloudfront.net/photo/31928718/photo/thumb-ee3aca47fd5d427e2c1c06d01773bd6f.jpg",
     alt: "Used Cars Under 15k Brisbane category image from Statewide Auto Group",
-    // ?maxPrice=15000
-    filters: { maxPrice: 15000, },
+    filters: { maxPrice: 15000 },
   },
   {
     title: "Used 4x4s & Utes Brisbane",
@@ -44,7 +43,6 @@ const CARDS: CardDef[] = [
     image:
       "https://d2s8i866417m9.cloudfront.net/photo/32428698/photo/thumb-232954f40d5f21bf8a4fa35d6daa7a7a.jpg",
     alt: "Used 4x4s and Utes Brisbane category image from Statewide Auto Group",
-    // ?driveType=4WD,4x4
     filters: { driveType: ["4WD", "4x4"] },
   },
   {
@@ -53,18 +51,43 @@ const CARDS: CardDef[] = [
     image:
       "https://d2s8i866417m9.cloudfront.net/photo/21458119/photo/thumb-cd1212b187aac661b7e12bbff1a7acf0.jpg",
     alt: "Used SUVs for Brisbane Families category image from Statewide Auto Group",
-    // ?bodyType=SUV,MPV
     filters: { bodyType: ["SUV"] },
   },
 ];
 
-function categoryHref(filters: CardDef["filters"]): string {
+const PRICE_BUCKET_STEP = 5000;
+
+function categoryHref(
+  filters: CardDef["filters"],
+  vehicles?: DealerVehicle[]
+): string {
   const base = parseInventorySearchParams({});
-  return inventoryListingQueryHref({
+  const state: InventoryFilterState = {
     ...base,
     page: 1,
     ...filters,
-  });
+  };
+
+  let href = inventoryListingHref(state, vehicles);
+  if (!href.includes("?")) return href;
+
+  if (filters.driveType && filters.driveType.length > 1) {
+    for (const dt of filters.driveType) {
+      href = inventoryListingHref({ ...state, driveType: [dt] }, vehicles);
+      if (!href.includes("?")) return href;
+    }
+  }
+
+  if (filters.maxPrice != null && state.minPrice === null) {
+    const lo = Math.max(0, filters.maxPrice - PRICE_BUCKET_STEP);
+    href = inventoryListingHref(
+      { ...state, minPrice: lo, maxPrice: filters.maxPrice },
+      vehicles
+    );
+    if (!href.includes("?")) return href;
+  }
+
+  return href;
 }
 
 function filterStateForCard(
@@ -107,7 +130,7 @@ export default async function PopularUsedCars() {
         </div>
         <div className="row g-4 mt-1">
           {CARDS.map((card) => {
-            const href = categoryHref(card.filters);
+            const href = categoryHref(card.filters, vehicles);
             const matched = filterDealerVehicles(
               vehicles,
               filterStateForCard(condition, card.filters)

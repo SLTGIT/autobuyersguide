@@ -18,6 +18,7 @@ import HomeBanner from "@/components/home/HomeBanner";
 import PopularCarTypes from "@/components/home/PopularCarTypes";
 import PopularUsedCars from "@/components/home/PopularUsedCars";
 import LatestBlogPosts from "@/components/home/LatestBlogPosts";
+import DriveawaySection from "@/components/home/DriveawaySection";
 import VisitUs from "@/components/home/VisitUs";
 import "./[slug]/cms-page.scss";
 
@@ -67,6 +68,7 @@ export default async function Home() {
       <PopularCarTypes />
       <PopularUsedCars />
       <LatestBlogPosts />
+      {/* <DriveawaySection /> */}
       <VisitUs />
       {page.content?.rendered?.trim() ? (
         <div
