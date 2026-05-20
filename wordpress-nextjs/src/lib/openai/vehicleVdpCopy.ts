@@ -436,11 +436,18 @@ export function resolveDealerCommentsContent(
     .filter(Boolean);
 
   const sourceLen = listingCommentSourceText(snapshot).length;
-  const aiLen = aiParagraphs.join("").length + aiBullets.join("").length;
-  const minChars = sourceLen >= 280 ? Math.floor(sourceLen * 0.5) : 0;
+  const aiLen =
+    aiParagraphs.join(" ").length + aiBullets.join(" ").length;
+  /** Long feeds (comments + description) can exceed 10k chars; 50% of that is unrealistic for JSON. */
+  const ratioMin = sourceLen >= 280 ? Math.floor(sourceLen * 0.5) : 0;
+  const minChars = Math.min(ratioMin, 2200);
+  /** Prefer a solid multi-paragraph rewrite even when it is under half of a very long raw listing. */
+  const substantialParagraphRewrite =
+    aiParagraphs.length >= 4 && aiLen >= 900;
 
   const useAi =
-    aiParagraphs.length > 0 && (sourceLen < 280 || aiLen >= minChars);
+    aiParagraphs.length > 0 &&
+    (sourceLen < 280 || aiLen >= minChars || substantialParagraphRewrite);
 
   if (useAi) {
     return {
@@ -975,6 +982,8 @@ async function fetchVehicleVdpAiFromOpenAI(
   });
 
   const text = completion.choices[0]?.message?.content?.trim();
+
+  // console.log("text", text);
   if (!text) {
     return fallbackVehicleVdpAiContent(snapshot);
   }
@@ -983,6 +992,7 @@ async function fetchVehicleVdpAiFromOpenAI(
   try {
     parsed = JSON.parse(text) as unknown;
   } catch {
+    // console.log("parsed", parsed);
     return fallbackVehicleVdpAiContent(snapshot);
   }
 
