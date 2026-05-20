@@ -25,7 +25,10 @@ function formatDealerAddress(): string {
   return `${a.streetAddress}, ${a.addressLocality}, ${a.addressRegion} ${a.postalCode}`;
 }
 
-function buildHeroSubtitle(snapshot: VehicleVdpSnapshot, heroBadge: string): string {
+function buildHeroSubtitle(
+  snapshot: VehicleVdpSnapshot,
+  heroBadge: string,
+): string {
   const badge = heroBadge.trim();
   if (badge) return badge;
   const parts = [
@@ -149,8 +152,14 @@ export default function VehicleVdpRefPage({
         <div className="container">
           <div className="row g-4">
             <div className="col-lg-8">
-              <header className="vdp-ref-page-header mb-3 mb-md-4" data-vdp-page-header>
-                <nav className="vdp-ref-breadcrumb mb-3" aria-label="Breadcrumb">
+              <header
+                className="vdp-ref-page-header mb-3 mb-md-4"
+                data-vdp-page-header
+              >
+                <nav
+                  className="vdp-ref-breadcrumb mb-3"
+                  aria-label="Breadcrumb"
+                >
                   <Link className="vdp-ref-breadcrumb-link" href="/">
                     Home
                   </Link>
@@ -217,12 +226,6 @@ export default function VehicleVdpRefPage({
 
               <VdpQuickSpecsRow items={quickSpecs} />
 
-              {similarItems.length > 0 ? (
-                <div className="cs-card p-4 p-lg-5 mb-4 vdp-ref-main-similar">
-                  <VehicleSimilarCarousel items={similarItems} />
-                </div>
-              ) : null}
-
               <VdpKeyHighlights chips={ai.highlightChips} />
 
               <VdpDealerCommentsExpandable
@@ -274,6 +277,12 @@ export default function VehicleVdpRefPage({
                 />
                 <VehicleTestDriveForm item={enquiryItem} />
               </section>
+
+              {similarItems.length > 0 ? (
+                <div className="cs-card p-4 p-lg-5 mb-4 vdp-ref-main-similar mt-4">
+                  <VehicleSimilarCarousel items={similarItems} />
+                </div>
+              ) : null}
             </div>
 
             <aside className="col-lg-4 vdp-ref-sidebar">
@@ -302,7 +311,9 @@ export default function VehicleVdpRefPage({
                     showDivider={false}
                     className="mb-4 pb-4 border-bottom"
                   />
-                  <h2 className="h5 fw-bold mb-3">Get in touch with the dealer</h2>
+                  <h2 className="h5 fw-bold mb-3">
+                    Get in touch with the dealer
+                  </h2>
                   <VehicleVdpRefInlineEnquiry item={enquiryItem} />
                 </div>
 
