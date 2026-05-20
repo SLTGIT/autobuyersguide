@@ -218,7 +218,7 @@ export default function VehicleVdpRefPage({
               <VdpQuickSpecsRow items={quickSpecs} />
 
               {similarItems.length > 0 ? (
-                <div className="cs-card p-3 mb-4 d-lg-none vdp-ref-mobile-similar">
+                <div className="cs-card p-4 p-lg-5 mb-4 vdp-ref-main-similar">
                   <VehicleSimilarCarousel items={similarItems} />
                 </div>
               ) : null}
@@ -347,13 +347,6 @@ export default function VehicleVdpRefPage({
                       </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="cs-card p-4 mb-4 vdp-ref-sidebar-similar d-none d-lg-block">
-                  <VehicleSimilarCarousel
-                    items={similarItems}
-                    variant="sidebar"
-                  />
                 </div>
               </div>
             </aside>

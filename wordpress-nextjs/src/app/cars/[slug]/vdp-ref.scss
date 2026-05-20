@@ -520,22 +520,6 @@
     margin-bottom: 0;
   }
 
-  .vdp-ref-sidebar-similar {
-    overflow: hidden;
-
-    .vdp-similar {
-      margin-top: 0;
-    }
-
-    .vdp-similar-head {
-      margin-bottom: 0.75rem;
-    }
-
-    .vdp-similar-title {
-      font-size: 1rem;
-    }
-  }
-
   .vdp-similar--sidebar {
     .vdp-similar-scroller {
       display: flex;
@@ -701,7 +685,7 @@
     }
   }
 
-  .vdp-ref-mobile-similar {
+  .vdp-ref-main-similar {
     overflow: hidden;
 
     .vdp-similar {

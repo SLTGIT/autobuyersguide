@@ -983,7 +983,6 @@ async function fetchVehicleVdpAiFromOpenAI(
 
   const text = completion.choices[0]?.message?.content?.trim();
 
-  // console.log("text", text);
   if (!text) {
     return fallbackVehicleVdpAiContent(snapshot);
   }
@@ -992,7 +991,6 @@ async function fetchVehicleVdpAiFromOpenAI(
   try {
     parsed = JSON.parse(text) as unknown;
   } catch {
-    // console.log("parsed", parsed);
     return fallbackVehicleVdpAiContent(snapshot);
   }
 
