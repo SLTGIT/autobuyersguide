@@ -19,6 +19,7 @@ function imageAltFromUrl(url: string, index: number): string {
   return `Happy driver gallery photo ${index + 1}`;
 }
 
+
 export default function DriveawayCarousel({ images }: DriveawayCarouselProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const regionRef = useRef<HTMLDivElement>(null);
