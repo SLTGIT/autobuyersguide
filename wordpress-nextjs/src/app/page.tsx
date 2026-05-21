@@ -68,7 +68,7 @@ export default async function Home() {
       <PopularCarTypes />
       <PopularUsedCars />
       <LatestBlogPosts />
-      {/* <DriveawaySection /> */}
+      <DriveawaySection />
       <VisitUs />
       {page.content?.rendered?.trim() ? (
         <div
