@@ -161,7 +161,7 @@ export default async function PopularUsedCars() {
                   </Link>
                   <div className="p-4 d-flex flex-column flex-grow-1">
                     <h3 className="h5 fw-bold mb-2">{card.title}</h3>
-                    <p className="text-secondary">{card.description}</p>
+                    <p className="text-secondary mb-2">{card.description}</p>
                     <Link
                       href={href}
                       className="btn btn-outline-primary cs-pill mt-auto align-self-start"
