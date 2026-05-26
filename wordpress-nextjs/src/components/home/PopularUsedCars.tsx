@@ -32,7 +32,7 @@ const CARDS: CardDef[] = [
     description:
       "Reliable, inspected budget starters and city commuters.",
     image:
-      "https://d2s8i866417m9.cloudfront.net/photo/31928718/photo/thumb-ee3aca47fd5d427e2c1c06d01773bd6f.jpg",
+      "/assets/images/PopularUsedCars_1.jpg",
     alt: "Used Cars Under 15k Brisbane category image from Statewide Auto Group",
     filters: { maxPrice: 15000 },
   },
@@ -41,7 +41,7 @@ const CARDS: CardDef[] = [
     description:
       "ABN specialist stock. Hilux, Ranger, and Navara experts.",
     image:
-      "https://d2s8i866417m9.cloudfront.net/photo/32428698/photo/thumb-232954f40d5f21bf8a4fa35d6daa7a7a.jpg",
+      "/assets/images/PopularUsedCars_2.jpg",
     alt: "Used 4x4s and Utes Brisbane category image from Statewide Auto Group",
     filters: { driveType: ["4WD", "4x4"] },
   },
@@ -49,7 +49,7 @@ const CARDS: CardDef[] = [
     title: "Used SUVs for Brisbane Families",
     description: "Safety-first 7-seaters and luxury crossovers.",
     image:
-      "https://d2s8i866417m9.cloudfront.net/photo/21458119/photo/thumb-cd1212b187aac661b7e12bbff1a7acf0.jpg",
+      "/assets/images/PopularUsedCars_3.jpg",
     alt: "Used SUVs for Brisbane Families category image from Statewide Auto Group",
     filters: { bodyType: ["SUV"] },
   },
@@ -137,7 +137,7 @@ export default async function PopularUsedCars() {
             );
             const hero = firstVehicleWithPhoto(matched);
             const listing = hero ? dealerVehicleToListing(hero) : null;
-            const imageSrc = listing?.featured_image ?? card.image;
+            const imageSrc =   card.image ?? listing?.featured_image;
             const imageAlt = listing
               ? `${vehicleCardHeadline(listing)} — ${card.title}`
               : card.alt;

@@ -6,7 +6,7 @@ import { formatVehicleVdpBrowserTitle } from "@/lib/openai/vehicleVdpCopy";
 import { dealerVehicleToListing } from "@/lib/inventory/transform";
 import { buildVehicleSlug } from "@/lib/inventory/slug";
 import {
-  inventoryListingQueryHref,
+  inventoryListingHref,
   parseInventorySearchParams,
 } from "@/lib/inventory/query";
 import { getSimilarVehicles } from "@/lib/inventory/similar";
@@ -164,15 +164,18 @@ export default async function VehicleDetailPage({
 
   const condLower = (listing.condition || "used").toLowerCase();
   const catalogHref =
-    condLower === "new" ? "/search?condition=New" : "/search?condition=Used";
+    condLower === "new" ? "/search" : "/search";
   const catalogLabel = condLower === "new" ? "New Cars" : "Used Cars";
   const breadcrumbMake = (v.Make?.trim() || listing.make || "").trim();
   const breadcrumbMakeHref = breadcrumbMake
-    ? inventoryListingQueryHref({
-        ...parseInventorySearchParams({}),
-        make: breadcrumbMake.toLowerCase(),
-        page: 1,
-      })
+    ? inventoryListingHref(
+        {
+          ...parseInventorySearchParams({}),
+          make: breadcrumbMake.toLowerCase(),
+          page: 1,
+        },
+        allVehicles
+      )
     : "/search";
 
   const priceMain =
