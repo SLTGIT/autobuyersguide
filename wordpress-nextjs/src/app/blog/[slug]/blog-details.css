@@ -17,6 +17,7 @@
 }
 .cs-title-tight {
   letter-spacing: -0.03em;
+  font-size: 2rem !important;
 }
 .cs-rating-star {
   color: #ffb400;
