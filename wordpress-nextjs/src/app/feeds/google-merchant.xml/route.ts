@@ -2,7 +2,7 @@ import { buildCatalogFeedItems } from "@/lib/catalog-feed/build-items";
 import { buildGoogleMerchantXml } from "@/lib/catalog-feed/google-merchant-xml";
 import { NextResponse } from "next/server";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
@@ -12,7 +12,7 @@ export async function GET() {
       status: 200,
       headers: {
         "Content-Type": "application/xml; charset=utf-8",
-        "Cache-Control": "public, max-age=3600, s-maxage=3600",
+        "Cache-Control": "no-store",
       },
     });
   } catch (err) {

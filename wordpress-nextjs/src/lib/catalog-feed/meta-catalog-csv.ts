@@ -1,3 +1,4 @@
+import { formatCatalogPriceAud } from "@/lib/catalog-feed/build-items";
 import {
   META_CATALOG_CSV_HEADERS,
   type CatalogFeedItem,
@@ -22,7 +23,7 @@ function rowValues(item: CatalogFeedItem): string[] {
     item.description,
     item.availability,
     item.condition,
-    item.priceFormatted,
+    formatCatalogPriceAud(item.priceAud),
     item.link,
     item.imageLink,
     item.odometer.unit,

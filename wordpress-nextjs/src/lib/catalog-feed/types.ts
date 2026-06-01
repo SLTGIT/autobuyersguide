@@ -5,6 +5,9 @@ export type CatalogFeedItem = {
   description: string;
   availability: "in stock";
   condition: "new" | "used";
+  /** Numeric AUD price for feed formatters. */
+  priceAud: number;
+  /** Meta CSV / display: e.g. `49990 AUD` (no decimals). */
   priceFormatted: string;
   link: string;
   imageLink: string;

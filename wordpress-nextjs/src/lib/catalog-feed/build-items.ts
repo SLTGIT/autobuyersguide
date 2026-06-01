@@ -92,8 +92,9 @@ function resolveYear(listing: VehicleListing, v: DealerVehicle): number | null {
   return n > 0 ? n : null;
 }
 
-function formatGooglePriceAud(amount: number): string {
-  return `${amount.toFixed(2)} AUD`;
+/** Whole dollars + space + AUD (Google Merchant + Meta catalog). */
+export function formatCatalogPriceAud(amount: number): string {
+  return `${Math.round(amount)} AUD`;
 }
 
 const ODOMETER_UNIT_KM = "km";
@@ -142,7 +143,8 @@ export function vehicleToCatalogItem(
     link,
     imageLink,
     additionalImageLinks,
-    priceFormatted: formatGooglePriceAud(priceAud),
+    priceAud,
+    priceFormatted: formatCatalogPriceAud(priceAud),
     availability: "in stock",
     condition: normalizeCondition(listing),
     make,

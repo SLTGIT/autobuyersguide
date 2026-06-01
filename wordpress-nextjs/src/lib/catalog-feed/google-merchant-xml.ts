@@ -1,5 +1,6 @@
 import { escapeXml } from "@/lib/sitemap-xml";
 import {
+  formatCatalogPriceAud,
   GOOGLE_PRODUCT_CATEGORY,
   SITE_NAME,
 } from "@/lib/catalog-feed/build-items";
@@ -67,7 +68,7 @@ function itemXml(item: CatalogFeedItem): string {
     `      <g:description>${escapeXml(item.description)}</g:description>`,
     `      <g:availability>${escapeXml(item.availability)}</g:availability>`,
     `      <g:condition>${escapeXml(item.condition)}</g:condition>`,
-    `      <g:price>${escapeXml(item.priceFormatted)}</g:price>`,
+    `      <g:price>${escapeXml(formatCatalogPriceAud(item.priceAud))}</g:price>`,
     `      <g:link>${escapeXml(item.link)}</g:link>`,
     `      <g:image_link>${escapeXml(item.imageLink)}</g:image_link>`,
     `      <g:google_product_category>${escapeXml(GOOGLE_PRODUCT_CATEGORY)}</g:google_product_category>`,
