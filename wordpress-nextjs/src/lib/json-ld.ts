@@ -693,7 +693,6 @@ export function vehicleJsonLdFromInventory(
     vehicleModelDate: yearStr,
     // productID: String(v.ItemID),
     mainEntityOfPage: { "@id": `${productUrl}#webpage` },
-    inLanguage: "en-AU",
   };
 
   if (bodyTypeNorm) node.bodyType = bodyTypeForSchemaDisplay(bodyTypeNorm);
