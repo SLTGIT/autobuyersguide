@@ -31,6 +31,9 @@ export interface DealerVehicle {
   Pricing: DealerPricing;
   Photos: DealerPhoto[];
   Comments?: string;
+  /** Present on some Dealer Solutions exports. */
+  VIN?: string;
+  Vin?: string;
 }
 
 export interface DealerInventoryFeed {

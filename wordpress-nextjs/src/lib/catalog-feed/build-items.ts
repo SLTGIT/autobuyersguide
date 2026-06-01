@@ -7,10 +7,12 @@ import {
   dealerVehicleToListing,
   inventoryPriceField,
   listingDisplayNumericPriceAud,
+  parseInventoryOdometerKm,
   priceNumber,
 } from "@/lib/inventory/transform";
 import { resolveSitemapOrigin } from "@/lib/sitemap-xml";
 import type { DealerVehicle, VehicleListing } from "@/types/inventory";
+import { extractVinFromDealerVehicle } from "./extract-vin";
 import type { CatalogFeedItem } from "./types";
 
 const SITE_NAME = "Car Sales Brisbane";
@@ -62,14 +64,19 @@ function catalogId(v: DealerVehicle, listing: VehicleListing): string {
   return String(v.ItemID);
 }
 
+/** Dealer headline for `title` (make / model / year are separate columns, before title). */
 function catalogTitle(listing: VehicleListing): string {
+  const fromListing = listing.title.trim();
+  if (fromListing) return fromListing;
   const make = listing.make.trim();
   const model = listing.model.trim();
   const year =
     listing.year != null && Number.isFinite(listing.year) ? listing.year : null;
-  const built = [year, make, model].filter(Boolean).join(" ").trim();
-  const fromListing = listing.title.trim();
-  return built || fromListing || "Vehicle";
+  return [year, make, model].filter(Boolean).join(" ").trim() || "Vehicle";
+}
+
+function catalogLocation(listing: VehicleListing, v: DealerVehicle): string {
+  return v.Location?.trim() || listing.location_short.trim() || "";
 }
 
 function normalizeCondition(listing: VehicleListing): "new" | "used" {
@@ -87,6 +94,19 @@ function resolveYear(listing: VehicleListing, v: DealerVehicle): number | null {
 
 function formatGooglePriceAud(amount: number): string {
   return `${amount.toFixed(2)} AUD`;
+}
+
+const ODOMETER_UNIT_KM = "km";
+
+function catalogOdometer(
+  listing: VehicleListing,
+  v: DealerVehicle,
+): { value: string; unit: string } {
+  const km =
+    parseInventoryOdometerKm(listing.odometer) ??
+    parseInventoryOdometerKm(v.Odometer);
+  if (km == null || km < 0) return { value: "", unit: "" };
+  return { value: String(Math.round(km)), unit: ODOMETER_UNIT_KM };
 }
 
 export function vehicleToCatalogItem(
@@ -107,9 +127,13 @@ export function vehicleToCatalogItem(
     .filter((url) => url && url !== imageLink)
     .slice(0, 9);
 
-  const description = buildVehicleListingDescription(listing, v);
-  const brand = listing.make.trim() || v.Make?.trim() || "";
+  const make = listing.make.trim() || v.Make?.trim() || "";
   const model = listing.model.trim() || v.Model?.trim() || "";
+  const year = resolveYear(listing, v);
+  const location = catalogLocation(listing, v);
+  const description = buildVehicleListingDescription(listing, v)
+    .trim()
+    .slice(0, 5000);
 
   return {
     id: catalogId(v, listing),
@@ -118,13 +142,18 @@ export function vehicleToCatalogItem(
     link,
     imageLink,
     additionalImageLinks,
-    priceAud,
     priceFormatted: formatGooglePriceAud(priceAud),
     availability: "in stock",
     condition: normalizeCondition(listing),
-    brand,
+    make,
     model,
-    year: resolveYear(listing, v),
+    year,
+    location,
+    odometer: catalogOdometer(listing, v),
+    fuel_type: listing.fuel_type.trim() || v.FuelType?.trim() || "",
+    transmission:
+      listing.transmission.trim() || v.TransmissionType?.trim() || "",
+    vin: extractVinFromDealerVehicle(v),
   };
 }
 

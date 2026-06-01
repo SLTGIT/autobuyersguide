@@ -1,18 +1,7 @@
-import type { CatalogFeedItem } from "@/lib/catalog-feed/types";
-
-const CSV_HEADERS = [
-  "id",
-  "title",
-  "description",
-  "availability",
-  "condition",
-  "price",
-  "link",
-  "image_link",
-  "brand",
-  "model",
-  "year",
-] as const;
+import {
+  META_CATALOG_CSV_HEADERS,
+  type CatalogFeedItem,
+} from "@/lib/catalog-feed/types";
 
 function escapeCsvField(value: string): string {
   const t = value.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
@@ -25,6 +14,10 @@ function escapeCsvField(value: string): string {
 function rowValues(item: CatalogFeedItem): string[] {
   return [
     item.id,
+    item.make,
+    item.model,
+    item.year != null ? String(item.year) : "",
+    item.location,
     item.title,
     item.description,
     item.availability,
@@ -32,15 +25,17 @@ function rowValues(item: CatalogFeedItem): string[] {
     item.priceFormatted,
     item.link,
     item.imageLink,
-    item.brand,
-    item.model,
-    item.year != null ? String(item.year) : "",
+    item.odometer.unit,
+    item.odometer.value,
+    item.fuel_type,
+    item.transmission,
+    item.vin,
   ];
 }
 
 export function buildMetaCatalogCsv(items: CatalogFeedItem[]): string {
   const lines = [
-    CSV_HEADERS.join(","),
+    META_CATALOG_CSV_HEADERS.join(","),
     ...items.map((item) =>
       rowValues(item).map((v) => escapeCsvField(v)).join(","),
     ),

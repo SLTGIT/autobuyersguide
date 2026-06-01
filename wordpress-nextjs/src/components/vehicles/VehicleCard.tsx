@@ -105,7 +105,7 @@ export default function VehicleCard({
                   className="bi bi-speedometer2 inventory-card-spec-icon inventory-card-spec-icon--list"
                   aria-hidden
                 />
-                <span className="inventory-card-spec-label">Mileage</span>
+                {/* <span className="inventory-card-spec-label">Mileage</span> */}
               </div>
               <span className="inventory-card-spec-value">{odoSpec}</span>
             </div>
@@ -115,7 +115,7 @@ export default function VehicleCard({
                 className="bi bi-fuel-pump inventory-card-spec-icon inventory-card-spec-icon--list"
                 aria-hidden
               />
-              <span className="inventory-card-spec-label">Fuel type</span>
+              {/* <span className="inventory-card-spec-label">Fuel type</span> */}
               </div>
               <span className="inventory-card-spec-value">{fuelSpec}</span>
             </div>
@@ -125,7 +125,7 @@ export default function VehicleCard({
                 className="bi bi-gear-wide-connected inventory-card-spec-icon inventory-card-spec-icon--list"
                 aria-hidden
               />
-              <span className="inventory-card-spec-label">Transmission</span>
+              {/* <span className="inventory-card-spec-label">Transmission</span> */}
               </div>
               <span className="inventory-card-spec-value">{transSpec}</span>
             </div>
