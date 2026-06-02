@@ -53,6 +53,7 @@ function trailingProductDetails(item: CatalogFeedItem): string {
     ["fuel_type", item.fuel_type],
     ["transmission", item.transmission],
     ["vin", item.vin],
+    ["sku", item.sku],
   ]);
 }
 

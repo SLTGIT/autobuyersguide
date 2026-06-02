@@ -94,6 +94,20 @@ function normalizeCondition(listing: VehicleListing): "new" | "used" {
     : "used";
 }
 
+function catalogDescriptionLine(
+  listing: VehicleListing,
+  make: string,
+  model: string,
+  year: number | null,
+): string {
+  const raw = (listing.condition || "used").trim().toLowerCase();
+  const conditionLabel = raw === "new" ? "New" : raw === "cpo" ? "CPO" : "Used";
+  const yearLabel = year != null ? String(year) : "";
+  const makeModel = [make, model].filter(Boolean).join(" ").trim();
+  const headline = [conditionLabel, yearLabel, makeModel].filter(Boolean).join(" ").trim();
+  return headline ? `${headline} for sale` : "";
+}
+
 function resolveYear(listing: VehicleListing, v: DealerVehicle): number | null {
   const y = listing.year ?? v.ManufactureYear;
   if (y == null || !Number.isFinite(Number(y))) return null;
@@ -180,13 +194,16 @@ export function vehicleToCatalogItem(
   const year = resolveYear(listing, v);
   const location = catalogLocation(listing, v);
   const address = splitAddress(location);
-  const description = buildVehicleListingDescription(listing, v)
+  const descriptionTemplate = catalogDescriptionLine(listing, make, model, year);
+  const descriptionFallback = buildVehicleListingDescription(listing, v)
     .trim()
     .slice(0, 5000);
+  const description = descriptionTemplate || descriptionFallback;
 
   return {
     id: catalogId(v, listing),
     vehicle_id: catalogId(v, listing),
+    sku: listing.stock_number.trim() || v.SKU?.trim() || "",
     title: catalogTitle(listing),
     description,
     link,

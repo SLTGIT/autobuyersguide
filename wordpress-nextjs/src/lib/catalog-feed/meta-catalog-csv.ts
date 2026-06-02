@@ -34,6 +34,7 @@ function rowValues(item: CatalogFeedItem): string[] {
     item.fuel_type,
     item.transmission,
     item.vin,
+    item.sku,
   ];
 }
 

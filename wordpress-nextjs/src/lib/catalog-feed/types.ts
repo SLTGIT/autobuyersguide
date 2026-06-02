@@ -2,6 +2,7 @@
 export type CatalogFeedItem = {
   id: string;
   vehicle_id: string;
+  sku: string;
   title: string;
   description: string;
   availability: "in stock";
@@ -55,4 +56,5 @@ export const META_CATALOG_CSV_HEADERS = [
   "fuel_type",
   "transmission",
   "vin",
+  "sku",
 ] as const;
