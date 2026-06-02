@@ -1,5 +1,5 @@
 import { getPageBySlug } from "@/lib/wordpress";
-import { getMetadata, getYoastSeoCopy } from "@/lib/wordpress/seo";
+import { getMetadata, getAcfSeoCopy } from "@/lib/wordpress/seo";
 import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from "@/lib/site-url";
 import { notFound, permanentRedirect } from "next/navigation";
 import { Metadata } from "next";
@@ -60,11 +60,11 @@ export default async function DynamicPage(props: PageProps) {
   const { currentUrl } = await getCurrentUrlAndRoute(path);
   const pageUrl = upgradeHttpToHttpsUrl(currentUrl);
   const origin = new URL(pageUrl).origin;
-  const yoastSeo = getYoastSeoCopy(page);
+  const acfSeo = getAcfSeoCopy(page);
   const headline = stripHtml(page.title.rendered);
   const excerpt = stripHtml(page.excerpt?.rendered || "");
-  const seoTitle = yoastSeo?.title || headline;
-  const seoDescription = yoastSeo?.description || excerpt || headline;
+  const seoTitle = acfSeo?.title || headline;
+  const seoDescription = acfSeo?.description || excerpt || headline;
   const featuredUrl = page._embedded?.["wp:featuredmedia"]?.[0]?.source_url as
     | string
     | undefined;

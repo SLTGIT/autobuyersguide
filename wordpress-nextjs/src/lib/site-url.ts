@@ -173,7 +173,7 @@ export function siteUrlMetadataFields(
   };
 }
 
-/** Merge Yoast/basic metadata with site URL + canonical + Open Graph. */
+/** Merge CMS/basic metadata with site URL + canonical + Open Graph. */
 export async function mergeSiteUrlMetadata(
   meta: Metadata,
   pathname: string

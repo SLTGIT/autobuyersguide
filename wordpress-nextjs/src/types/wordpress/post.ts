@@ -2,6 +2,13 @@
  * WordPress Post Type Definition
  */
 
+import type { WPSeoACFFields } from '@/lib/wordpress/acf';
+
+export interface WPPostACFFields extends WPSeoACFFields {
+  faq?: unknown;
+  hero_section?: string;
+}
+
 export interface WPPost {
   id: number;
   date: string;
@@ -38,10 +45,5 @@ export interface WPPost {
     'wp:featuredmedia'?: any[];
     'wp:term'?: any[][];
   };
-  acf?: {
-    faq?: unknown;
-    hero_section?: string;
-    [key: string]: unknown;
-  };
-  yoast_head_json?: any;
+  acf?: WPPostACFFields;
 }

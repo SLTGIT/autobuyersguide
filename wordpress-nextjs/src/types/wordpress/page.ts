@@ -2,8 +2,10 @@
  * WordPress Page Type Definition
  */
 
+import type { WPSeoACFFields } from '@/lib/wordpress/acf';
+
 /** ACF keys must match the field "Name" (API key) in WordPress, not the label. */
-export interface WPPageACFFields {
+export interface WPPageACFFields extends WPSeoACFFields {
   heading?: string;
   paragraph?: string;
 }
@@ -42,5 +44,4 @@ export interface WPPage {
     'wp:featuredmedia'?: any[];
   };
   acf?: WPPageACFFields;
-  yoast_head_json?: any;
 }

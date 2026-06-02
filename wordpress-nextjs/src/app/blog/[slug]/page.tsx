@@ -5,7 +5,7 @@ import { getPostBySlug, getPosts } from "@/lib/wordpress";
 import RelatedPostsSidebar from "@/components/blog/RelatedPostsSidebar";
 import type { WPPost } from "@/types/wordpress";
 import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
-import { getMetadata } from "@/lib/wordpress/seo";
+import { getAcfSeoCopy, getMetadata } from "@/lib/wordpress/seo";
 import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from "@/lib/site-url";
 import JsonLd from "@/components/JsonLd";
 import {
@@ -167,6 +167,9 @@ export default async function BlogPost({ params }: BlogPostProps) {
   const blogEntityId = `${blogCanonicalHttps}#blog`;
   const headline = stripHtml(post.title.rendered);
   const excerpt = stripHtml(post.excerpt.rendered);
+  const acfSeo = getAcfSeoCopy(post);
+  const seoTitle = acfSeo?.title || headline;
+  const seoDescription = acfSeo?.description || excerpt || headline;
   const imageUrl = featuredImage?.source_url as string | undefined;
   const authorName = author?.name as string | undefined;
   const faqItems = parseFaqField(post.acf?.faq);
@@ -192,7 +195,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
   blogPosting.author = authorName
     ? { "@type": "Person", name: authorName }
     : { "@id": `${origin}/#organization` };
-  if (excerpt) blogPosting.description = excerpt;
+  if (seoDescription) blogPosting.description = seoDescription;
   const faqPage = blogFaqPageJsonLd(articleHttps, faqItems);
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),
@@ -208,8 +211,8 @@ export default async function BlogPost({ params }: BlogPostProps) {
     },
     webPageJsonLd({
       pageUrl: articleHttps,
-      name: headline,
-      description: excerpt || headline,
+      name: seoTitle,
+      description: seoDescription,
     }),
     blogPosting,
     faqPage,

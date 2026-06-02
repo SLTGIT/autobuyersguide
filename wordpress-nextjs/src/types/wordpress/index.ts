@@ -4,7 +4,7 @@
  */
 
 // Core content types
-export type { WPPost } from './post';
+export type { WPPost, WPPostACFFields } from './post';
 export type { WPPage, WPPageACFFields } from './page';
 export type { WPUser } from './user';
 

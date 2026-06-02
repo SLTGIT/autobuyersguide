@@ -3,8 +3,13 @@
  * Functions for fetching and managing WordPress posts
  */
 
-import { WPPost } from '@/types/wordpress';
+import { WPPost, WPPostACFFields } from '@/types/wordpress';
+import { normalizeAcf } from '../acf';
 import { fetchAPI } from './client';
+
+function withNormalizedAcf(post: WPPost): WPPost {
+  return { ...post, acf: normalizeAcf<WPPostACFFields>(post.acf as unknown) };
+}
 
 /**
  * Fetch posts with optional filtering and pagination
@@ -51,7 +56,8 @@ export async function getPosts(params: {
     queryParams.append('_embed', '1');
 
     const query = queryParams.toString();
-    return fetchAPI<WPPost[]>(`/wp/v2/posts${query ? `?${query}` : ''}`);
+    const posts = await fetchAPI<WPPost[]>(`/wp/v2/posts${query ? `?${query}` : ''}`);
+    return posts.map(withNormalizedAcf);
 }
 
 /**
@@ -59,12 +65,13 @@ export async function getPosts(params: {
  */
 export async function getPostBySlug(slug: string): Promise<WPPost | null> {
     const posts = await fetchAPI<WPPost[]>(`/wp/v2/posts?slug=${slug}&_embed=1`);
-    return posts.length > 0 ? posts[0] : null;
+    return posts.length > 0 ? withNormalizedAcf(posts[0]) : null;
 }
 
 /**
  * Fetch a single post by ID
  */
 export async function getPostById(id: number): Promise<WPPost> {
-    return fetchAPI<WPPost>(`/wp/v2/posts/${id}?_embed=1`);
+    const post = await fetchAPI<WPPost>(`/wp/v2/posts/${id}?_embed=1`);
+    return withNormalizedAcf(post);
 }

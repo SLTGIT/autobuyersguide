@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPageBySlug } from "@/lib/wordpress";
-import { getMetadata, getYoastSeoCopy } from "@/lib/wordpress/seo";
+import { getMetadata, getAcfSeoCopy } from "@/lib/wordpress/seo";
 import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
 import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from "@/lib/site-url";
 import JsonLd from "@/components/JsonLd";
@@ -44,11 +44,11 @@ export default async function Home() {
   const { currentUrl } = await getCurrentUrlAndRoute(HOME_PATH);
   const pageUrl = upgradeHttpToHttpsUrl(currentUrl);
   const origin = new URL(pageUrl).origin;
-  const yoastSeo = getYoastSeoCopy(page);
+  const acfSeo = getAcfSeoCopy(page);
   const headline = stripHtml(page.title.rendered);
   const excerpt = stripHtml(page.excerpt?.rendered || "");
-  const seoTitle = yoastSeo?.title || headline;
-  const seoDescription = yoastSeo?.description || excerpt || headline;
+  const seoTitle = acfSeo?.title || headline;
+  const seoDescription = acfSeo?.description || excerpt || headline;
 
   const jsonLd = jsonLdGraph(
     organizationJsonLd(origin),

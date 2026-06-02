@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPageBySlug, getPosts, getCategories } from "@/lib/wordpress";
-import { getMetadata, getYoastSeoCopy } from "@/lib/wordpress/seo";
+import { getMetadata, getAcfSeoCopy } from "@/lib/wordpress/seo";
 import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
 import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from "@/lib/site-url";
 import type { WPPost, WPCategory } from "@/types/wordpress";
@@ -93,11 +93,11 @@ export default async function Blog({ searchParams }: BlogPageProps) {
   const origin = new URL(listingPageHttps).origin;
   const blogEntityId = `${blogCanonicalHttps}#blog`;
 
-  const yoastSeo = getYoastSeoCopy(cmsPage);
+  const acfSeo = getAcfSeoCopy(cmsPage);
   const headline = stripHtml(cmsPage.title.rendered);
   const excerpt = stripHtml(cmsPage.excerpt?.rendered || "");
-  const pageTitle = yoastSeo?.title || headline;
-  const pageDescription = yoastSeo?.description || excerpt || headline;
+  const pageTitle = acfSeo?.title || headline;
+  const pageDescription = acfSeo?.description || excerpt || headline;
 
   const blogPostingSchemas: Record<string, unknown>[] = posts.map((post) => {
     const postHeadline = stripHtml(post.title.rendered);

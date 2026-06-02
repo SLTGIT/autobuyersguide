@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPageBySlug } from "@/lib/wordpress";
-import { getMetadata, getYoastSeoCopy } from "@/lib/wordpress/seo";
+import { getMetadata, getAcfSeoCopy } from "@/lib/wordpress/seo";
 import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
 import { mergeSiteUrlMetadata } from "@/lib/site-url";
 import { stripHtml } from "@/lib/json-ld";
@@ -31,11 +31,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     notFound();
   }
 
-  const yoastSeo = getYoastSeoCopy(page);
+  const acfSeo = getAcfSeoCopy(page);
   const headline = stripHtml(page.title.rendered);
   const excerpt = stripHtml(page.excerpt?.rendered || "");
-  const seoTitle = yoastSeo?.title || headline;
-  const seoDescription = yoastSeo?.description || excerpt || headline;
+  const seoTitle = acfSeo?.title || headline;
+  const seoDescription = acfSeo?.description || excerpt || headline;
 
   const raw = await searchParams;
   const filters = parseInventorySearchParams(raw);
