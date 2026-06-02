@@ -37,19 +37,19 @@ function leadingProductDetails(item: CatalogFeedItem): string {
     ["make", item.make],
     ["model", item.model],
     ["year", item.year != null ? String(item.year) : ""],
-    ["location", item.location],
+    ["address.addr1", item.address.addr1],
+    ["address.city", item.address.city],
+    ["address.postal_code", item.address.postal_code],
+    ["address.country", item.address.country],
   ]);
-}
-
-function odometerProductDetails(item: CatalogFeedItem): string {
-  return [
-    productDetailXmlAlways("odometer.unit", item.odometer.unit),
-    productDetailXmlAlways("odometer.value", item.odometer.value),
-  ].join("\n");
 }
 
 function trailingProductDetails(item: CatalogFeedItem): string {
   return productDetailsBlock([
+    ["sale_price", formatCatalogPriceAud(item.priceAud)],
+    ["state_of_vehicle", item.state_of_vehicle],
+    ["exterior_color", item.exterior_color],
+    ["body_style", item.body_style],
     ["fuel_type", item.fuel_type],
     ["transmission", item.transmission],
     ["vin", item.vin],
@@ -57,7 +57,7 @@ function trailingProductDetails(item: CatalogFeedItem): string {
 }
 
 function itemXml(item: CatalogFeedItem): string {
-  const parts = [`    <item>`, `      <g:id>${escapeXml(item.id)}</g:id>`];
+  const parts = [`    <item>`, `      <g:id>${escapeXml(item.vehicle_id)}</g:id>`];
 
   const leading = leadingProductDetails(item);
   if (leading) parts.push(leading);
@@ -67,7 +67,6 @@ function itemXml(item: CatalogFeedItem): string {
   parts.push(
     `      <g:description>${escapeXml(item.description)}</g:description>`,
     `      <g:availability>${escapeXml(item.availability)}</g:availability>`,
-    `      <g:condition>${escapeXml(item.condition)}</g:condition>`,
     `      <g:price>${escapeXml(formatCatalogPriceAud(item.priceAud))}</g:price>`,
     `      <g:link>${escapeXml(item.link)}</g:link>`,
     `      <g:image_link>${escapeXml(item.imageLink)}</g:image_link>`,
@@ -82,8 +81,6 @@ function itemXml(item: CatalogFeedItem): string {
       );
     }
   }
-
-  parts.push(odometerProductDetails(item));
 
   const trailing = trailingProductDetails(item);
   if (trailing) parts.push(trailing);

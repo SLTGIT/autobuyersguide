@@ -58,7 +58,7 @@ export default function HeaderNavbar() {
             <li className="nav-item">
               <Link
                 className="nav-link text-dark"
-                href="/search"
+                href="/search/car-sales-in-brisbane"
                 onClick={closeNav}
               >
                 Used Cars for sale

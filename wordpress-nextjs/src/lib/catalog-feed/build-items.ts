@@ -79,6 +79,15 @@ function catalogLocation(listing: VehicleListing, v: DealerVehicle): string {
   return v.Location?.trim() || listing.location_short.trim() || "";
 }
 
+function mapStateOfVehicle(
+  listing: VehicleListing,
+): "USED" | "NEW" | "CPO" {
+  const raw = (listing.condition || "").trim().toLowerCase();
+  if (raw === "new") return "NEW";
+  if (raw === "cpo" || raw.includes("certified")) return "CPO";
+  return "USED";
+}
+
 function normalizeCondition(listing: VehicleListing): "new" | "used" {
   return (listing.condition || "used").trim().toLowerCase() === "new"
     ? "new"
@@ -110,6 +119,44 @@ function catalogOdometer(
   return { value: String(Math.round(km)), unit: ODOMETER_UNIT_KM };
 }
 
+function splitAddress(input: string): {
+  addr1: string;
+  city: string;
+  postal_code: string;
+  country: string;
+} {
+  const empty = {
+    addr1: "",
+    city: "",
+    postal_code: "",
+    country: "AU",
+  };
+  const t = input.trim();
+  if (!t) return empty;
+
+  const parts = t.split(",").map((s) => s.trim()).filter(Boolean);
+  if (parts.length >= 4) {
+    return {
+      addr1: parts[0] || "",
+      city: parts[1] || "",
+      postal_code: parts[3]?.replace(/\D/g, "") || "",
+      country: parts[4] || "AU",
+    };
+  }
+
+  if (parts.length === 3) {
+    const regionPostal = parts[2].match(/^([A-Za-z]{2,4})\s+(\d{4})$/);
+    return {
+      addr1: parts[0] || "",
+      city: parts[1] || "",
+      postal_code: regionPostal?.[2] || "",
+      country: "AU",
+    };
+  }
+
+  return { ...empty, addr1: t };
+}
+
 export function vehicleToCatalogItem(
   origin: string,
   v: DealerVehicle,
@@ -132,12 +179,14 @@ export function vehicleToCatalogItem(
   const model = listing.model.trim() || v.Model?.trim() || "";
   const year = resolveYear(listing, v);
   const location = catalogLocation(listing, v);
+  const address = splitAddress(location);
   const description = buildVehicleListingDescription(listing, v)
     .trim()
     .slice(0, 5000);
 
   return {
     id: catalogId(v, listing),
+    vehicle_id: catalogId(v, listing),
     title: catalogTitle(listing),
     description,
     link,
@@ -146,12 +195,16 @@ export function vehicleToCatalogItem(
     priceAud,
     priceFormatted: formatCatalogPriceAud(priceAud),
     availability: "in stock",
+    state_of_vehicle: mapStateOfVehicle(listing),
     condition: normalizeCondition(listing),
     make,
     model,
     year,
     location,
+    address,
     odometer: catalogOdometer(listing, v),
+    exterior_color: (v.BodyColour || "").trim(),
+    body_style: (listing.body_type || v.BodyType || "").trim(),
     fuel_type: listing.fuel_type.trim() || v.FuelType?.trim() || "",
     transmission:
       listing.transmission.trim() || v.TransmissionType?.trim() || "",
