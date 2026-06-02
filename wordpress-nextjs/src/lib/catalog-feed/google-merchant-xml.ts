@@ -1,110 +1,81 @@
 import { escapeXml } from "@/lib/sitemap-xml";
 import {
   formatCatalogPriceAud,
-  GOOGLE_PRODUCT_CATEGORY,
   SITE_NAME,
 } from "@/lib/catalog-feed/build-items";
 import type { CatalogFeedItem } from "@/lib/catalog-feed/types";
 
-function productDetailXml(name: string, value: string): string {
-  if (!value.trim()) return "";
-  return `      <g:product_detail>
-        <g:attribute_name>${escapeXml(name)}</g:attribute_name>
-        <g:attribute_value>${escapeXml(value)}</g:attribute_value>
-      </g:product_detail>
-`;
+function textNode(tag: string, value: string): string {
+  return `    <${tag}>${escapeXml(value)}</${tag}>`;
 }
 
-/** Always emitted (e.g. odometer when value may be empty). */
-function productDetailXmlAlways(name: string, value: string): string {
-  return `      <g:product_detail>
-        <g:attribute_name>${escapeXml(name)}</g:attribute_name>
-        <g:attribute_value>${escapeXml(value)}</g:attribute_value>
-      </g:product_detail>
-`;
+function stateOfVehicleLabel(raw: "USED" | "NEW" | "CPO"): string {
+  if (raw === "NEW") return "New";
+  if (raw === "CPO") return "CPO";
+  return "Used";
 }
 
-function productDetailsBlock(entries: Array<[string, string]>): string {
-  return entries
-    .map(([name, value]) => productDetailXml(name, value).trimEnd())
-    .filter(Boolean)
+function addressNode(item: CatalogFeedItem): string {
+  return `    <address format="simple">
+      <component name="addr1">${escapeXml(item.address.addr1)}</component>
+      <component name="city">${escapeXml(item.address.city)}</component>
+      <component name="region"></component>
+      <component name="country">${escapeXml(item.address.country)}</component>
+      <component name="postal_code">${escapeXml(item.address.postal_code)}</component>
+    </address>`;
+}
+
+function imageNodes(item: CatalogFeedItem): string {
+  const urls = [item.imageLink, ...item.additionalImageLinks].filter(Boolean);
+  return urls
+    .map((url) => `    <image>\n      <url>${escapeXml(url)}</url>\n    </image>`)
     .join("\n");
 }
 
-/** make, model, year, location before g:title */
-function leadingProductDetails(item: CatalogFeedItem): string {
-  return productDetailsBlock([
-    ["make", item.make],
-    ["model", item.model],
-    ["year", item.year != null ? String(item.year) : ""],
-    ["address.addr1", item.address.addr1],
-    ["address.city", item.address.city],
-    ["address.postal_code", item.address.postal_code],
-    ["address.country", item.address.country],
-  ]);
-}
-
-function trailingProductDetails(item: CatalogFeedItem): string {
-  return productDetailsBlock([
-    ["sale_price", formatCatalogPriceAud(item.priceAud)],
-    ["state_of_vehicle", item.state_of_vehicle],
-    ["exterior_color", item.exterior_color],
-    ["body_style", item.body_style],
-    ["fuel_type", item.fuel_type],
-    ["transmission", item.transmission],
-    ["vin", item.vin],
-    ["sku", item.sku],
-  ]);
-}
-
 function itemXml(item: CatalogFeedItem): string {
-  const parts = [`    <item>`, `      <g:id>${escapeXml(item.vehicle_id)}</g:id>`];
+  const mileageValue = item.odometer.value || "";
+  const mileageUnit = item.odometer.unit ? item.odometer.unit.toUpperCase() : "";
+  const images = imageNodes(item);
 
-  const leading = leadingProductDetails(item);
-  if (leading) parts.push(leading);
-
-  parts.push(`      <g:title>${escapeXml(item.title)}</g:title>`);
-
-  parts.push(
-    `      <g:description>${escapeXml(item.description)}</g:description>`,
-    `      <g:availability>${escapeXml(item.availability)}</g:availability>`,
-    `      <g:price>${escapeXml(formatCatalogPriceAud(item.priceAud))}</g:price>`,
-    `      <g:link>${escapeXml(item.link)}</g:link>`,
-    `      <g:image_link>${escapeXml(item.imageLink)}</g:image_link>`,
-    `      <g:google_product_category>${escapeXml(GOOGLE_PRODUCT_CATEGORY)}</g:google_product_category>`,
-    `      <g:identifier_exists>no</g:identifier_exists>`,
-  );
-
-  if (item.additionalImageLinks.length) {
-    for (const url of item.additionalImageLinks) {
-      parts.push(
-        `      <g:additional_image_link>${escapeXml(url)}</g:additional_image_link>`,
-      );
-    }
-  }
-
-  const trailing = trailingProductDetails(item);
-  if (trailing) parts.push(trailing);
-
-  parts.push(`    </item>`);
-  return parts.join("\n");
+  return `  <listing>
+${textNode("vehicle_id", item.vehicle_id)}
+${textNode("title", item.title)}
+${textNode("description", item.description)}
+${textNode("vin", item.vin)}
+${textNode("url", item.link)}
+${textNode("make", item.make)}
+${textNode("model", item.model)}
+${textNode("year", item.year != null ? String(item.year) : "")}
+${textNode("drivetrain", item.drivetrain)}
+${textNode("vehicle_type", item.vehicle_type)}
+${textNode("body_style", item.body_style)}
+${textNode("fuel_type", item.fuel_type)}
+${textNode("transmission", item.transmission)}
+    <mileage>
+      <value>${escapeXml(mileageValue)}</value>
+      <unit>${escapeXml(mileageUnit)}</unit>
+    </mileage>
+${images}
+${textNode("price", formatCatalogPriceAud(item.priceAud))}
+${addressNode(item)}
+${textNode("exterior_color", item.exterior_color)}
+${textNode("state_of_vehicle", stateOfVehicleLabel(item.state_of_vehicle))}
+${textNode("stock_number", item.sku)}
+  </listing>`;
 }
 
 export function buildGoogleMerchantXml(
   origin: string,
   items: CatalogFeedItem[],
 ): string {
-  const channelLink = escapeXml(origin.replace(/\/$/, ""));
+  const selfLink = escapeXml(`${origin.replace(/\/$/, "")}/feeds/google-merchant.xml`);
   const itemBlocks = items.map(itemXml).join("\n");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
-  <channel>
-    <title>${escapeXml(SITE_NAME)} Inventory</title>
-    <link>${channelLink}</link>
-    <description>${escapeXml(`${SITE_NAME} vehicle inventory for Google Merchant Center`)}</description>
+<listings>
+  <title>${escapeXml(`${SITE_NAME} Vehicles Feed`)}</title>
+  <link rel="self" href="${selfLink}" />
 ${itemBlocks}
-  </channel>
-</rss>
+  </listings>
 `;
 }

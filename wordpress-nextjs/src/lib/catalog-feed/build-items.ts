@@ -222,6 +222,8 @@ export function vehicleToCatalogItem(
     odometer: catalogOdometer(listing, v),
     exterior_color: (v.BodyColour || "").trim(),
     body_style: (listing.body_type || v.BodyType || "").trim(),
+    drivetrain: (listing.drive_type || v.DriveType || "").trim(),
+    vehicle_type: (listing.type_code || v.Type || "").trim(),
     fuel_type: listing.fuel_type.trim() || v.FuelType?.trim() || "",
     transmission:
       listing.transmission.trim() || v.TransmissionType?.trim() || "",

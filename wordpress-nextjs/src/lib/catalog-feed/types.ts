@@ -29,6 +29,8 @@ export type CatalogFeedItem = {
   odometer: { value: string; unit: string };
   exterior_color: string;
   body_style: string;
+  drivetrain: string;
+  vehicle_type: string;
   fuel_type: string;
   transmission: string;
   vin: string;
@@ -49,12 +51,16 @@ export const META_CATALOG_CSV_HEADERS = [
   "availability",
   "state_of_vehicle",
   "sale_price",
-  "link",
+  "url",
   "image_link",
   "exterior_color",
   "body_style",
+  "drivetrain",
+  "vehicle_type",
+  "mileage.unit",
+  "mileage.value",
   "fuel_type",
   "transmission",
   "vin",
-  "sku",
+  "stock_number",
 ] as const;
