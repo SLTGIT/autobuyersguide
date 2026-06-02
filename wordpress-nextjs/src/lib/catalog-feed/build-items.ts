@@ -88,6 +88,79 @@ function mapStateOfVehicle(
   return "USED";
 }
 
+function normalizeBodyStyle(raw: string): string {
+  const t = (raw || "").trim().toLowerCase();
+  if (!t) return "OTHER";
+  if (/cab\s*chassis/.test(t)) return "TRUCK";
+  if (/dual\s*cab\s*utility/.test(t)) return "PICKUP";
+  if (/pickup\s*crew\s*cab/.test(t)) return "PICKUP";
+  if (/utility/.test(t)) return "PICKUP";
+  if (/wagon/.test(t)) return "WAGON";
+  if (/suv|crossover/.test(t)) return "SUV";
+  if (/hatch/.test(t)) return "HATCHBACK";
+  if (/ute|pickup|pick-up/.test(t)) return "PICKUP";
+  if (/truck/.test(t)) return "TRUCK";
+  if (/van|people mover|peoplemover/.test(t)) return "VAN";
+  if (/sedan|saloon/.test(t)) return "SEDAN";
+  if (/coupe/.test(t)) return "COUPE";
+  if (/convertible|cabriolet|roadster/.test(t)) return "CONVERTIBLE";
+  if (/boat|marine|vessel/.test(t)) return "OTHER";
+  return "OTHER";
+}
+
+function normalizeFuelType(raw: string): string {
+  const t = (raw || "").trim().toLowerCase();
+  if (!t) return "";
+  if (/hybrid|phev|plug[-\s]?in/.test(t)) return "HYBRID";
+  if (/electric|ev/.test(t)) return "ELECTRIC";
+  if (/diesel/.test(t)) return "DIESEL";
+  if (/petrol|gasoline|unleaded/.test(t)) return "PETROL";
+  if (/lpg|cng|gas/.test(t)) return "GAS";
+  return t.toUpperCase();
+}
+
+function normalizeTransmission(raw: string): string {
+  const t = (raw || "").trim().toLowerCase();
+  if (!t) return "";
+  if (/manual/.test(t)) return "MANUAL";
+  if (/auto|automatic|cvt|dct|tiptronic/.test(t)) return "AUTOMATIC";
+  return "AUTOMATIC";
+}
+
+function normalizeVehicleType(raw: string): string {
+  const t = (raw || "").trim().toLowerCase();
+  if (!t) return "CAR_TRUCK";
+  if (/boat|marine|vessel/.test(t)) return "BOAT";
+  if (t === "car") return "CAR_TRUCK";
+  return "CAR_TRUCK";
+}
+
+function normalizeDrivetrain(raw: string): string {
+  const t = (raw || "").trim().toUpperCase();
+  if (!t) return "";
+  if (t === "4WD") return "4X4";
+  if (t === "4X4") return "4X4";
+  return t;
+}
+
+function inferBoatFromVehicle(v: DealerVehicle, listing: VehicleListing): boolean {
+  const text = [
+    v.Type,
+    listing.type_code,
+    v.BodyType,
+    listing.body_type,
+    v.Make,
+    v.Model,
+    listing.title,
+    v.Description,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  if (/landcruiser/.test(text)) return false;
+  return /boat|marine|vessel|outboard|stern\s*drive|trailer\s*boat|whittley/.test(text);
+}
+
 function normalizeCondition(listing: VehicleListing): "new" | "used" {
   return (listing.condition || "used").trim().toLowerCase() === "new"
     ? "new"
@@ -118,6 +191,17 @@ function resolveYear(listing: VehicleListing, v: DealerVehicle): number | null {
 /** Whole dollars + space + AUD (Google Merchant + Meta catalog). */
 export function formatCatalogPriceAud(amount: number): string {
   return `${Math.round(amount)} AUD`;
+}
+
+/** Force feed image URLs to absolute HTTP. */
+function normalizeFeedImageUrl(raw: string): string {
+  const t = (raw || "").trim();
+  if (!t) return "";
+  if (/^http:\/\//i.test(t)) return t;
+  if (/^https:\/\//i.test(t)) return `http://${t.slice(8)}`;
+  if (t.startsWith("//")) return `http:${t}`;
+  if (/^[a-z0-9.-]+\.[a-z]{2,}(?:\/|$)/i.test(t)) return `http://${t}`;
+  return "";
 }
 
 const ODOMETER_UNIT_KM = "km";
@@ -152,22 +236,30 @@ function splitAddress(input: string): {
 
   const parts = t.split(",").map((s) => s.trim()).filter(Boolean);
   if (parts.length >= 4) {
+    const country =
+      (parts.find((p) => /^(AU|Australia)$/i.test(p)) || "AU").toUpperCase();
+    const region =
+      parts.find((p) => /^(ACT|NSW|NT|QLD|SA|TAS|VIC|WA)$/i.test(p)) || "";
+    const postal =
+      (parts.find((p) => /^\d{4}$/.test(p)) || t.match(/\b(\d{4})\b/)?.[1] || "")
+        .replace(/\D/g, "");
     return {
       addr1: parts[0] || "",
       city: parts[1] || "",
-      region: parts[2] || "",
-      postal_code: parts[3]?.replace(/\D/g, "") || "",
-      country: parts[4] || "AU",
+      region: region.toUpperCase(),
+      postal_code: postal,
+      country,
     };
   }
 
   if (parts.length === 3) {
     const regionPostal = parts[2].match(/^([A-Za-z]{2,4})\s+(\d{4})$/);
+    const postalFallback = t.match(/\b(\d{4})\b/)?.[1] || "";
     return {
       addr1: parts[0] || "",
       city: parts[1] || "",
       region: regionPostal?.[1] || "",
-      postal_code: regionPostal?.[2] || "",
+      postal_code: regionPostal?.[2] || postalFallback,
       country: "AU",
     };
   }
@@ -201,14 +293,14 @@ export function vehicleToCatalogItem(
   const listing = dealerVehicleToListing(v);
   const priceAud = catalogOfferPriceAud(v, listing);
   const imageRaw = listing.featured_image || v.Photos?.[0]?.PhotoUrl || "";
-  const imageLink = upgradeHttpToHttpsUrl(imageRaw.trim());
+  const imageLink = normalizeFeedImageUrl(imageRaw);
 
   if (!imageLink || priceAud == null) return null;
 
   const siteOrigin = upgradeHttpToHttpsUrl(origin.replace(/\/$/, ""));
   const link = upgradeHttpToHttpsUrl(`${siteOrigin}/cars/${listing.slug}`);
   const additionalImageLinks = (v.Photos ?? [])
-    .map((p) => upgradeHttpToHttpsUrl(p.PhotoUrl?.trim() || ""))
+    .map((p) => normalizeFeedImageUrl(p.PhotoUrl?.trim() || ""))
     .filter((url) => url && url !== imageLink)
     .slice(0, 9);
 
@@ -217,6 +309,7 @@ export function vehicleToCatalogItem(
   const year = resolveYear(listing, v);
   const location = catalogLocation(listing, v);
   const address = splitAddress(location);
+  const isBoat = inferBoatFromVehicle(v, listing);
   const descriptionTemplate = catalogDescriptionLine(listing, make, model, year);
   const descriptionFallback = buildVehicleListingDescription(listing, v)
     .trim()
@@ -244,12 +337,13 @@ export function vehicleToCatalogItem(
     address,
     odometer: catalogOdometer(listing, v),
     exterior_color: (v.BodyColour || "").trim(),
-    body_style: (listing.body_type || v.BodyType || "").trim(),
-    drivetrain: (listing.drive_type || v.DriveType || "").trim(),
-    vehicle_type: (listing.type_code || v.Type || "").trim(),
-    fuel_type: listing.fuel_type.trim() || v.FuelType?.trim() || "",
-    transmission:
+    body_style: normalizeBodyStyle(listing.body_type || v.BodyType || ""),
+    drivetrain: normalizeDrivetrain(listing.drive_type || v.DriveType || ""),
+    vehicle_type: isBoat ? "BOAT" : normalizeVehicleType(listing.type_code || v.Type || ""),
+    fuel_type: normalizeFuelType(listing.fuel_type.trim() || v.FuelType?.trim() || ""),
+    transmission: normalizeTransmission(
       listing.transmission.trim() || v.TransmissionType?.trim() || "",
+    ),
     vin: extractVinFromDealerVehicle(v),
   };
 }

@@ -10,9 +10,7 @@ function textNode(tag: string, value: string): string {
 }
 
 function stateOfVehicleLabel(raw: "USED" | "NEW" | "CPO"): string {
-  if (raw === "NEW") return "New";
-  if (raw === "CPO") return "CPO";
-  return "Used";
+  return raw;
 }
 
 function addressNode(item: CatalogFeedItem): string {
@@ -21,7 +19,6 @@ function addressNode(item: CatalogFeedItem): string {
       <component name="city">${escapeXml(item.address.city)}</component>
       <component name="region">${escapeXml(item.address.region)}</component>
       <component name="country">${escapeXml(item.address.country)}</component>
-      <component name="postal_code">${escapeXml(item.address.postal_code)}</component>
     </address>`;
 }
 
@@ -36,6 +33,10 @@ function itemXml(item: CatalogFeedItem): string {
   const mileageValue = item.odometer.value || "";
   const mileageUnit = item.odometer.unit ? item.odometer.unit.toUpperCase() : "";
   const images = imageNodes(item);
+  const mileageBlock =
+    mileageValue && mileageUnit
+      ? `    <mileage>\n      <value>${escapeXml(mileageValue)}</value>\n      <unit>${escapeXml(mileageUnit)}</unit>\n    </mileage>`
+      : "";
 
   return `  <listing>
 ${textNode("vehicle_id", item.vehicle_id)}
@@ -51,10 +52,7 @@ ${textNode("vehicle_type", item.vehicle_type)}
 ${textNode("body_style", item.body_style)}
 ${textNode("fuel_type", item.fuel_type)}
 ${textNode("transmission", item.transmission)}
-    <mileage>
-      <value>${escapeXml(mileageValue)}</value>
-      <unit>${escapeXml(mileageUnit)}</unit>
-    </mileage>
+${mileageBlock}
 ${images}
 ${textNode("price", formatCatalogPriceAud(item.priceAud))}
 ${addressNode(item)}
