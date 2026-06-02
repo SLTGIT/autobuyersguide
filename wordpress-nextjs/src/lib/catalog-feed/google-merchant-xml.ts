@@ -19,7 +19,7 @@ function addressNode(item: CatalogFeedItem): string {
   return `    <address format="simple">
       <component name="addr1">${escapeXml(item.address.addr1)}</component>
       <component name="city">${escapeXml(item.address.city)}</component>
-      <component name="region"></component>
+      <component name="region">${escapeXml(item.address.region)}</component>
       <component name="country">${escapeXml(item.address.country)}</component>
       <component name="postal_code">${escapeXml(item.address.postal_code)}</component>
     </address>`;

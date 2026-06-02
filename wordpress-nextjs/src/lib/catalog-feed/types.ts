@@ -23,6 +23,7 @@ export type CatalogFeedItem = {
   address: {
     addr1: string;
     city: string;
+    region: string;
     postal_code: string;
     country: string;
   };

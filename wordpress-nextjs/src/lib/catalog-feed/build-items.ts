@@ -136,12 +136,14 @@ function catalogOdometer(
 function splitAddress(input: string): {
   addr1: string;
   city: string;
+  region: string;
   postal_code: string;
   country: string;
 } {
   const empty = {
     addr1: "",
     city: "",
+    region: "",
     postal_code: "",
     country: "AU",
   };
@@ -153,6 +155,7 @@ function splitAddress(input: string): {
     return {
       addr1: parts[0] || "",
       city: parts[1] || "",
+      region: parts[2] || "",
       postal_code: parts[3]?.replace(/\D/g, "") || "",
       country: parts[4] || "AU",
     };
@@ -163,7 +166,27 @@ function splitAddress(input: string): {
     return {
       addr1: parts[0] || "",
       city: parts[1] || "",
+      region: regionPostal?.[1] || "",
       postal_code: regionPostal?.[2] || "",
+      country: "AU",
+    };
+  }
+
+  // Non-comma address fallback: "22 Tombo Street Capalaba QLD 4157"
+  const normalized = t.replace(/\s+/g, " ").trim();
+  const m = normalized.match(
+    /^(.*?)(?:\s+([A-Za-z][A-Za-z\s'-]+?))?\s+(ACT|NSW|NT|QLD|SA|TAS|VIC|WA)(?:\s+(\d{4}))?$/i,
+  );
+  if (m) {
+    const street = (m[1] || "").trim();
+    const city = (m[2] || "").trim();
+    const region = (m[3] || "").toUpperCase();
+    const postal = (m[4] || "").trim();
+    return {
+      addr1: street,
+      city,
+      region,
+      postal_code: postal,
       country: "AU",
     };
   }
