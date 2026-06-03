@@ -42,12 +42,12 @@ export default function Footer() {
           <div className="col-lg-3">
             <h3 className="h5 fw-bold">Company</h3>
             <ul className="list-unstyled text-white-50 mb-0">
-              {/* <li>
-                <Link href="/about-us">About Us</Link>
-              </li> */}
               <li>
-                <Link href="/contact">Contact Us</Link>
+                <Link href="/about-us">About Us</Link>
               </li>
+              {/* <li>
+                <Link href="/contact">Contact Us</Link>
+              </li> */}
               <li>
                 <Link href="/privacy-policy">Privacy Policy</Link>
               </li>
