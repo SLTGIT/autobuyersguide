@@ -217,6 +217,59 @@ function catalogOdometer(
   return { value: String(Math.round(km)), unit: ODOMETER_UNIT_KM };
 }
 
+const AU_STATE_RE = /^(ACT|NSW|NT|QLD|SA|TAS|VIC|WA)$/i;
+const AU_STATE_POSTCODE_SUFFIX_RE =
+  /\s+(ACT|NSW|NT|QLD|SA|TAS|VIC|WA)(?:\s+(\d{4}))?\s*$/i;
+
+/** e.g. `22`, `54-56`, `22A` when street name is in the next comma segment */
+function isStreetNumberOnly(segment: string): boolean {
+  return /^\d+[A-Za-z]?(?:\s*[-–]\s*\d+[A-Za-z]?)?$/.test(segment.trim());
+}
+
+/** Split "Tombo Street Capalaba" → street line + suburb. */
+function splitStreetLineAndSuburb(line: string): {
+  street: string;
+  suburb: string;
+} {
+  const t = line.replace(/\s+/g, " ").trim();
+  if (!t) return { street: "", suburb: "" };
+
+  const suffixRe =
+    /\b(street|st|road|rd|avenue|ave|drive|dr|court|ct|way|parade|pde|boulevard|blvd|lane|ln|crescent|cres|place|pl|terrace|tce|circuit|cct|close|cl|grove|gr)\b/gi;
+
+  let lastSuffixEnd = -1;
+  for (const m of t.matchAll(suffixRe)) {
+    lastSuffixEnd = (m.index ?? 0) + m[0].length;
+  }
+
+  if (lastSuffixEnd > 0) {
+    const street = t.slice(0, lastSuffixEnd).trim();
+    const suburb = t.slice(lastSuffixEnd).trim();
+    if (suburb) return { street, suburb };
+  }
+
+  const words = t.split(/\s+/).filter(Boolean);
+  if (words.length >= 2) {
+    return {
+      street: words.slice(0, -1).join(" "),
+      suburb: words[words.length - 1] ?? "",
+    };
+  }
+
+  return { street: t, suburb: "" };
+}
+
+function findRegionAndCountry(parts: string[]): {
+  region: string;
+  country: string;
+} {
+  const region =
+    parts.find((p) => AU_STATE_RE.test(p))?.toUpperCase() || "";
+  const country =
+    parts.find((p) => /^(AU|Australia)$/i.test(p))?.toUpperCase() || "AU";
+  return { region, country };
+}
+
 function splitAddress(input: string): {
   addr1: string;
   city: string;
@@ -235,55 +288,53 @@ function splitAddress(input: string): {
   if (!t) return empty;
 
   const parts = t.split(",").map((s) => s.trim()).filter(Boolean);
-  if (parts.length >= 4) {
-    const country =
-      (parts.find((p) => /^(AU|Australia)$/i.test(p)) || "AU").toUpperCase();
-    const region =
-      parts.find((p) => /^(ACT|NSW|NT|QLD|SA|TAS|VIC|WA)$/i.test(p)) || "";
-    const postal =
-      (parts.find((p) => /^\d{4}$/.test(p)) || t.match(/\b(\d{4})\b/)?.[1] || "")
-        .replace(/\D/g, "");
+
+  // "22, Tombo Street Capalaba" or "54-56, Freeth Street West, Ormiston"
+  if (parts.length >= 2 && isStreetNumberOnly(parts[0])) {
+    const explicitCity = parts
+      .slice(2)
+      .find(
+        (p) =>
+          !AU_STATE_RE.test(p) &&
+          !/^(AU|Australia)$/i.test(p) &&
+          !/^\d{4}$/.test(p),
+      );
+    const { street, suburb } = explicitCity
+      ? { street: parts[1], suburb: "" }
+      : splitStreetLineAndSuburb(parts[1]);
+    const addr1 = [parts[0], street].filter(Boolean).join(" ").trim();
+    const city = explicitCity || suburb;
+    const { region, country } = findRegionAndCountry(parts.slice(2));
+    return { addr1, city, region, postal_code: "", country };
+  }
+
+  // "22 Tombo St, Capalaba, QLD" (well-formed comma address)
+  if (parts.length >= 2) {
+    const { region, country } = findRegionAndCountry(parts.slice(2));
     return {
       addr1: parts[0] || "",
       city: parts[1] || "",
-      region: region.toUpperCase(),
-      postal_code: postal,
+      region,
+      postal_code: "",
       country,
     };
   }
 
-  if (parts.length === 3) {
-    const regionPostal = parts[2].match(/^([A-Za-z]{2,4})\s+(\d{4})$/);
-    const postalFallback = t.match(/\b(\d{4})\b/)?.[1] || "";
-    return {
-      addr1: parts[0] || "",
-      city: parts[1] || "",
-      region: regionPostal?.[1] || "",
-      postal_code: regionPostal?.[2] || postalFallback,
-      country: "AU",
-    };
-  }
-
-  // Non-comma address fallback: "22 Tombo Street Capalaba QLD 4157"
-  const normalized = t.replace(/\s+/g, " ").trim();
-  const m = normalized.match(
-    /^(.*?)(?:\s+([A-Za-z][A-Za-z\s'-]+?))?\s+(ACT|NSW|NT|QLD|SA|TAS|VIC|WA)(?:\s+(\d{4}))?$/i,
-  );
-  if (m) {
-    const street = (m[1] || "").trim();
-    const city = (m[2] || "").trim();
-    const region = (m[3] || "").toUpperCase();
-    const postal = (m[4] || "").trim();
-    return {
-      addr1: street,
-      city,
-      region,
-      postal_code: postal,
-      country: "AU",
-    };
-  }
-
-  return { ...empty, addr1: t };
+  // "22 Tombo Street Capalaba QLD 4157" (no commas)
+  const stateMatch = t.match(AU_STATE_POSTCODE_SUFFIX_RE);
+  const lineBody = stateMatch
+    ? t.slice(0, stateMatch.index).trim().replace(/,\s*$/, "")
+    : t;
+  const region = stateMatch?.[1]?.toUpperCase() || "";
+  const postal_code = stateMatch?.[2] || "";
+  const { street, suburb } = splitStreetLineAndSuburb(lineBody);
+  return {
+    addr1: street,
+    city: suburb,
+    region,
+    postal_code,
+    country: "AU",
+  };
 }
 
 export function vehicleToCatalogItem(
