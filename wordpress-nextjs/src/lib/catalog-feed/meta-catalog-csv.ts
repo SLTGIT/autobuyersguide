@@ -20,6 +20,7 @@ function rowValues(item: CatalogFeedItem): string[] {
     item.year != null ? String(item.year) : "",
     item.address.addr1,
     item.address.city,
+    item.address.region,
     item.address.country,
     item.title,
     item.description,

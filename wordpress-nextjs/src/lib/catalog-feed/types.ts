@@ -45,6 +45,7 @@ export const META_CATALOG_CSV_HEADERS = [
   "year",
   "address.addr1",
   "address.city",
+  "address.region",
   "address.country",
   "title",
   "description",

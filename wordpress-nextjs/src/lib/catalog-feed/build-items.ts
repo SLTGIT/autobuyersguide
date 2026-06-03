@@ -18,6 +18,9 @@ import type { CatalogFeedItem } from "./types";
 const SITE_NAME = "Car Sales Brisbane";
 const GOOGLE_PRODUCT_CATEGORY = "916";
 
+/** Stock / vehicle_id values omitted from Meta and Google catalog feeds. */
+const CATALOG_FEED_EXCLUDED_VEHICLE_IDS = new Set(["00101806"]);
+
 export { GOOGLE_PRODUCT_CATEGORY, SITE_NAME };
 
 function catalogOfferPriceAud(
@@ -259,15 +262,55 @@ function splitStreetLineAndSuburb(line: string): {
   return { street: t, suburb: "" };
 }
 
+function parseStateFromSegment(segment: string): string {
+  const t = segment.trim();
+  if (AU_STATE_RE.test(t)) return t.toUpperCase();
+  const m = t.match(/^(ACT|NSW|NT|QLD|SA|TAS|VIC|WA)(?:\s+\d{4})?$/i);
+  return m ? m[1].toUpperCase() : "";
+}
+
+/** e.g. `Ormiston QLD` → city `Ormiston`, region `QLD` */
+function splitCityAndRegion(
+  city: string,
+  region: string,
+): { city: string; region: string } {
+  const c = city.trim();
+  let r = region.trim().toUpperCase();
+  if (r) return { city: c, region: r };
+
+  const embedded = c.match(/^(.+?)\s+(ACT|NSW|NT|QLD|SA|TAS|VIC|WA)$/i);
+  if (embedded) {
+    return { city: embedded[1].trim(), region: embedded[2].toUpperCase() };
+  }
+  return { city: c, region: "" };
+}
+
 function findRegionAndCountry(parts: string[]): {
   region: string;
   country: string;
 } {
   const region =
-    parts.find((p) => AU_STATE_RE.test(p))?.toUpperCase() || "";
+    parts.map(parseStateFromSegment).find(Boolean) || "";
   const country =
     parts.find((p) => /^(AU|Australia)$/i.test(p))?.toUpperCase() || "AU";
   return { region, country };
+}
+
+function finalizeAddress(address: {
+  addr1: string;
+  city: string;
+  region: string;
+  postal_code: string;
+  country: string;
+}): {
+  addr1: string;
+  city: string;
+  region: string;
+  postal_code: string;
+  country: string;
+} {
+  const { city, region } = splitCityAndRegion(address.city, address.region);
+  return { ...address, city, region };
 }
 
 function splitAddress(input: string): {
@@ -305,19 +348,19 @@ function splitAddress(input: string): {
     const addr1 = [parts[0], street].filter(Boolean).join(" ").trim();
     const city = explicitCity || suburb;
     const { region, country } = findRegionAndCountry(parts.slice(2));
-    return { addr1, city, region, postal_code: "", country };
+    return finalizeAddress({ addr1, city, region, postal_code: "", country });
   }
 
-  // "22 Tombo St, Capalaba, QLD" (well-formed comma address)
+  // "54-56 Freeth Street West, Ormiston QLD" or "22 Tombo St, Capalaba, QLD"
   if (parts.length >= 2) {
     const { region, country } = findRegionAndCountry(parts.slice(2));
-    return {
+    return finalizeAddress({
       addr1: parts[0] || "",
       city: parts[1] || "",
       region,
       postal_code: "",
       country,
-    };
+    });
   }
 
   // "22 Tombo Street Capalaba QLD 4157" (no commas)
@@ -328,13 +371,13 @@ function splitAddress(input: string): {
   const region = stateMatch?.[1]?.toUpperCase() || "";
   const postal_code = stateMatch?.[2] || "";
   const { street, suburb } = splitStreetLineAndSuburb(lineBody);
-  return {
+  return finalizeAddress({
     addr1: street,
     city: suburb,
     region,
     postal_code,
     country: "AU",
-  };
+  });
 }
 
 export function vehicleToCatalogItem(
@@ -411,6 +454,7 @@ export async function buildCatalogFeedItems(): Promise<{
   for (const v of vehicles) {
     const item = vehicleToCatalogItem(origin, v);
     if (!item) continue;
+    if (CATALOG_FEED_EXCLUDED_VEHICLE_IDS.has(item.vehicle_id)) continue;
     const key = item.link.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
