@@ -6,7 +6,8 @@ export type SubmitLeadResponse = {
 };
 
 /**
- * POSTs lead payload to the Next.js API route, which emails LEADS_TO_EMAIL via SMTP.
+ * POSTs lead payload to the Next.js API route (/api/leads).
+ * The server verifies reCAPTCHA, emails LEADS_TO_EMAIL, and forwards to WordPress with the secret token.
  */
 export async function submitLead(
   body: Record<string, unknown>,

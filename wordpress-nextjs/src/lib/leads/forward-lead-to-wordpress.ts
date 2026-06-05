@@ -1,6 +1,6 @@
 /**
- * POSTs the same JSON body the browser used to send directly to WordPress.
- * Runs on the Next.js server (no browser CORS).
+ * POSTs lead payload to WordPress REST `custom/v1/submit-lead`.
+ * Runs on the Next.js server only — Bearer token stays in LEAD_API_SECRET (never sent to the browser).
  */
 export async function forwardLeadToWordpress(
   body: Record<string, unknown>,
@@ -14,12 +14,22 @@ export async function forwardLeadToWordpress(
     );
   }
 
+  const secret = process.env.LEAD_API_SECRET?.trim();
+  if (!secret) {
+    throw new Error(
+      "LEAD_API_SECRET is not set. Add it to your server environment (must match WordPress LEAD_API_SECRET).",
+    );
+  }
+
   const base = raw.replace(/\/$/, "");
   const url = `${base}/custom/v1/submit-lead`;
 
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${secret}`,
+    },
     body: JSON.stringify(body),
     cache: "no-store",
   });

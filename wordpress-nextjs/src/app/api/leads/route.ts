@@ -13,7 +13,7 @@ function isNonEmptyString(v: unknown): v is string {
  * POST /api/leads
  * Accepts the same JSON shape used by site forms:
  * - sends email (LEADS_TO_EMAIL)
- * - forwards the same payload to WordPress REST `custom/v1/submit-lead`
+ * - forwards the same payload to WordPress REST `custom/v1/submit-lead` (Bearer token from LEAD_API_SECRET)
  */
 export async function POST(req: NextRequest) {
   let body: Record<string, unknown>;
