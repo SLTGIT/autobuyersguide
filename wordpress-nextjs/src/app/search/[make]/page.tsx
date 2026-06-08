@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import type { DealerVehicle } from "@/types/inventory";
 import { fetchDealerInventory } from "@/lib/dealer-solutions/fetch-inventory";
 import {
+  filterDealerVehicles,
   mergeInventoryFiltersWithPathAugment,
   parseInventorySearchParams,
 } from "@/lib/inventory/query";
+import { labelFromSearchPathSlug } from "@/lib/inventory/srp-not-found";
 import { resolveSearchPathSlug } from "@/lib/inventory/search-path-slugs";
 import { mergeSiteUrlMetadata } from "@/lib/site-url";
 import {
@@ -13,6 +14,8 @@ import {
   renderCmsSrpSearchPage,
 } from "@/lib/cms-srp/render-cms-srp-search";
 import SearchPageView from "../SearchPageView";
+
+export const dynamic = "force-dynamic";
 
 interface SearchMakePageProps {
   params: Promise<{ make: string }>;
@@ -70,19 +73,46 @@ export default async function SearchByMakePage({
 
   const vehicles: DealerVehicle[] = await fetchDealerInventory().catch(() => []);
   const resolved = resolveSearchPathSlug(slug, vehicles);
-  if (!resolved) notFound();
-
   const fromQuery = parseInventorySearchParams(raw);
+
+  if (!resolved) {
+    return (
+      <SearchPageView
+        filters={fromQuery}
+        pathAugment={null}
+        pathHeroLabel={null}
+        srpNotFoundLabel={labelFromSearchPathSlug(slug)}
+        listingBasePathname="/search"
+        initialSearchParams={raw}
+      />
+    );
+  }
+
   const filters = mergeInventoryFiltersWithPathAugment(
     fromQuery,
     resolved.pathAugment,
   );
+
+  const filtered = filterDealerVehicles(vehicles, filters);
+  if (filtered.length === 0 && vehicles.length > 0) {
+    return (
+      <SearchPageView
+        filters={fromQuery}
+        pathAugment={null}
+        pathHeroLabel={null}
+        srpNotFoundLabel={resolved.heroLabel}
+        listingBasePathname="/search"
+        initialSearchParams={raw}
+      />
+    );
+  }
 
   return (
     <SearchPageView
       filters={filters}
       pathAugment={resolved.pathAugment}
       pathHeroLabel={resolved.heroLabel}
+      initialSearchParams={raw}
     />
   );
 }

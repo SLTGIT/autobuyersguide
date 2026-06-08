@@ -26,16 +26,16 @@ export default function Footer() {
             <h3 className="h5 fw-bold">Used Cars</h3>
             <ul className="list-unstyled text-white-50 mb-0">
               <li>
-                <Link href={"/search/4x4"}>4x4 Cars for Sale</Link>
+                <Link href={"/search/4x4"}>Used 4x4 Cars for Sale</Link>
               </li>
               <li>
-                <Link href={"/search/sedan"}>Sedan Cars</Link>
+                <Link href={"/search/utility"}> Used Utility Cars for Sale </Link>
               </li>
               <li>
-                <Link href={"/search/suv"}>SUV Cars</Link>
+                <Link href={"/search/suv"}>Used SUVs for Sale</Link>
               </li>
               <li>
-                <Link href={"/search/hatchback"}>Hatchback Cars</Link>
+                <Link href={"/search/hatchback"}>Used Hatchback Cars for Sale</Link>
               </li>
             </ul>
           </div>

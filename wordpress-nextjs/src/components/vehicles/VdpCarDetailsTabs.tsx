@@ -101,7 +101,6 @@ export default function VdpCarDetailsTabs({
         role="tabpanel"
         aria-labelledby="vdp-tab-overview"
         hidden={active !== "overview"}
-        className={active === "overview" ? undefined : "d-none"}
       >
         {overviewParagraphs.map((p, i) => (
           <p
@@ -119,7 +118,6 @@ export default function VdpCarDetailsTabs({
         role="tabpanel"
         aria-labelledby="vdp-tab-features"
         hidden={active !== "features"}
-        className={active === "features" ? undefined : "d-none"}
       >
         <FeaturesGrid items={featureItems} />
       </div>
@@ -129,7 +127,6 @@ export default function VdpCarDetailsTabs({
         role="tabpanel"
         aria-labelledby="vdp-tab-specifications"
         hidden={active !== "specifications"}
-        className={active === "specifications" ? undefined : "d-none"}
       >
         <SpecGrid rows={engineTowingRows} />
       </div>

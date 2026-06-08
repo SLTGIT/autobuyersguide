@@ -43,6 +43,7 @@ export async function renderCmsSrpSearchPage(
       }}
       listingSeo={listingJsonLd}
       canonicalPathname={pathname}
+      initialSearchParams={rawSearchParams ?? {}}
     />
   );
 }

@@ -48,6 +48,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       pathHeroLabel={null}
       wpHeroHtml={rendered ? repairWpRenderedHtml(rendered) : null}
       listingSeo={{ title: seoTitle, description: seoDescription }}
+      initialSearchParams={raw}
     />
   );
 }

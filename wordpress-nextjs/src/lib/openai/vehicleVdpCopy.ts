@@ -20,7 +20,8 @@ import {
   sanitizeBiSuffix,
 } from "./vehicleVdpDisplayUtils";
 
-const VDP_AI_REVALIDATE_SEC = 2592000; //  1 month
+// const VDP_AI_REVALIDATE_SEC = 2592000; //  1 month
+const VDP_AI_REVALIDATE_SEC = 3600; //  1 hour
 const VDP_MAX_FAQS = 6;
 
 /** Hero pill should summarise year/condition/body/fuel — not warranty marketing. */
@@ -358,6 +359,75 @@ function parseStringList(raw: unknown, max = 24): string[] {
   return out;
 }
 
+/** OpenAI sometimes returns a string or nested object instead of string[]. */
+function parseDealerCommentsParagraphs(raw: unknown, max = 12): string[] {
+  if (typeof raw === "string") {
+    const t = raw.trim();
+    if (!t) return [];
+    const split = splitVehicleDescription(t);
+    return (split.length ? split : [t]).slice(0, max);
+  }
+  if (Array.isArray(raw)) {
+    const fromStrings = parseStringList(raw, max);
+    if (fromStrings.length) return fromStrings;
+    const out: string[] = [];
+    for (const item of raw) {
+      if (!item || typeof item !== "object") continue;
+      const rec = item as Record<string, unknown>;
+      const text = [rec.text, rec.paragraph, rec.body, rec.content].find(
+        (v) => typeof v === "string" && v.trim(),
+      );
+      if (typeof text === "string") {
+        const t = text.trim();
+        if (t && !out.includes(t)) out.push(t);
+      }
+      if (out.length >= max) break;
+    }
+    return out;
+  }
+  if (raw && typeof raw === "object") {
+    const nested = (raw as { paragraphs?: unknown }).paragraphs;
+    if (nested !== undefined) return parseDealerCommentsParagraphs(nested, max);
+  }
+  return [];
+}
+
+function parseDealerCommentsBullets(raw: unknown, max = 24): string[] {
+  if (typeof raw === "string") {
+    const t = raw.trim();
+    if (!t) return [];
+    const lines = t
+      .split(/\n|•|;/)
+      .map((s) => s.replace(/^[\s\-*]+/, "").trim())
+      .filter(Boolean);
+    return lines.slice(0, max);
+  }
+  if (Array.isArray(raw)) {
+    const fromStrings = parseStringList(raw, max);
+    if (fromStrings.length) return fromStrings;
+    const out: string[] = [];
+    for (const item of raw) {
+      if (!item || typeof item !== "object") continue;
+      const rec = item as Record<string, unknown>;
+      const text = [rec.text, rec.label, rec.item, rec.feature].find(
+        (v) => typeof v === "string" && v.trim(),
+      );
+      if (typeof text === "string") {
+        const t = text.trim();
+        if (t && !out.includes(t)) out.push(t);
+      }
+      if (out.length >= max) break;
+    }
+    return out;
+  }
+  if (raw && typeof raw === "object") {
+    const nested = (raw as { bullets?: unknown; items?: unknown }).bullets ??
+      (raw as { items?: unknown }).items;
+    if (nested !== undefined) return parseDealerCommentsBullets(nested, max);
+  }
+  return [];
+}
+
 function listingCommentSourceText(snapshot: VehicleVdpSnapshot): string {
   const comments = snapshot.comments.trim();
   const description = snapshot.description.trim();
@@ -438,25 +508,84 @@ export function resolveDealerCommentsContent(
   const sourceLen = listingCommentSourceText(snapshot).length;
   const aiLen =
     aiParagraphs.join(" ").length + aiBullets.join(" ").length;
-  /** Long feeds (comments + description) can exceed 10k chars; 50% of that is unrealistic for JSON. */
-  const ratioMin = sourceLen >= 280 ? Math.floor(sourceLen * 0.5) : 0;
-  const minChars = Math.min(ratioMin, 2200);
-  /** Prefer a solid multi-paragraph rewrite even when it is under half of a very long raw listing. */
-  const substantialParagraphRewrite =
-    aiParagraphs.length >= 4 && aiLen >= 900;
 
+  if (aiParagraphs.length === 0 && aiBullets.length === 0) {
+    return raw;
+  }
+
+  /** Accept OpenAI rewrite when it is substantive enough for the source length. */
+  const minCharsForLongSource = Math.min(
+    Math.max(Math.floor(sourceLen * 0.3), 280),
+    1600,
+  );
   const useAi =
-    aiParagraphs.length > 0 &&
-    (sourceLen < 280 || aiLen >= minChars || substantialParagraphRewrite);
+    (aiParagraphs.length >= 2 && aiLen >= 400) ||
+    (aiParagraphs.length >= 3 && aiLen >= 280) ||
+    (sourceLen < 200 && aiParagraphs.length > 0) ||
+    (sourceLen >= 200 && aiLen >= minCharsForLongSource) ||
+    (aiParagraphs.length >= 4 && aiLen >= 700);
 
   if (useAi) {
     return {
       dealerCommentsParagraphs: aiParagraphs.slice(0, 12),
-      dealerCommentsBullets: aiBullets.slice(0, 24),
+      dealerCommentsBullets: aiBullets.length
+        ? aiBullets.slice(0, 24)
+        : raw.dealerCommentsBullets.slice(0, 24),
+    };
+  }
+
+  /** Partial AI output — prefer AI paragraphs when they add value over raw. */
+  if (aiParagraphs.length > 0 && aiLen >= 180) {
+    return {
+      dealerCommentsParagraphs: aiParagraphs.slice(0, 12),
+      dealerCommentsBullets: (aiBullets.length ? aiBullets : raw.dealerCommentsBullets).slice(
+        0,
+        24,
+      ),
     };
   }
 
   return raw;
+}
+
+function ensureDealerCommentsPresent(
+  content: Pick<
+    VehicleVdpAiContent,
+    "dealerCommentsParagraphs" | "dealerCommentsBullets"
+  >,
+  snapshot: VehicleVdpSnapshot,
+): Pick<VehicleVdpAiContent, "dealerCommentsParagraphs" | "dealerCommentsBullets"> {
+  const paragraphs = content.dealerCommentsParagraphs
+    .map((p) => p.trim())
+    .filter(Boolean);
+  const bullets = content.dealerCommentsBullets
+    .map((b) => b.trim())
+    .filter(Boolean);
+  if (paragraphs.length || bullets.length) {
+    return {
+      dealerCommentsParagraphs: paragraphs,
+      dealerCommentsBullets: bullets,
+    };
+  }
+  return buildDealerCommentsFromRawListing(snapshot);
+}
+
+function backfillDealerCommentsIfMissing(
+  content: VehicleVdpAiContent,
+  snapshot: VehicleVdpSnapshot,
+): VehicleVdpAiContent {
+  const hasAi =
+    content.dealerCommentsParagraphs.some((p) => p.trim()) ||
+    content.dealerCommentsBullets.some((b) => b.trim());
+  if (hasAi || !listingCommentSourceText(snapshot).trim()) {
+    return content;
+  }
+  const raw = buildDealerCommentsFromRawListing(snapshot);
+  return {
+    ...content,
+    dealerCommentsParagraphs: raw.dealerCommentsParagraphs,
+    dealerCommentsBullets: raw.dealerCommentsBullets,
+  };
 }
 
 function parseHighlightChips(raw: unknown): string[] {
@@ -654,15 +783,24 @@ export function parseVehicleVdpAiContent(raw: unknown): VehicleVdpAiContent | nu
       (raw as { keyHighlights?: unknown }).keyHighlights
   );
 
-  const dealerCommentsParagraphs = parseStringList(
-    (raw as { dealerCommentsParagraphs?: unknown }).dealerCommentsParagraphs ??
-      (raw as { optimizedDealerComments?: unknown }).optimizedDealerComments,
-    12
+  const dealerCommentsRaw = raw as {
+    dealerCommentsParagraphs?: unknown;
+    optimizedDealerComments?: unknown;
+    dealerComments?: unknown;
+    dealerComment?: unknown;
+  };
+  const dealerCommentsParagraphs = parseDealerCommentsParagraphs(
+    dealerCommentsRaw.dealerCommentsParagraphs ??
+      dealerCommentsRaw.optimizedDealerComments ??
+      dealerCommentsRaw.dealerComments ??
+      dealerCommentsRaw.dealerComment,
+    12,
   );
-  const dealerCommentsBullets = parseStringList(
+  const dealerCommentsBullets = parseDealerCommentsBullets(
     (raw as { dealerCommentsBullets?: unknown }).dealerCommentsBullets ??
-      (raw as { dealerCommentFeatures?: unknown }).dealerCommentFeatures,
-    24
+      (raw as { dealerCommentFeatures?: unknown }).dealerCommentFeatures ??
+      (raw as { dealerCommentsFeatures?: unknown }).dealerCommentsFeatures,
+    24,
   );
 
   const goodNextStep = (raw as { goodNextStep?: unknown }).goodNextStep;
@@ -1018,7 +1156,7 @@ async function fetchVehicleVdpAiFromOpenAI(
       fallbackVehicleVdpAiContent(snapshot).engineTowingRows;
   }
 
-  return content;
+  return backfillDealerCommentsIfMissing(content, snapshot);
 }
 
 const runCachedOpenAi = unstable_cache(
@@ -1027,7 +1165,7 @@ const runCachedOpenAi = unstable_cache(
     return fetchVehicleVdpAiFromOpenAI(snapshot);
   },
   // Bump when prompt/schema changes so listings are not stuck on stale AI JSON.
-  ["vehicle-vdp-ai-openai", "v12-faq-max-6"],
+  ["vehicle-vdp-ai-openai", "v13-dealer-comments"],
   { revalidate: VDP_AI_REVALIDATE_SEC }
 );
 
@@ -1062,10 +1200,14 @@ function finalizeVehicleVdpAiContent(
   content: VehicleVdpAiContent,
   snapshot: VehicleVdpSnapshot
 ): VehicleVdpAiContent {
-  const dealerComments = resolveDealerCommentsContent(content, snapshot);
+  const withBackfill = backfillDealerCommentsIfMissing(content, snapshot);
+  const dealerComments = ensureDealerCommentsPresent(
+    resolveDealerCommentsContent(withBackfill, snapshot),
+    snapshot,
+  );
   return {
-    ...content,
-    heroBadge: buildListingHeroBadge(content.heroBadge, snapshot),
+    ...withBackfill,
+    heroBadge: buildListingHeroBadge(withBackfill.heroBadge, snapshot),
     ...dealerComments,
   };
 }

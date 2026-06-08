@@ -499,49 +499,6 @@ function resolveVehicleOfferPriceAud(
   return null;
 }
 
-/** Google Merchant listings: AU pickup / QLD delivery + used-vehicle return policy. */
-const MERCHANT_LISTING_SHIPPING_DETAILS: Record<string, unknown> = {
-  "@type": "OfferShippingDetails",
-  shippingDestination: {
-    "@type": "DefinedRegion",
-    addressCountry: "AU",
-    addressRegion: "QLD",
-  },
-  shippingRate: {
-    "@type": "MonetaryAmount",
-    value: 0,
-    currency: "AUD",
-  },
-  deliveryTime: {
-    "@type": "ShippingDeliveryTime",
-    handlingTime: {
-      "@type": "QuantitativeValue",
-      minValue: 1,
-      maxValue: 5,
-      unitCode: "DAY",
-    },
-    transitTime: {
-      "@type": "QuantitativeValue",
-      minValue: 1,
-      maxValue: 14,
-      unitCode: "DAY",
-    },
-  },
-};
-
-const MERCHANT_LISTING_RETURN_POLICY: Record<string, unknown> = {
-  "@type": "MerchantReturnPolicy",
-  applicableCountry: "AU",
-  returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
-};
-
-function offerMerchantListingFields(): Record<string, unknown> {
-  return {
-    shippingDetails: MERCHANT_LISTING_SHIPPING_DETAILS,
-    hasMerchantReturnPolicy: MERCHANT_LISTING_RETURN_POLICY,
-  };
-}
-
 /** Product description for merchant listings (meta, feed, or synthesized). */
 export function buildVehicleListingDescription(
   listing: VehicleListing,
@@ -607,7 +564,6 @@ function buildVehicleOfferJsonLd(input: {
     availability: "https://schema.org/InStock",
     itemCondition: input.itemCondition,
     seller: { "@id": input.sellerId },
-    ...offerMerchantListingFields(),
   };
 
   if (input.priceSpecDescription) {

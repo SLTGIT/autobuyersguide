@@ -1,7 +1,6 @@
 import "./search.css";
 import { after } from "next/server";
 import { getCurrentUrlAndRoute } from "@/lib/site-url";
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { fetchDealerInventory } from "@/lib/dealer-solutions/fetch-inventory";
@@ -12,6 +11,7 @@ import {
   PER_PAGE,
   inventoryListingQueryHref,
   inventoryListingHrefForContext,
+  clearPathAugmentFromFilters,
 } from "@/lib/inventory/query";
 import type { InventoryFilterState } from "@/types/inventory";
 import JsonLd from "@/components/JsonLd";
@@ -34,22 +34,6 @@ import InventorySrpVehicleGrid from "@/components/vehicles/InventorySrpVehicleGr
 import { warmVehicleVdpCachesForVehicles } from "@/lib/openai/warmVehicleVdpCache";
 import { InventorySearchUrlProvider } from "@/components/vehicles/InventorySearchUrlContext";
 import type { MakeModelPathResolution } from "@/lib/inventory/search-make-model-paths";
-
-function ToolbarFallback() {
-  return (
-    <div className="inventory-toolbar inventory-toolbar--loading" aria-hidden>
-      <p className="inventory-toolbar-count">Loading results…</p>
-    </div>
-  );
-}
-
-function SidebarFallback() {
-  return (
-    <aside className="inventory-sidebar inventory-sidebar--loading" aria-hidden>
-      <p>Loading filters…</p>
-    </aside>
-  );
-}
 
 export type SearchPageCustomHero = {
   heading: string;
@@ -83,6 +67,10 @@ export type SearchPageViewProps = {
   listingBasePathname?: string | null;
   /** WordPress page HTML for `/search` hero (`cs-page-hero search-page-hero`). */
   wpHeroHtml?: string | null;
+  /** Shown in toolbar when redirected from a path SRP with no matches (e.g. "SUV"). */
+  srpNotFoundLabel?: string | null;
+  /** Raw URL search params for stable client hydration. */
+  initialSearchParams?: Record<string, string | string[] | undefined> | null;
 };
 
 export default async function SearchPageView({
@@ -95,27 +83,45 @@ export default async function SearchPageView({
   canonicalPathname,
   listingBasePathname,
   wpHeroHtml,
+  srpNotFoundLabel = null,
+  initialSearchParams = null,
 }: SearchPageViewProps) {
   const all = await fetchDealerInventory();
-  const bounds = priceYearBounds(all);
-  const facets = buildInventoryFacets(all, filters);
 
-  const filtered = filterDealerVehicles(all, filters);
-  const sorted = sortDealerVehicles(filtered, filters.sort);
+  let effectiveFilters = filters;
+  let effectivePathAugment = pathAugment;
+  let effectiveNotFoundLabel = srpNotFoundLabel?.trim() || null;
+
+  let filtered = filterDealerVehicles(all, effectiveFilters);
+  if (
+    pathAugment &&
+    filtered.length === 0 &&
+    all.length > 0 &&
+    !effectiveNotFoundLabel
+  ) {
+    effectiveNotFoundLabel = pathHeroLabel?.trim() || "Vehicle";
+    effectiveFilters = clearPathAugmentFromFilters(effectiveFilters, pathAugment);
+    effectivePathAugment = null;
+    filtered = filterDealerVehicles(all, effectiveFilters);
+  }
+
+  const bounds = priceYearBounds(all);
+  const facets = buildInventoryFacets(all, effectiveFilters);
+  const sorted = sortDealerVehicles(filtered, effectiveFilters.sort);
   const totalPages = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
 
-  if (filters.page > totalPages) {
+  if (effectiveFilters.page > totalPages) {
     redirect(
       inventoryListingHrefForContext(listingBasePathname ?? null, {
-        ...filters,
+        ...effectiveFilters,
         page: totalPages,
       }),
     );
   }
 
   const pageSlice = sorted.slice(
-    (filters.page - 1) * PER_PAGE,
-    filters.page * PER_PAGE,
+    (effectiveFilters.page - 1) * PER_PAGE,
+    effectiveFilters.page * PER_PAGE,
   );
   const listings = pageSlice.map(dealerVehicleToListing);
 
@@ -130,7 +136,7 @@ export default async function SearchPageView({
   const pathForCurrentUrl = (() => {
     const c = canonicalPathname?.trim();
     if (c) return c.startsWith("/") ? c : `/${c}`;
-    return inventoryListingQueryHref(filters);
+    return inventoryListingQueryHref(effectiveFilters);
   })();
 
   const { currentUrl } = await getCurrentUrlAndRoute(pathForCurrentUrl);
@@ -166,7 +172,7 @@ export default async function SearchPageView({
     pageSlice.length > 0
       ? pageSlice.map((vehicle, index) => ({
           "@type": "ListItem",
-          position: (filters.page - 1) * PER_PAGE + index + 1,
+          position: (effectiveFilters.page - 1) * PER_PAGE + index + 1,
           item: vehicleJsonLdFromInventory(
             origin,
             vehicle,
@@ -251,8 +257,9 @@ export default async function SearchPageView({
 
   return (
     <InventorySearchUrlProvider
-      pathAugment={pathAugment}
+      pathAugment={effectivePathAugment}
       listingBasePathname={listingBasePathname ?? null}
+      initialSearchParams={initialSearchParams}
     >
       <JsonLd data={jsonLd} />
       {showWpHero ? (
@@ -321,21 +328,16 @@ export default async function SearchPageView({
           </nav>
 
           <div className="inventory-srp-layout">
-            <Suspense fallback={<SidebarFallback />}>
-              <InventoryFiltersSidebar facets={facets} bounds={bounds} />
-            </Suspense>
+            <InventoryFiltersSidebar facets={facets} bounds={bounds} />
 
             <div className="inventory-srp-main">
-              <Suspense fallback={<ToolbarFallback />}>
-                <InventoryToolbar
-                  total={sorted.length}
-                  sort={filters.sort}
-                />
-              </Suspense>
+              <InventoryToolbar
+                total={sorted.length}
+                sort={effectiveFilters.sort}
+                notFoundLabel={effectiveNotFoundLabel}
+              />
 
-              <Suspense fallback={null}>
-                <InventorySearchBar />
-              </Suspense>
+              <InventorySearchBar />
 
               {sorted.length === 0 ? (
                 <div className="inventory-empty">
@@ -362,7 +364,7 @@ export default async function SearchPageView({
                 <>
                   <InventorySrpVehicleGrid listings={listings} />
                   <InventoryPagination
-                    filters={filters}
+                    filters={effectiveFilters}
                     totalPages={totalPages}
                     listingBasePathname={listingBasePathname ?? null}
                   />

@@ -1,37 +1,32 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import type { InventoryFilterState, InventorySort } from "@/types/inventory";
 import { DEFAULT_INVENTORY_SORT } from "@/types/inventory";
-import {
-  parseInventorySearchParams,
-  urlSearchParamsToRecord,
-  mergeInventoryFiltersWithPathAugment,
-  inventoryListingHrefForContext,
-} from "@/lib/inventory/query";
+import { inventoryListingHrefForContext } from "@/lib/inventory/query";
 import { useInventorySearchUrl } from "@/components/vehicles/InventorySearchUrlContext";
+import { useStableInventoryFilters } from "@/components/vehicles/useStableInventoryFilters";
 
 interface InventoryToolbarProps {
   total: number;
   sort: InventorySort;
+  /** e.g. "SUV" → "SUV not found 51 used vehicles found" */
+  notFoundLabel?: string | null;
 }
 
 export default function InventoryToolbar({
   total,
   sort,
+  notFoundLabel,
 }: InventoryToolbarProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const { pathAugment, resultsView, setResultsView, listingBasePathname } =
+  const current = useStableInventoryFilters();
+  const { resultsView, setResultsView, listingBasePathname } =
     useInventorySearchUrl();
 
   const setSort = (nextSort: InventorySort) => {
-    const base = mergeInventoryFiltersWithPathAugment(
-      parseInventorySearchParams(urlSearchParamsToRecord(searchParams)),
-      pathAugment,
-    );
     const next: InventoryFilterState = {
-      ...base,
+      ...current,
       sort: nextSort,
       page: 1,
     };
@@ -41,6 +36,9 @@ export default function InventoryToolbar({
   return (
     <div className="inventory-toolbar">
       <p className="inventory-toolbar-count">
+        {notFoundLabel ? (
+          <span>{notFoundLabel} not found </span>
+        ) : null}
         <strong>{total.toLocaleString("en-AU")}</strong>
         <span> used vehicles found</span>
       </p>

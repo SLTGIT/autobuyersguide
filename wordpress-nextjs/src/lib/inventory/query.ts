@@ -359,6 +359,41 @@ export function mergeInventoryFiltersWithPathAugment(
   return mergePathAugmentIntoFilters(filters, pathAugment);
 }
 
+/** Strip path-implied filters so the full inventory can be shown (e.g. facet SRP miss). */
+export function clearPathAugmentFromFilters(
+  filters: InventoryFilterState,
+  augment: Partial<InventoryFilterState>,
+): InventoryFilterState {
+  const out = { ...filters, page: 1 };
+  if (augment.make?.trim()) out.make = "";
+  if (augment.model?.trim()) out.model = "";
+  if (augment.bodyType?.length) out.bodyType = [];
+  if (augment.fuelType?.length) out.fuelType = [];
+  if (augment.bodyColour?.length) out.bodyColour = [];
+  if (augment.driveType?.length) out.driveType = [];
+  if (augment.transmission?.length) out.transmission = [];
+  if (augment.type?.length) out.type = [];
+  if (
+    augment.minPrice !== null &&
+    augment.minPrice !== undefined &&
+    augment.maxPrice !== null &&
+    augment.maxPrice !== undefined
+  ) {
+    out.minPrice = null;
+    out.maxPrice = null;
+  }
+  if (
+    augment.minYear !== null &&
+    augment.minYear !== undefined &&
+    augment.maxYear !== null &&
+    augment.maxYear !== undefined
+  ) {
+    out.minYear = null;
+    out.maxYear = null;
+  }
+  return out;
+}
+
 /**
  * When the URL is `/search/{makeSlug}?…`, query string may omit `make`;
  * merge the path-derived make into filter state for parsing + navigation.

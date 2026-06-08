@@ -4,6 +4,7 @@ import { VehicleImage } from "@/types/vehicle";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { useClientMounted } from "@/hooks/useClientMounted";
 
 const AUTOPLAY_INTERVAL_MS = 5000;
 const PAUSE_AFTER_MANUAL_MS = 12000;
@@ -41,6 +42,7 @@ export default function VehicleGallery({
     ...galleryImages.map((img) => ({ url: img.large, alt: img.alt || title })),
   ].filter((img) => img.url);
 
+  const mounted = useClientMounted();
   const [index, setIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const pointerInsideRef = useRef(false);
@@ -312,7 +314,7 @@ export default function VehicleGallery({
         </div>
       )}
 
-      {lightboxOpen && selectedImage
+      {mounted && lightboxOpen && selectedImage
         ? createPortal(
             <div
               className="vehicle-gallery__lightbox"

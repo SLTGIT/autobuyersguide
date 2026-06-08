@@ -13,6 +13,8 @@ import type { InventoryFilterState } from "@/types/inventory";
 
 const RESULTS_VIEW_STORAGE_KEY = "cs-inventory-srp-view";
 
+type SearchParamsRecord = Record<string, string | string[] | undefined>;
+
 type InventorySearchUrlContextValue = {
   /**
    * Filter fields implied by `/search/{slug}` when those dimensions are absent
@@ -24,6 +26,8 @@ type InventorySearchUrlContextValue = {
    * instead of `/search?…`.
    */
   listingBasePathname: string | null;
+  /** Server-rendered query string for stable hydration before `useSearchParams` mounts. */
+  initialSearchParams: SearchParamsRecord | null;
   /** Grid vs list layout — not reflected in the URL; persisted in sessionStorage. */
   resultsView: "grid" | "list";
   setResultsView: (v: "grid" | "list") => void;
@@ -33,6 +37,7 @@ const InventorySearchUrlContext =
   createContext<InventorySearchUrlContextValue>({
     pathAugment: null,
     listingBasePathname: null,
+    initialSearchParams: null,
     resultsView: "list",
     setResultsView: () => {},
   });
@@ -40,10 +45,12 @@ const InventorySearchUrlContext =
 export function InventorySearchUrlProvider({
   pathAugment,
   listingBasePathname = null,
+  initialSearchParams = null,
   children,
 }: {
   pathAugment: Partial<InventoryFilterState> | null;
   listingBasePathname?: string | null;
+  initialSearchParams?: SearchParamsRecord | null;
   children: ReactNode;
 }) {
   const [resultsView, setResultsViewState] = useState<"grid" | "list">("list");
@@ -72,10 +79,17 @@ export function InventorySearchUrlProvider({
     () => ({
       pathAugment,
       listingBasePathname: listingBasePathname?.trim() || null,
+      initialSearchParams: initialSearchParams ?? null,
       resultsView,
       setResultsView,
     }),
-    [pathAugment, listingBasePathname, resultsView, setResultsView],
+    [
+      pathAugment,
+      listingBasePathname,
+      initialSearchParams,
+      resultsView,
+      setResultsView,
+    ],
   );
 
   return (

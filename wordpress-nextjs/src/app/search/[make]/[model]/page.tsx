@@ -10,6 +10,8 @@ import { resolveMakeModelFromPathSlugs } from "@/lib/inventory/search-make-model
 import { mergeSiteUrlMetadata } from "@/lib/site-url";
 import SearchPageView from "../../SearchPageView";
 
+export const dynamic = "force-dynamic";
+
 interface SearchMakeModelPageProps {
   params: Promise<{ make: string; model: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -60,6 +62,7 @@ export default async function SearchByMakeModelPage({
       pathAugment={resolved.pathAugment}
       pathHeroLabel={resolved.heroLabel}
       pathBreadcrumb={resolved.breadcrumb}
+      initialSearchParams={raw}
     />
   );
 }

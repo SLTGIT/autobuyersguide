@@ -28,6 +28,8 @@ import {
 
 import "./vdp-ref.scss";
 
+export const dynamic = "force-dynamic";
+
 interface VehicleDetailPageProps {
   params: Promise<{ slug: string }>;
 }

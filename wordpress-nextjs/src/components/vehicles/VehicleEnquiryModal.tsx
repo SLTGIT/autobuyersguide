@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { useClientMounted } from "@/hooks/useClientMounted";
 import VehicleEnquiryForm, {
   type VehicleEnquiryItemPayload,
 } from "./VehicleEnquiryForm";
@@ -29,6 +30,7 @@ export default function VehicleEnquiryModal({ item }: VehicleEnquiryModalProps) 
   const idPrefixInline = `vdp-enq-inline-${safe}`;
   const inlineHeadingId = `${idPrefixInline}-heading`;
 
+  const mounted = useClientMounted();
   const closeRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
 
@@ -96,7 +98,7 @@ export default function VehicleEnquiryModal({ item }: VehicleEnquiryModalProps) 
         <VehicleEnquiryForm idPrefix={idPrefixInline} item={item} />
       </section>
 
-      {open
+      {mounted && open
         ? createPortal(
             <div
               className="vdp-enquiry-backdrop"

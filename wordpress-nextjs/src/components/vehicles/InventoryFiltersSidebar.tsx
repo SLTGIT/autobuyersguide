@@ -1,19 +1,15 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, useCallback, type ReactNode } from "react";
 import type {
   FilterOptionCount,
   InventoryFacets,
   InventoryFilterState,
 } from "@/types/inventory";
-import {
-  parseInventorySearchParams,
-  urlSearchParamsToRecord,
-  mergeInventoryFiltersWithPathAugment,
-  inventoryListingHrefForContext,
-} from "@/lib/inventory/query";
+import { inventoryListingHrefForContext } from "@/lib/inventory/query";
 import { useInventorySearchUrl } from "@/components/vehicles/InventorySearchUrlContext";
+import { useStableInventoryFilters } from "@/components/vehicles/useStableInventoryFilters";
 import RangeSlider from "./RangeSlider";
 
 interface InventoryFiltersSidebarProps {
@@ -60,17 +56,8 @@ export default function InventoryFiltersSidebar({
   bounds,
 }: InventoryFiltersSidebarProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const { pathAugment, listingBasePathname } = useInventorySearchUrl();
-
-  const current = useMemo(
-    () =>
-      mergeInventoryFiltersWithPathAugment(
-        parseInventorySearchParams(urlSearchParamsToRecord(searchParams)),
-        pathAugment,
-      ),
-    [searchParams, pathAugment],
-  );
+  const current = useStableInventoryFilters();
+  const { listingBasePathname } = useInventorySearchUrl();
 
   const [open, setOpen] = useState<Record<string, boolean>>({
     bodyColour: false,

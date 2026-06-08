@@ -1,31 +1,23 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FormEvent, useState, useEffect } from "react";
-import {
-  parseInventorySearchParams,
-  urlSearchParamsToRecord,
-  mergeInventoryFiltersWithPathAugment,
-  inventoryListingHrefForContext,
-} from "@/lib/inventory/query";
+import { inventoryListingHrefForContext } from "@/lib/inventory/query";
 import { useInventorySearchUrl } from "@/components/vehicles/InventorySearchUrlContext";
+import { useStableInventoryFilters } from "@/components/vehicles/useStableInventoryFilters";
 
 export default function InventorySearchBar() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const { pathAugment, listingBasePathname } = useInventorySearchUrl();
-  const [q, setQ] = useState(searchParams.get("q") ?? "");
+  const current = useStableInventoryFilters();
+  const { listingBasePathname } = useInventorySearchUrl();
+  const [q, setQ] = useState(current.q);
 
   useEffect(() => {
-    setQ(searchParams.get("q") ?? "");
-  }, [searchParams]);
+    setQ(current.q);
+  }, [current.q]);
 
   const apply = (nextQ: string) => {
-    const base = mergeInventoryFiltersWithPathAugment(
-      parseInventorySearchParams(urlSearchParamsToRecord(searchParams)),
-      pathAugment,
-    );
-    const next = { ...base, q: nextQ.trim(), page: 1 };
+    const next = { ...current, q: nextQ.trim(), page: 1 };
     router.push(inventoryListingHrefForContext(listingBasePathname, next));
   };
 

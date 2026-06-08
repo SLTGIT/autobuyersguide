@@ -2,6 +2,7 @@
 
 import ReCAPTCHA from "react-google-recaptcha";
 import { useEffect, useRef } from "react";
+import { useClientMounted } from "@/hooks/useClientMounted";
 
 type RecaptchaFieldProps = {
   token: string | null;
@@ -18,6 +19,7 @@ export default function RecaptchaField({
   errorMessage,
   className,
 }: RecaptchaFieldProps) {
+  const mounted = useClientMounted();
   const captchaRef = useRef<ReCAPTCHA>(null);
   const previousTokenRef = useRef<string | null>(token);
 
@@ -34,6 +36,16 @@ export default function RecaptchaField({
       <p className="text-danger small mb-0" role="alert">
         reCAPTCHA is not configured. Add NEXT_PUBLIC_RECAPTCHA_SITE_KEY.
       </p>
+    );
+  }
+
+  if (!mounted) {
+    return (
+      <div
+        className={className}
+        aria-hidden
+        style={{ minHeight: "78px" }}
+      />
     );
   }
 
