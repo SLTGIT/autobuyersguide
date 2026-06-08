@@ -76,6 +76,15 @@ export default function VehicleGallery({
     setIndex(n);
   }, [allImages.length]);
 
+  const openLightboxAt = useCallback(
+    (i: number) => {
+      bumpManualPause();
+      goTo(i);
+      setLightboxOpen(true);
+    },
+    [bumpManualPause, goTo],
+  );
+
   useEffect(() => {
     if (allImages.length < 2 || lightboxOpen) return;
 
@@ -267,11 +276,11 @@ export default function VehicleGallery({
               type="button"
               role="tab"
               aria-selected={index === i}
+              aria-label={`View photo ${i + 1} of ${allImages.length} in gallery`}
               className={`vehicle-gallery__grid-thumb ${index === i ? "is-active" : ""}`}
               onClick={(e) => {
                 e.stopPropagation();
-                bumpManualPause();
-                goTo(i);
+                openLightboxAt(i);
               }}
             >
               <span className="vehicle-gallery__grid-thumb-frame">
@@ -286,14 +295,19 @@ export default function VehicleGallery({
             </button>
           ))}
           {showMorePhotosCard ? (
-            <div
+            <button
+              type="button"
               className="vehicle-gallery__grid-more"
-              aria-label={`${allImages.length} photos in this listing`}
+              aria-label={`View all ${allImages.length} photos in gallery`}
+              onClick={(e) => {
+                e.stopPropagation();
+                openLightboxAt(GRID_THUMB_MAX);
+              }}
             >
               <span className="vehicle-gallery__grid-more-text">
                 {allImages.length} photos listed
               </span>
-            </div>
+            </button>
           ) : null}
         </div>
       )}
