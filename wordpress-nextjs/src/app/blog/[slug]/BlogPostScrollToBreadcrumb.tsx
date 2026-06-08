@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 
 const BREADCRUMB_ANCHOR_ID = "blog-breadcrumb";
 
@@ -9,7 +9,7 @@ const BREADCRUMB_ANCHOR_ID = "blog-breadcrumb";
  * between posts (client-side) so the previous page's scroll position is not kept.
  */
 export function BlogPostScrollToBreadcrumb({ slug }: { slug: string }) {
-  useLayoutEffect(() => {
+  useEffect(() => {
     const el = document.getElementById(BREADCRUMB_ANCHOR_ID);
     if (el) {
       el.scrollIntoView({ block: "start", behavior: "auto" });

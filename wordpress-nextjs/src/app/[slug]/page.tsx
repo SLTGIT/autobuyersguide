@@ -15,7 +15,7 @@ import {
 } from "@/lib/json-ld";
 import { fetchCmsSrpPageBySlug } from "@/lib/cms-srp/cms-srp-page";
 import { cmsSrpMetadataForSlug } from "@/lib/cms-srp/render-cms-srp-search";
-import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
+import WpRenderedHtml from "@/components/cms/WpRenderedHtml";
 import "./cms-page.scss";
 
 export const dynamic = "force-dynamic";
@@ -105,14 +105,9 @@ export default async function DynamicPage(props: PageProps) {
   return (
     <div className="container py-3">
       <JsonLd data={jsonLd} />
-      {page.content?.rendered?.trim() && (
-        <div
-          className=""
-          dangerouslySetInnerHTML={{
-            __html: repairWpRenderedHtml(page.content.rendered),
-          }}
-        />
-      )}
+      {page.content?.rendered?.trim() ? (
+        <WpRenderedHtml html={page.content.rendered} />
+      ) : null}
     </div>
   );
 }

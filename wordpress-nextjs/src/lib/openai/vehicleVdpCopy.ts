@@ -20,8 +20,7 @@ import {
   sanitizeBiSuffix,
 } from "./vehicleVdpDisplayUtils";
 
-// const VDP_AI_REVALIDATE_SEC = 2592000; //  1 month
-const VDP_AI_REVALIDATE_SEC = 3600; //  1 hour
+const VDP_AI_REVALIDATE_SEC = 604800; //  7 days
 const VDP_MAX_FAQS = 6;
 
 /** Hero pill should summarise year/condition/body/fuel — not warranty marketing. */
@@ -35,9 +34,17 @@ function sanitizeHeroBadgeForDisplay(badge: string): string {
 function isPlaceholderHeroBadge(s: string): boolean {
   const t = s.trim().toLowerCase();
   if (!t) return true;
-  if (/\bcondition\b/.test(t) && /\b(body\s*type|body)\b/.test(t) && /\bfuel\b/.test(t))
+  if (
+    /\bcondition\b/.test(t) &&
+    /\b(body\s*type|body)\b/.test(t) &&
+    /\bfuel\b/.test(t)
+  )
     return true;
-  if (/\byear\b/.test(t) && /\bcondition\b/.test(t) && /\b(body|fuel)\b/.test(t))
+  if (
+    /\byear\b/.test(t) &&
+    /\bcondition\b/.test(t) &&
+    /\b(body|fuel)\b/.test(t)
+  )
     return true;
   return false;
 }
@@ -55,7 +62,8 @@ function simplifyFuelTypeForHero(fuel: string): string {
   if (/^unleaded\s+petrol$/i.test(t)) return "Petrol";
   if (/^petrol\s*[-–]\s*unleaded$/i.test(t)) return "Petrol";
   if (/^petrol\s*[-–]\s*premium(?:\s+98)?$/i.test(t)) return "Petrol (Premium)";
-  if (/^petrol\s*[-–]\s*prem(?:ium)?\s+unleaded$/i.test(t)) return "Petrol (Premium)";
+  if (/^petrol\s*[-–]\s*prem(?:ium)?\s+unleaded$/i.test(t))
+    return "Petrol (Premium)";
   return t;
 }
 
@@ -90,7 +98,7 @@ export function formatVehicleVdpBrowserTitle(seoTitlePart: string): string {
 
 function normalizeSeoTitlePart(
   raw: string,
-  snapshot: VehicleVdpSnapshot
+  snapshot: VehicleVdpSnapshot,
 ): string {
   let t = raw.trim();
   const suff = "| car sales brisbane";
@@ -117,9 +125,10 @@ function buildFallbackMetaDescription(snapshot: VehicleVdpSnapshot): string {
       : snapshot.advertisedPrice?.trim()
         ? `From ${snapshot.advertisedPrice.trim()}`
         : "";
-  const base = `${snapshot.condition} ${snapshot.year} ${snapshot.make} ${snapshot.model}`
-    .replace(/\s+/g, " ")
-    .trim();
+  const base =
+    `${snapshot.condition} ${snapshot.year} ${snapshot.make} ${snapshot.model}`
+      .replace(/\s+/g, " ")
+      .trim();
   const bits = [
     base,
     priceLine,
@@ -133,7 +142,7 @@ function buildFallbackMetaDescription(snapshot: VehicleVdpSnapshot): string {
 /** Ensures AI-generated or fallback SEO strings are always present and length-safe. */
 export function ensureVehicleVdpSeoFields(
   content: VehicleVdpAiContent,
-  snapshot: VehicleVdpSnapshot
+  snapshot: VehicleVdpSnapshot,
 ): VehicleVdpAiContent {
   const seoTitle = normalizeSeoTitlePart(content.seoTitle || "", snapshot);
   let meta = (content.metaDescription || "").trim();
@@ -147,7 +156,7 @@ export function ensureVehicleVdpSeoFields(
 /** Prefer listing data when the model echoes prompt placeholders or omits the year. */
 export function buildListingHeroBadge(
   aiBadge: string,
-  snapshot: VehicleVdpSnapshot
+  snapshot: VehicleVdpSnapshot,
 ): string {
   const cleaned = sanitizeHeroBadgeForDisplay(aiBadge);
   if (isPlaceholderHeroBadge(cleaned) || !cleaned) {
@@ -163,7 +172,7 @@ function stripTypicalGenerationPreamble(value: string): string {
   return value
     .replace(
       /^\s*not\s+in\s+listing\s*[—–-]\s*typical\s+for\s+this\s+generation\s*:\s*/i,
-      ""
+      "",
     )
     .trim();
 }
@@ -173,8 +182,7 @@ function sanitizeSpecRowDisplayValues(rows: VehicleVdpAiSpecRow[]) {
   for (const r of rows) {
     let t = r.value.trim();
     if (/^inferred\.?$/i.test(t)) {
-      r.value =
-        "Not listed online — check with the dealer for this vehicle.";
+      r.value = "Not listed online — check with the dealer for this vehicle.";
       continue;
     }
     t = stripTypicalGenerationPreamble(t);
@@ -186,7 +194,7 @@ function ensureSpecRowIcons(rows: VehicleVdpAiSpecRow[]) {
   for (const r of rows) {
     r.icon = resolveBootstrapIconSuffix(
       r.icon,
-      fallbackIconForSpecLabel(r.label)
+      fallbackIconForSpecLabel(r.label),
     );
   }
 }
@@ -195,7 +203,7 @@ function ensureFeatureItemIcons(items: VehicleVdpAiFeatureItem[]) {
   for (const it of items) {
     it.icon = resolveBootstrapIconSuffix(
       it.icon,
-      fallbackIconForFeatureItem(it.label, it.value)
+      fallbackIconForFeatureItem(it.label, it.value),
     );
   }
 }
@@ -215,7 +223,7 @@ function lowerKeyRecord(o: object): Record<string, unknown> {
 
 function strField(
   m: Record<string, unknown>,
-  keys: string[]
+  keys: string[],
 ): string | undefined {
   for (const k of keys) {
     const v = m[k];
@@ -276,7 +284,13 @@ function parseFeatureItem(o: unknown): VehicleVdpAiFeatureItem | null {
     "content",
     "item",
   ]);
-  const textRaw = strField(m, ["text", "line", "feature", "summary", "equipment"]);
+  const textRaw = strField(m, [
+    "text",
+    "line",
+    "feature",
+    "summary",
+    "equipment",
+  ]);
   const iconRaw = m.icon ?? m.bootstrapicon ?? m.bicon;
 
   let label = "";
@@ -305,7 +319,7 @@ function parseFeatureItem(o: unknown): VehicleVdpAiFeatureItem | null {
   if (!label?.trim()) label = "Feature";
   const icon =
     typeof iconRaw === "string"
-      ? sanitizeBiSuffix(String(iconRaw)) ?? "star-fill"
+      ? (sanitizeBiSuffix(String(iconRaw)) ?? "star-fill")
       : "star-fill";
   return { label: label.trim(), value: value.trim(), icon };
 }
@@ -421,7 +435,8 @@ function parseDealerCommentsBullets(raw: unknown, max = 24): string[] {
     return out;
   }
   if (raw && typeof raw === "object") {
-    const nested = (raw as { bullets?: unknown; items?: unknown }).bullets ??
+    const nested =
+      (raw as { bullets?: unknown; items?: unknown }).bullets ??
       (raw as { items?: unknown }).items;
     if (nested !== undefined) return parseDealerCommentsBullets(nested, max);
   }
@@ -438,7 +453,9 @@ function listingCommentSourceText(snapshot: VehicleVdpSnapshot): string {
 }
 
 /** Full structured copy from raw feed (fallback when AI output is too thin). */
-export function buildDealerCommentsFromRawListing(snapshot: VehicleVdpSnapshot): {
+export function buildDealerCommentsFromRawListing(
+  snapshot: VehicleVdpSnapshot,
+): {
   dealerCommentsParagraphs: string[];
   dealerCommentsBullets: string[];
 } {
@@ -495,8 +512,11 @@ export function buildDealerCommentsFromRawListing(snapshot: VehicleVdpSnapshot):
 /** Prefer full AI rewrite; fall back to raw listing if AI trimmed too much. */
 export function resolveDealerCommentsContent(
   content: VehicleVdpAiContent,
-  snapshot: VehicleVdpSnapshot
-): Pick<VehicleVdpAiContent, "dealerCommentsParagraphs" | "dealerCommentsBullets"> {
+  snapshot: VehicleVdpSnapshot,
+): Pick<
+  VehicleVdpAiContent,
+  "dealerCommentsParagraphs" | "dealerCommentsBullets"
+> {
   const raw = buildDealerCommentsFromRawListing(snapshot);
   const aiParagraphs = content.dealerCommentsParagraphs
     .map((p) => p.trim())
@@ -506,8 +526,7 @@ export function resolveDealerCommentsContent(
     .filter(Boolean);
 
   const sourceLen = listingCommentSourceText(snapshot).length;
-  const aiLen =
-    aiParagraphs.join(" ").length + aiBullets.join(" ").length;
+  const aiLen = aiParagraphs.join(" ").length + aiBullets.join(" ").length;
 
   if (aiParagraphs.length === 0 && aiBullets.length === 0) {
     return raw;
@@ -538,10 +557,10 @@ export function resolveDealerCommentsContent(
   if (aiParagraphs.length > 0 && aiLen >= 180) {
     return {
       dealerCommentsParagraphs: aiParagraphs.slice(0, 12),
-      dealerCommentsBullets: (aiBullets.length ? aiBullets : raw.dealerCommentsBullets).slice(
-        0,
-        24,
-      ),
+      dealerCommentsBullets: (aiBullets.length
+        ? aiBullets
+        : raw.dealerCommentsBullets
+      ).slice(0, 24),
     };
   }
 
@@ -554,7 +573,10 @@ function ensureDealerCommentsPresent(
     "dealerCommentsParagraphs" | "dealerCommentsBullets"
   >,
   snapshot: VehicleVdpSnapshot,
-): Pick<VehicleVdpAiContent, "dealerCommentsParagraphs" | "dealerCommentsBullets"> {
+): Pick<
+  VehicleVdpAiContent,
+  "dealerCommentsParagraphs" | "dealerCommentsBullets"
+> {
   const paragraphs = content.dealerCommentsParagraphs
     .map((p) => p.trim())
     .filter(Boolean);
@@ -601,7 +623,7 @@ function parseHighlightChips(raw: unknown): string[] {
 }
 
 function deriveHighlightChipsFromFeatures(
-  items: VehicleVdpAiFeatureItem[]
+  items: VehicleVdpAiFeatureItem[],
 ): string[] {
   const chips: string[] = [];
   for (const it of items) {
@@ -618,7 +640,8 @@ function deriveHighlightChipsFromFeatures(
 }
 
 function ensureHighlightChips(content: VehicleVdpAiContent): string[] {
-  if (content.highlightChips.length >= 4) return content.highlightChips.slice(0, 20);
+  if (content.highlightChips.length >= 4)
+    return content.highlightChips.slice(0, 20);
   const derived = deriveHighlightChipsFromFeatures(content.featureItems);
   const merged = [...content.highlightChips];
   for (const c of derived) {
@@ -661,11 +684,14 @@ function parseQuickBuyer(o: unknown): VehicleVdpAiQuickBuyer | null {
   return { title, body, bestFor, checkFirst, searchIntent };
 }
 
-export function parseVehicleVdpAiContent(raw: unknown): VehicleVdpAiContent | null {
+export function parseVehicleVdpAiContent(
+  raw: unknown,
+): VehicleVdpAiContent | null {
   if (typeof raw !== "object" || raw === null) return null;
   const heroBadge = (raw as { heroBadge?: unknown }).heroBadge;
   const heroLead = (raw as { heroLead?: unknown }).heroLead;
-  if (typeof heroBadge !== "string" || typeof heroLead !== "string") return null;
+  if (typeof heroBadge !== "string" || typeof heroLead !== "string")
+    return null;
 
   const overviewParagraphs = (raw as { overviewParagraphs?: unknown })
     .overviewParagraphs;
@@ -683,10 +709,10 @@ export function parseVehicleVdpAiContent(raw: unknown): VehicleVdpAiContent | nu
   }
 
   let carDetailsRows = parseSpecRowsArray(
-    (raw as { carDetailsRows?: unknown }).carDetailsRows
+    (raw as { carDetailsRows?: unknown }).carDetailsRows,
   );
   let engineTowingRows = parseSpecRowsArray(
-    (raw as { engineTowingRows?: unknown }).engineTowingRows
+    (raw as { engineTowingRows?: unknown }).engineTowingRows,
   );
   const featureItemsRaw = (raw as { featureItems?: unknown }).featureItems;
   const featureItems: VehicleVdpAiFeatureItem[] = [];
@@ -727,7 +753,7 @@ export function parseVehicleVdpAiContent(raw: unknown): VehicleVdpAiContent | nu
   }
   if (engineTowingRows.length === 0) {
     const eng = specSections.find((s) =>
-      /engine|towing|payload|dimension|gvm|compliance/i.test(s.title)
+      /engine|towing|payload|dimension|gvm|compliance/i.test(s.title),
     );
     if (eng) engineTowingRows = eng.rows;
   }
@@ -753,7 +779,9 @@ export function parseVehicleVdpAiContent(raw: unknown): VehicleVdpAiContent | nu
     }
   }
 
-  const quickBuyer = parseQuickBuyer((raw as { quickBuyer?: unknown }).quickBuyer);
+  const quickBuyer = parseQuickBuyer(
+    (raw as { quickBuyer?: unknown }).quickBuyer,
+  );
   if (!quickBuyer) return null;
 
   const dealerRaw = (raw as { dealerBreakdownCards?: unknown })
@@ -780,7 +808,7 @@ export function parseVehicleVdpAiContent(raw: unknown): VehicleVdpAiContent | nu
 
   const highlightChips = parseHighlightChips(
     (raw as { highlightChips?: unknown }).highlightChips ??
-      (raw as { keyHighlights?: unknown }).keyHighlights
+      (raw as { keyHighlights?: unknown }).keyHighlights,
   );
 
   const dealerCommentsRaw = raw as {
@@ -848,7 +876,7 @@ export function parseVehicleVdpAiContent(raw: unknown): VehicleVdpAiContent | nu
  * (e.g. `{ icon, text }`). Re-parse feature rows so the UI always gets strings.
  */
 function applyRuntimeVehicleVdpCoercion(
-  content: VehicleVdpAiContent
+  content: VehicleVdpAiContent,
 ): VehicleVdpAiContent {
   const featureItems: VehicleVdpAiFeatureItem[] = [];
   for (const row of content.featureItems) {
@@ -893,7 +921,7 @@ function applyRuntimeVehicleVdpCoercion(
 }
 
 export function fallbackVehicleVdpAiContent(
-  snapshot: VehicleVdpSnapshot
+  snapshot: VehicleVdpSnapshot,
 ): VehicleVdpAiContent {
   const headline = [snapshot.year, snapshot.make, snapshot.model]
     .filter(Boolean)
@@ -928,14 +956,24 @@ export function fallbackVehicleVdpAiContent(
       sourceTag: "listing",
       icon: "calendar3",
     },
-    { label: "Odometer", value: odo, sourceTag: "listing", icon: "speedometer2" },
+    {
+      label: "Odometer",
+      value: odo,
+      sourceTag: "listing",
+      icon: "speedometer2",
+    },
     {
       label: "Transmission",
       value: snapshot.transmission || "—",
       sourceTag: "listing",
       icon: "gear-fill",
     },
-    { label: "Body", value: snapshot.bodyType || "—", sourceTag: "listing", icon: "truck" },
+    {
+      label: "Body",
+      value: snapshot.bodyType || "—",
+      sourceTag: "listing",
+      icon: "truck",
+    },
     {
       label: "Fuel",
       value: snapshot.fuelType || "—",
@@ -1084,7 +1122,7 @@ Rules: Australian English. Never change price, VIN, stock number, or odometer fr
 Critical for carDetailsRows and engineTowingRows: every "value" must be readable data (e.g. "380 Nm", "3,200 kg braked", "2970 mm") or a short factual sentence — never the single word "Inferred" or an empty placeholder. The field sourceTag is where you mark listing vs inferred; do not put the word "Inferred" inside value. If unknown, use "—" or "Not in listing — confirm with dealer."`;
 
 async function fetchVehicleVdpAiFromOpenAI(
-  snapshot: VehicleVdpSnapshot
+  snapshot: VehicleVdpSnapshot,
 ): Promise<VehicleVdpAiContent> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -1092,14 +1130,13 @@ async function fetchVehicleVdpAiFromOpenAI(
     return fallbackVehicleVdpAiContent(snapshot);
   }
 
-  const model =
-    process.env.OPENAI_VDP_MODEL?.trim() || "gpt-4o-mini";
+  const model = process.env.OPENAI_VDP_MODEL?.trim() || "gpt-4o-mini";
 
   const client = new OpenAI({ apiKey });
   const userPayload = JSON.stringify(
     { task: "vehicle_vdp_copy", listing: snapshot },
     null,
-    2
+    2,
   );
 
   const completion = await client.chat.completions.create({
@@ -1142,13 +1179,14 @@ async function fetchVehicleVdpAiFromOpenAI(
     while (content.dealerBreakdownCards.length < 3) {
       const idx = content.dealerBreakdownCards.length;
       content.dealerBreakdownCards.push(
-        fb.dealerBreakdownCards[idx] ?? fb.dealerBreakdownCards[0]
+        fb.dealerBreakdownCards[idx] ?? fb.dealerBreakdownCards[0],
       );
     }
   }
 
   if (content.carDetailsRows.length === 0) {
-    content.carDetailsRows = fallbackVehicleVdpAiContent(snapshot).carDetailsRows;
+    content.carDetailsRows =
+      fallbackVehicleVdpAiContent(snapshot).carDetailsRows;
   }
 
   if (content.engineTowingRows.length === 0) {
@@ -1166,39 +1204,48 @@ const runCachedOpenAi = unstable_cache(
   },
   // Bump when prompt/schema changes so listings are not stuck on stale AI JSON.
   ["vehicle-vdp-ai-openai", "v13-dealer-comments"],
-  { revalidate: VDP_AI_REVALIDATE_SEC }
+  { revalidate: VDP_AI_REVALIDATE_SEC },
 );
 
 /**
  * Returns AI-generated VDP marketing/spec presentation; falls back to inventory-only copy on error.
  */
 export async function getVehicleVdpAiContent(
-  snapshot: VehicleVdpSnapshot
+  snapshot: VehicleVdpSnapshot,
 ): Promise<VehicleVdpAiContent> {
   if (!process.env.OPENAI_API_KEY?.trim()) {
     const coerced = applyRuntimeVehicleVdpCoercion(
-      fallbackVehicleVdpAiContent(snapshot)
+      fallbackVehicleVdpAiContent(snapshot),
     );
-    return ensureVehicleVdpSeoFields(finalizeVehicleVdpAiContent(coerced, snapshot), snapshot);
+    return ensureVehicleVdpSeoFields(
+      finalizeVehicleVdpAiContent(coerced, snapshot),
+      snapshot,
+    );
   }
 
   try {
     const snapshotJson = JSON.stringify(snapshot);
     const content = await runCachedOpenAi(snapshotJson);
     const coerced = applyRuntimeVehicleVdpCoercion(content);
-    return ensureVehicleVdpSeoFields(finalizeVehicleVdpAiContent(coerced, snapshot), snapshot);
+    return ensureVehicleVdpSeoFields(
+      finalizeVehicleVdpAiContent(coerced, snapshot),
+      snapshot,
+    );
   } catch (e) {
     console.error("[vehicleVdpCopy]", e);
     const coerced = applyRuntimeVehicleVdpCoercion(
-      fallbackVehicleVdpAiContent(snapshot)
+      fallbackVehicleVdpAiContent(snapshot),
     );
-    return ensureVehicleVdpSeoFields(finalizeVehicleVdpAiContent(coerced, snapshot), snapshot);
+    return ensureVehicleVdpSeoFields(
+      finalizeVehicleVdpAiContent(coerced, snapshot),
+      snapshot,
+    );
   }
 }
 
 function finalizeVehicleVdpAiContent(
   content: VehicleVdpAiContent,
-  snapshot: VehicleVdpSnapshot
+  snapshot: VehicleVdpSnapshot,
 ): VehicleVdpAiContent {
   const withBackfill = backfillDealerCommentsIfMissing(content, snapshot);
   const dealerComments = ensureDealerCommentsPresent(

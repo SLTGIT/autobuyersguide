@@ -1,91 +1,29 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getPostBySlug, getPosts } from "@/lib/wordpress";
 import RelatedPostsSidebar from "@/components/blog/RelatedPostsSidebar";
 import type { WPPost } from "@/types/wordpress";
-import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
+import WpRenderedHtml from "@/components/cms/WpRenderedHtml";
 import { getAcfSeoCopy, getMetadata } from "@/lib/wordpress/seo";
 import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from "@/lib/site-url";
 import JsonLd from "@/components/JsonLd";
 import {
-  breadcrumbJsonLd,
-  jsonLdGraph,
-  organizationJsonLd,
+  blogPostingJsonLd,
+  extractPostTagKeywords,
+  faqPageJsonLd,
+  parseAcfFaqField,
   stripHtml,
   upgradeHttpToHttpsUrl,
-  webPageJsonLd,
-  webSiteJsonLd,
 } from "@/lib/json-ld";
 import "./blog-details.css";
 import { BlogPostScrollToBreadcrumb } from "./BlogPostScrollToBreadcrumb";
+
+export const dynamic = "force-dynamic";
 
 interface BlogPostProps {
   params: Promise<{
     slug: string;
   }>;
-}
-
-function normalizeFaqItems(
-  items: unknown[],
-): { question: string; answer: string }[] {
-  return items
-    .map((item) => {
-      if (!item || typeof item !== "object") return null;
-      const it = item as Record<string, unknown>;
-      const rawQuestion = typeof it.question === "string" ? it.question : "";
-      const rawAnswer = typeof it.answer === "string" ? it.answer : "";
-      const question = stripHtml(rawQuestion).trim();
-      const answer = stripHtml(rawAnswer).replace(/\s+/g, " ").trim();
-      if (!question || !answer) return null;
-      return { question, answer };
-    })
-    .filter(Boolean) as { question: string; answer: string }[];
-}
-
-function parseFaqField(
-  rawFaq: unknown,
-): { question: string; answer: string }[] {
-  if (!rawFaq) return [];
-
-  // Supports ACF textarea containing JSON, array values, or FAQPage.mainEntity.
-  if (typeof rawFaq === "string") {
-    const trimmed = rawFaq.trim();
-    if (!trimmed) return [];
-    try {
-      return parseFaqField(JSON.parse(trimmed));
-    } catch {
-      return [];
-    }
-  }
-
-  if (Array.isArray(rawFaq)) {
-    return normalizeFaqItems(rawFaq);
-  }
-
-  if (typeof rawFaq !== "object") {
-    return [];
-  }
-
-  const obj = rawFaq as Record<string, unknown>;
-  if (Array.isArray(obj.mainEntity)) {
-    return normalizeFaqItems(
-      obj.mainEntity
-        .map((entity) => {
-          if (!entity || typeof entity !== "object") return null;
-          const e = entity as Record<string, unknown>;
-          return {
-            question: e.name,
-            answer:
-              (e.acceptedAnswer as Record<string, unknown> | undefined)?.text ??
-              "",
-          };
-        })
-        .filter(Boolean),
-    );
-  }
-
-  return [];
 }
 
 const RELATED_POSTS_LIMIT = 4;
@@ -110,25 +48,6 @@ async function getRelatedPosts(current: WPPost): Promise<WPPost[]> {
   }
 
   return related.slice(0, RELATED_POSTS_LIMIT);
-}
-
-function blogFaqPageJsonLd(
-  pageUrl: string,
-  faqs: { question: string; answer: string }[],
-): Record<string, unknown> | null {
-  if (!faqs.length) return null;
-  return {
-    "@type": "FAQPage",
-    "@id": `${pageUrl}#faqs`,
-    mainEntity: faqs.map((f) => ({
-      "@type": "Question",
-      name: f.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: f.answer,
-      },
-    })),
-  };
 }
 
 /* SEO Metadata */
@@ -156,15 +75,8 @@ export default async function BlogPost({ params }: BlogPostProps) {
   const featuredImage = post._embedded?.["wp:featuredmedia"]?.[0];
   const author = post._embedded?.author?.[0];
 
-  const [{ currentUrl: articleUrl }, { currentUrl: blogCanonicalUrl }] =
-    await Promise.all([
-      getCurrentUrlAndRoute(`/blog/${slug}`),
-      getCurrentUrlAndRoute("/blog"),
-    ]);
+  const { currentUrl: articleUrl } = await getCurrentUrlAndRoute(`/blog/${slug}`);
   const articleHttps = upgradeHttpToHttpsUrl(articleUrl);
-  const blogCanonicalHttps = upgradeHttpToHttpsUrl(blogCanonicalUrl);
-  const origin = new URL(articleHttps).origin;
-  const blogEntityId = `${blogCanonicalHttps}#blog`;
   const headline = stripHtml(post.title.rendered);
   const excerpt = stripHtml(post.excerpt.rendered);
   const acfSeo = getAcfSeoCopy(post);
@@ -172,63 +84,39 @@ export default async function BlogPost({ params }: BlogPostProps) {
   const seoDescription = acfSeo?.description || excerpt || headline;
   const imageUrl = featuredImage?.source_url as string | undefined;
   const authorName = author?.name as string | undefined;
-  const faqItems = parseFaqField(post.acf?.faq);
   const heroHtml =
     typeof post.acf?.hero_section === "string"
       ? post.acf.hero_section.trim()
       : "";
   const relatedPosts = await getRelatedPosts(post);
 
-  const blogPosting: Record<string, unknown> = {
-    "@type": "BlogPosting",
-    "@id": `${articleHttps}#article`,
+  const blogPostingLd = blogPostingJsonLd({
     headline,
+    alternativeHeadline: seoTitle,
+    imageUrl,
+    keywords: extractPostTagKeywords(post),
     url: articleHttps,
     datePublished: post.date,
     dateModified: post.modified,
-    inLanguage: "en-AU",
-    publisher: { "@id": `${origin}/#organization` },
-    isPartOf: { "@id": blogEntityId },
-    mainEntityOfPage: { "@id": `${articleHttps}#webpage` },
-  };
-  if (imageUrl) blogPosting.image = [upgradeHttpToHttpsUrl(imageUrl)];
-  blogPosting.author = authorName
-    ? { "@type": "Person", name: authorName }
-    : { "@id": `${origin}/#organization` };
-  if (seoDescription) blogPosting.description = seoDescription;
-  const faqPage = blogFaqPageJsonLd(articleHttps, faqItems);
-  const jsonLd = jsonLdGraph(
-    organizationJsonLd(origin),
-    webSiteJsonLd(origin),
-    {
-      "@type": "Blog",
-      "@id": blogEntityId,
-      name: "Used Car Guides for Brisbane Buyers",
-      url: blogCanonicalHttps,
-      inLanguage: "en-AU",
-      publisher: { "@id": `${origin}/#organization` },
-      isPartOf: { "@id": `${origin}/#website` },
-    },
-    webPageJsonLd({
-      pageUrl: articleHttps,
-      name: seoTitle,
-      description: seoDescription,
-    }),
-    blogPosting,
-    faqPage,
-    breadcrumbJsonLd(articleHttps, [
-      { name: "Home", item: `${origin}/` },
-      { name: "Blog", item: blogCanonicalHttps },
-      {
-        name: headline.length > 90 ? `${headline.slice(0, 87)}…` : headline,
-        item: articleHttps,
-      },
-    ]),
-  );
+    description: seoDescription,
+    articleBody: stripHtml(post.content.rendered),
+    authorName,
+  });
+  console.log("post.acf?.faq", post.acf?.faq);
+  const faqLd = faqPageJsonLd(articleHttps, parseAcfFaqField(post.acf?.faq));
+
 
   return (
     <div className="bg-white min-vh-100">
-      <JsonLd data={jsonLd} />
+      <JsonLd data={blogPostingLd} />
+      {faqLd ? (
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            ...faqLd,
+          }}
+        />
+      ) : null}
       <BlogPostScrollToBreadcrumb slug={slug} />
       {/* <div className="container pt-4">
         <nav id="blog-breadcrumb" aria-label="breadcrumb">
@@ -257,11 +145,10 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
       {/* Post Hero Section */}
       {heroHtml ? (
-        <section
+        <WpRenderedHtml
+          as="section"
           className="cs-page-hero py-3"
-          dangerouslySetInnerHTML={{
-            __html: repairWpRenderedHtml(heroHtml),
-          }}
+          html={heroHtml}
         />
       ) : null}
 
@@ -270,11 +157,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
         <div className="container">
           <div className="row g-5">
             <div className="col-lg-8">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: repairWpRenderedHtml(post.content.rendered),
-                }}
-              />
+              <WpRenderedHtml html={post.content.rendered} />
             </div>
             <div className="col-lg-4">
               <RelatedPostsSidebar posts={relatedPosts} />

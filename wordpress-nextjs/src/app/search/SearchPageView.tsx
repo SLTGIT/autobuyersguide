@@ -30,6 +30,7 @@ import InventoryFiltersSidebar from "@/components/vehicles/InventoryFiltersSideb
 import InventoryToolbar from "@/components/vehicles/InventoryToolbar";
 import InventorySearchBar from "@/components/vehicles/InventorySearchBar";
 import InventoryPagination from "@/components/vehicles/InventoryPagination";
+import WpRenderedHtml from "@/components/cms/WpRenderedHtml";
 import InventorySrpVehicleGrid from "@/components/vehicles/InventorySrpVehicleGrid";
 import { warmVehicleVdpCachesForVehicles } from "@/lib/openai/warmVehicleVdpCache";
 import { InventorySearchUrlProvider } from "@/components/vehicles/InventorySearchUrlContext";
@@ -263,7 +264,7 @@ export default async function SearchPageView({
     >
       <JsonLd data={jsonLd} />
       {showWpHero ? (
-        <div dangerouslySetInnerHTML={{ __html: wpHero }} />
+        <WpRenderedHtml html={wpHero} />
       ) : (
       <section className="cs-page-hero search-page-hero py-3 py-md-2">
         <div className="container py-lg-2">

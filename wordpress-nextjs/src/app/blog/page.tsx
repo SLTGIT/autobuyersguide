@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPageBySlug, getPosts, getCategories } from "@/lib/wordpress";
+import { getPageBySlug, getPostsPaginated, getCategories } from "@/lib/wordpress";
 import { getMetadata, getAcfSeoCopy } from "@/lib/wordpress/seo";
-import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
+import WpRenderedHtml from "@/components/cms/WpRenderedHtml";
 import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from "@/lib/site-url";
 import type { WPPost, WPCategory } from "@/types/wordpress";
 import BlogCard from "@/components/blog/BlogCard";
@@ -61,11 +61,12 @@ export default async function Blog({ searchParams }: BlogPageProps) {
 
   let posts: WPPost[] = [];
   let categories: WPCategory[] = [];
+  let totalPages = 1;
   let apiError = false;
 
   try {
-    [posts, categories] = await Promise.all([
-      getPosts({
+    const [postsResult, categoriesResult] = await Promise.all([
+      getPostsPaginated({
         per_page: postsPerPage,
         page: currentPage,
         categories: categoryFilter ? [categoryFilter] : undefined,
@@ -74,12 +75,15 @@ export default async function Blog({ searchParams }: BlogPageProps) {
       }),
       getCategories({ per_page: 100 }),
     ]);
+    posts = postsResult.posts;
+    totalPages = Math.max(1, postsResult.totalPages);
+    categories = categoriesResult;
   } catch (error) {
     console.error("Error fetching WordPress data:", error);
     apiError = true;
   }
 
-  const hasNextPage = posts.length === postsPerPage;
+  const hasNextPage = currentPage < totalPages;
   const hasPrevPage = currentPage > 1;
 
   const listingPath = blogListingPath(currentPage, categoryFilter);
@@ -190,12 +194,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
     <>
       <JsonLd data={jsonLd} />
       {cmsPage.content?.rendered?.trim() ? (
-        <div
-          className=""
-          dangerouslySetInnerHTML={{
-            __html: repairWpRenderedHtml(cmsPage.content.rendered),
-          }}
-        />
+        <WpRenderedHtml html={cmsPage.content.rendered} />
       ) : null}
 
       <section className="bg-white">
@@ -221,34 +220,47 @@ export default async function Blog({ searchParams }: BlogPageProps) {
                   ))}
                 </div>
 
-                {(hasNextPage || hasPrevPage) && (
-                  <div className="d-flex justify-content-center align-items-center gap-2 mt-5">
-                    {hasPrevPage && (
+                {totalPages > 1 && (
+                  <nav
+                    className="blog-pagination"
+                    aria-label="Blog pages"
+                  >
+                    {hasPrevPage ? (
                       <Link
-                        href={`/blog?page=${currentPage - 1}${
-                          categoryFilter ? `&category=${categoryFilter}` : ""
-                        }`}
-                        className="btn btn-outline-secondary"
+                        className="blog-pagination-link"
+                        href={blogListingPath(
+                          currentPage - 1,
+                          categoryFilter,
+                        )}
                       >
                         Previous
                       </Link>
+                    ) : (
+                      <span className="blog-pagination-link is-disabled">
+                        Previous
+                      </span>
                     )}
 
-                    <span className="btn btn-primary disabled">
-                      {currentPage}
+                    <span className="blog-pagination-status">
+                      Page {currentPage} of {totalPages}
                     </span>
 
-                    {hasNextPage && (
+                    {hasNextPage ? (
                       <Link
-                        href={`/blog?page=${currentPage + 1}${
-                          categoryFilter ? `&category=${categoryFilter}` : ""
-                        }`}
-                        className="btn btn-outline-secondary"
+                        className="blog-pagination-link"
+                        href={blogListingPath(
+                          currentPage + 1,
+                          categoryFilter,
+                        )}
                       >
                         Next
                       </Link>
+                    ) : (
+                      <span className="blog-pagination-link is-disabled">
+                        Next
+                      </span>
                     )}
-                  </div>
+                  </nav>
                 )}
               </>
             ) : (

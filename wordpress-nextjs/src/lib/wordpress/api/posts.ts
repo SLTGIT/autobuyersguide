@@ -5,7 +5,33 @@
 
 import { WPPost, WPPostACFFields } from '@/types/wordpress';
 import { normalizeAcf } from '../acf';
-import { fetchAPI } from './client';
+import { fetchAPI, fetchAPIWithMeta } from './client';
+
+export type PostsQueryParams = {
+    per_page?: number;
+    page?: number;
+    categories?: number[];
+    tags?: number[];
+    search?: string;
+    orderby?: string;
+    order?: 'asc' | 'desc';
+};
+
+function buildPostsQuery(params: PostsQueryParams = {}): string {
+    const queryParams = new URLSearchParams();
+
+    if (params.per_page) queryParams.append('per_page', params.per_page.toString());
+    if (params.page) queryParams.append('page', params.page.toString());
+    if (params.categories?.length) queryParams.append('categories', params.categories.join(','));
+    if (params.tags?.length) queryParams.append('tags', params.tags.join(','));
+    if (params.search) queryParams.append('search', params.search);
+    if (params.orderby) queryParams.append('orderby', params.orderby);
+    if (params.order) queryParams.append('order', params.order);
+
+    queryParams.append('_embed', '1');
+
+    return queryParams.toString();
+}
 
 function withNormalizedAcf(post: WPPost): WPPost {
   return { ...post, acf: normalizeAcf<WPPostACFFields>(post.acf as unknown) };
@@ -34,30 +60,26 @@ export async function getAllPosts(options?: {
   return all;
 }
 
-export async function getPosts(params: {
-    per_page?: number;
-    page?: number;
-    categories?: number[];
-    tags?: number[];
-    search?: string;
-    orderby?: string;
-    order?: 'asc' | 'desc';
-} = {}): Promise<WPPost[]> {
-    const queryParams = new URLSearchParams();
-
-    if (params.per_page) queryParams.append('per_page', params.per_page.toString());
-    if (params.page) queryParams.append('page', params.page.toString());
-    if (params.categories?.length) queryParams.append('categories', params.categories.join(','));
-    if (params.tags?.length) queryParams.append('tags', params.tags.join(','));
-    if (params.search) queryParams.append('search', params.search);
-    if (params.orderby) queryParams.append('orderby', params.orderby);
-    if (params.order) queryParams.append('order', params.order);
-
-    queryParams.append('_embed', '1');
-
-    const query = queryParams.toString();
+export async function getPosts(params: PostsQueryParams = {}): Promise<WPPost[]> {
+    const query = buildPostsQuery(params);
     const posts = await fetchAPI<WPPost[]>(`/wp/v2/posts${query ? `?${query}` : ''}`);
     return posts.map(withNormalizedAcf);
+}
+
+export async function getPostsPaginated(params: PostsQueryParams = {}): Promise<{
+    posts: WPPost[];
+    total: number;
+    totalPages: number;
+}> {
+    const query = buildPostsQuery(params);
+    const { data, total, totalPages } = await fetchAPIWithMeta<WPPost[]>(
+        `/wp/v2/posts${query ? `?${query}` : ''}`,
+    );
+    return {
+        posts: data.map(withNormalizedAcf),
+        total,
+        totalPages,
+    };
 }
 
 /**

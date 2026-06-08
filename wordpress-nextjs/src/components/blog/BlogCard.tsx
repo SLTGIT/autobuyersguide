@@ -41,13 +41,7 @@ export default function BlogCard({ post }: BlogCardProps) {
       )}
       <div className={styles.body}>
         <h3 className={styles.title}>
-          <Link href={href}>
-            <span
-              dangerouslySetInnerHTML={{
-                __html: post.title.rendered,
-              }}
-            />
-          </Link>
+          <Link href={href}>{plainTitle}</Link>
         </h3>
         {/* {plainExcerpt ? (
           <p className={styles.excerpt}>{plainExcerpt}</p>

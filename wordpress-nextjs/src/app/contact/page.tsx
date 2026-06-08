@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPageBySlug } from "@/lib/wordpress";
 import { getMetadata, getAcfSeoCopy } from "@/lib/wordpress/seo";
-import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
+import WpRenderedHtml from "@/components/cms/WpRenderedHtml";
 import { getCurrentUrlAndRoute, mergeSiteUrlMetadata } from "@/lib/site-url";
 import JsonLd from "@/components/JsonLd";
 import {
@@ -66,12 +66,7 @@ export default async function ContactPage() {
     <>
       <JsonLd data={jsonLd} />
       {page.content?.rendered?.trim() ? (
-        <div
-          className=""
-          dangerouslySetInnerHTML={{
-            __html: repairWpRenderedHtml(page.content.rendered),
-          }}
-        />
+        <WpRenderedHtml html={page.content.rendered} />
       ) : null}
 
       <section className="py-5 bg-light border-top border-bottom border-light-subtle">

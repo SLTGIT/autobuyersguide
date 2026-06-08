@@ -24,6 +24,171 @@ export function stripHtml(html: string): string {
     .trim();
 }
 
+export const ORGANIZATION_NAME = "Car Sales Brisbane";
+
+/** ISO 8601 datetime → `YYYY-MM-DD` for BlogPosting schema dates. */
+export function formatSchemaDate(isoDate: string): string {
+  const trimmed = isoDate?.trim();
+  if (!trimmed) return trimmed;
+  return trimmed.slice(0, 10);
+}
+
+/** Comma-separated post tag names from WordPress `_embedded['wp:term']`. */
+export function extractPostTagKeywords(post: {
+  _embedded?: { "wp:term"?: unknown[][] };
+}): string | undefined {
+  const termGroups = post._embedded?.["wp:term"];
+  if (!Array.isArray(termGroups)) return undefined;
+
+  const names: string[] = [];
+  for (const group of termGroups) {
+    if (!Array.isArray(group)) continue;
+    for (const term of group) {
+      if (!term || typeof term !== "object") continue;
+      const t = term as { taxonomy?: string; name?: string };
+      if (t.taxonomy === "post_tag" && typeof t.name === "string" && t.name.trim()) {
+        names.push(t.name.trim());
+      }
+    }
+  }
+
+  return names.length > 0 ? names.join(",") : undefined;
+}
+
+export type BlogPostingJsonLdInput = {
+  headline: string;
+  alternativeHeadline?: string;
+  imageUrl?: string;
+  keywords?: string;
+  url: string;
+  datePublished: string;
+  dateModified: string;
+  description?: string;
+  articleBody?: string;
+  authorName?: string;
+  publisherName?: string;
+};
+
+/** Blog detail JSON-LD — BlogPosting fields only (no @graph extras). */
+export function blogPostingJsonLd(
+  input: BlogPostingJsonLdInput,
+): Record<string, unknown> {
+  const publisherName = input.publisherName ?? ORGANIZATION_NAME;
+  const url = upgradeHttpToHttpsUrl(input.url);
+  const node: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: input.headline,
+    url,
+    datePublished: formatSchemaDate(input.datePublished),
+    dateCreated: formatSchemaDate(input.datePublished),
+    dateModified: formatSchemaDate(input.dateModified),
+    publisher: { "@type": "Thing", name: publisherName },
+  };
+
+  const alternativeHeadline = input.alternativeHeadline?.trim();
+  if (alternativeHeadline) node.alternativeHeadline = alternativeHeadline;
+  if (input.imageUrl) node.image = upgradeHttpToHttpsUrl(input.imageUrl);
+  if (input.keywords) node.keywords = input.keywords;
+  if (input.description) node.description = input.description;
+  if (input.articleBody) node.articleBody = input.articleBody;
+  if (input.authorName) {
+    node.author = { "@type": "Person", name: input.authorName };
+  }
+
+  return node;
+}
+
+export type FaqItem = { question: string; answer: string };
+
+function normalizeAcfFaqItems(items: unknown[]): FaqItem[] {
+  return items
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const it = item as Record<string, unknown>;
+      const rawQuestion = typeof it.question === "string" ? it.question : "";
+      const rawAnswer = typeof it.answer === "string" ? it.answer : "";
+      const question = stripHtml(rawQuestion).trim();
+      const answer = stripHtml(rawAnswer).replace(/\s+/g, " ").trim();
+      if (!question || !answer) return null;
+      return { question, answer };
+    })
+    .filter(Boolean) as FaqItem[];
+}
+
+/** Parse WordPress ACF `faq` (JSON string, repeater array, or FAQPage shape). */
+export function parseAcfFaqField(rawFaq: unknown): FaqItem[] {
+  if (!rawFaq) return [];
+
+  if (typeof rawFaq === "string") {
+    const trimmed = rawFaq.trim();
+    if (!trimmed) return [];
+    try {
+      return parseAcfFaqField(JSON.parse(trimmed));
+    } catch {
+      return [];
+    }
+  }
+
+  if (Array.isArray(rawFaq)) {
+    return normalizeAcfFaqItems(rawFaq);
+  }
+
+  if (typeof rawFaq !== "object") {
+    return [];
+  }
+
+  const obj = rawFaq as Record<string, unknown>;
+  if (Array.isArray(obj.mainEntity)) {
+    return normalizeAcfFaqItems(
+      obj.mainEntity
+        .map((entity) => {
+          if (!entity || typeof entity !== "object") return null;
+          const e = entity as Record<string, unknown>;
+          return {
+            question: e.name,
+            answer:
+              (e.acceptedAnswer as Record<string, unknown> | undefined)?.text ??
+              "",
+          };
+        })
+        .filter(Boolean) as unknown[],
+    );
+  }
+
+  return [];
+}
+
+export function faqPageJsonLd(
+  pageUrl: string,
+  faqs: FaqItem[],
+): Record<string, unknown> | null {
+  const url = upgradeHttpToHttpsUrl(pageUrl);
+  const items = faqs
+    .map((f) => {
+      const name = stripHtml(f.question || "").trim();
+      const text = stripHtml(f.answer || "")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (!name || !text) return null;
+      return {
+        "@type": "Question",
+        name,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text,
+        },
+      };
+    })
+    .filter(Boolean) as Record<string, unknown>[];
+  if (!items.length) return null;
+  return {
+    "@type": "FAQPage",
+    "@id": `${url}#faqs`,
+    mainEntity: items,
+  };
+}
+
 export function safeJsonLd(value: unknown): string {
   return JSON.stringify(value).replace(/</g, "\\u003c");
 }
@@ -579,7 +744,7 @@ function buildVehicleOfferJsonLd(input: {
 }
 
 /**
- * Product + Vehicle JSON-LD for inventory / VDP (Rich Results–friendly).
+ * Vehicle JSON-LD for inventory / VDP (Rich Results–friendly).
  */
 export function vehicleJsonLdFromInventory(
   origin: string,
@@ -637,7 +802,7 @@ export function vehicleJsonLdFromInventory(
   const description = buildVehicleListingDescription(listing, v);
 
   const node: Record<string, unknown> = {
-    "@type": ["Product", "Vehicle"],
+    "@type": "Vehicle",
     "@id": `${productUrl}#vehicle`,
     name: listing.title,
     description,
@@ -733,36 +898,13 @@ export type VehicleVdpCarListingJsonLdInput = {
 
 function vehicleVdpFaqPageJsonLd(
   canonicalProductUrl: string,
-  faqs: { question: string; answer: string }[],
+  faqs: FaqItem[],
 ): Record<string, unknown> | null {
-  const pageUrl = upgradeHttpToHttpsUrl(canonicalProductUrl);
-  const items = faqs
-    .map((f) => {
-      const name = stripHtml(f.question || "").trim();
-      const text = stripHtml(f.answer || "")
-        .replace(/\s+/g, " ")
-        .trim();
-      if (!name || !text) return null;
-      return {
-        "@type": "Question",
-        name,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text,
-        },
-      };
-    })
-    .filter(Boolean) as Record<string, unknown>[];
-  if (!items.length) return null;
-  return {
-    "@type": "FAQPage",
-    "@id": `${pageUrl}#faqs`,
-    mainEntity: items,
-  };
+  return faqPageJsonLd(canonicalProductUrl, faqs);
 }
 
 /**
- * Vehicle detail JSON-LD: `@graph` with `Car`, `AutoDealer`, `BreadcrumbList`
+ * Vehicle detail JSON-LD: `@graph` with `Vehicle`, `AutoDealer`, `BreadcrumbList`
  * (dealer-style shape for rich results), plus optional `FAQPage`.
  */
 export function vehicleVdpCarListingGraphJsonLd(
@@ -844,7 +986,7 @@ export function vehicleVdpCarListingGraphJsonLd(
         : [productUrl];
 
   const car: Record<string, unknown> = {
-    "@type": ["Car", "Product"],
+    "@type": "Vehicle",
     "@id": `${productUrl}#vehicle`,
     name: listing.title,
     description: desc,
@@ -919,5 +1061,5 @@ export function vehicleVdpCarListingGraphJsonLd(
     ? vehicleVdpFaqPageJsonLd(productUrl, input.faqs)
     : null;
 
-  return jsonLdGraph(car, dealer, breadcrumbs, faqPage);
+  return jsonLdGraph(breadcrumbs, car, dealer, faqPage);
 }
