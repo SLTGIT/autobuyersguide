@@ -102,7 +102,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
     articleBody: stripHtml(post.content.rendered),
     authorName,
   });
-  console.log("post.acf?.faq", post.acf?.faq);
+  // console.log("post.acf?.faq", post.acf?.faq);
   const faqLd = faqPageJsonLd(articleHttps, parseAcfFaqField(post.acf?.faq));
 
 

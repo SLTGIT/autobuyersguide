@@ -33,9 +33,13 @@ export default function VdpDealerCommentsExpandable({
   return (
     <section className="cs-card p-4 p-lg-5 mb-4 vdp-ref-dealer-comments">
       <h2 className="h4 fw-bold mb-2">Comments from the dealer</h2>
-      <p className="vdp-ref-dealer-comments-note cs-muted small mb-3">
+      <p className="vdp-ref-dealer-comments-note cs-muted small mb-1">
         Prepared from the dealer listing for readability. Confirm all details with
         the dealer before purchase.
+      </p>
+      <p className="vdp-ref-dealer-comments-ai-note cs-muted small mb-3">
+        <i className="bi bi-stars me-1" aria-hidden />
+        Generated with AI from seller comments
       </p>
       <div
         id={bodyId}
