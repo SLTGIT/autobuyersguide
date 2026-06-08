@@ -1,5 +1,6 @@
 "use client";
 
+import { trackVdpFormSubmit } from "@/lib/analytics/vdp";
 import { submitLead } from "@/lib/leads/submit-lead-client";
 import RecaptchaField from "@/components/forms/RecaptchaField";
 import {
@@ -128,6 +129,15 @@ export default function VehicleTestDriveForm({
 
       const data = await submitLead(body);
       if (data.success) {
+        trackVdpFormSubmit(
+          {
+            stockNumber: item.stock,
+            make: item.make,
+            model: item.model,
+            year: item.year,
+          },
+          "test_drive",
+        );
         setStatus("success");
         setStatusMessage(
           "Thank you — your test drive request was sent. We will be in touch shortly.",

@@ -1,5 +1,6 @@
 "use client";
 
+import { trackVdpFormSubmit } from "@/lib/analytics/vdp";
 import { submitLead } from "@/lib/leads/submit-lead-client";
 import RecaptchaField from "@/components/forms/RecaptchaField";
 import {
@@ -140,6 +141,15 @@ export default function VehicleEnquiryForm({
 
       const data = await submitLead(body);
       if (data.success) {
+        trackVdpFormSubmit(
+          {
+            stockNumber: item.stock,
+            make: item.make,
+            model: item.model,
+            year: item.year,
+          },
+          "enquiry",
+        );
         setStatus("success");
         setStatusMessage(
           "Thank you — your enquiry was sent. We will be in touch shortly.",

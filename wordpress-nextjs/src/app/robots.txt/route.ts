@@ -19,22 +19,22 @@ async function resolveSiteOrigin(): Promise<string> {
   return `${proto === "http" || proto === "https" ? proto : "https"}://${host}`;
 }
 
-function buildRobotsBody(sitemapUrl: string): string {
+function buildRobotsBody(sitemapUrl: string, origin: string): string {
   return `Sitemap: ${sitemapUrl}
 
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /privacy-policy
-Disallow: /terms-of-service
-Disallow: /search?*
-Disallow: /*?
+# LLM-oriented site guide: ${origin}/llms.txt
 
 # ------------------------------------------
-# AI SEARCH / TRAFFIC BOTS (Allowed)
+# AI SEARCH / INDEXING (Allowed)
 # ------------------------------------------
+
+User-agent: Google-Extended
+Allow: /
 
 User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: GPTBot
 Allow: /
 
 User-agent: ChatGPT-User
@@ -46,12 +46,15 @@ Allow: /
 User-agent: ClaudeBot
 Allow: /
 
-# ------------------------------------------
-# AI TRAINING BOTS (Blocked)
-# ------------------------------------------
+User-agent: Claude-SearchBot
+Allow: /
 
-User-agent: GPTBot
-Disallow: /
+User-agent: Applebot-Extended
+Allow: /
+
+# ------------------------------------------
+# UNWANTED SCRAPERS (Blocked)
+# ------------------------------------------
 
 User-agent: CCBot
 Disallow: /
@@ -67,6 +70,18 @@ Disallow: /
 
 User-agent: Bytespider
 Disallow: /
+
+# ------------------------------------------
+# DEFAULT
+# ------------------------------------------
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /privacy-policy
+Disallow: /terms-of-service
+Disallow: /search?*
+Disallow: /*?
 `;
 }
 
@@ -74,7 +89,7 @@ export async function GET() {
   const origin = await resolveSiteOrigin();
   const sitemapUrl =
     process.env.NEXT_PUBLIC_ROBOTS_SITEMAP_URL?.trim() || `${origin}/sitemap.xml`;
-  const body = buildRobotsBody(sitemapUrl);
+  const body = buildRobotsBody(sitemapUrl, origin);
   return new NextResponse(body, {
     status: 200,
     headers: {

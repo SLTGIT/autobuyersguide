@@ -1,5 +1,6 @@
 "use client";
 
+import { trackVdpPhoneReveal } from "@/lib/analytics/vdp";
 import { useCallback, useId, useState } from "react";
 
 function digitsOnly(s: string): string {
@@ -28,6 +29,10 @@ export type VdpRefPhoneRevealProps = {
   dealerPhone: string;
   telHref: string;
   stockNumber: string;
+  make?: string;
+  model?: string;
+  year?: string | number;
+  slug?: string;
   /** When true (default), top border separates phone from content above (sidebar card). */
   showDivider?: boolean;
   className?: string;
@@ -37,6 +42,10 @@ export default function VdpRefPhoneReveal({
   dealerPhone,
   telHref,
   stockNumber,
+  make = "",
+  model = "",
+  year = "",
+  slug,
   showDivider = true,
   className,
 }: VdpRefPhoneRevealProps) {
@@ -47,7 +56,14 @@ export default function VdpRefPhoneReveal({
 
   const onReveal = useCallback(() => {
     setRevealed(true);
-  }, []);
+    trackVdpPhoneReveal({
+      stockNumber,
+      make,
+      model,
+      year,
+      slug,
+    });
+  }, [stockNumber, make, model, year, slug]);
 
   if (!dealerPhone.trim() || !telHref.trim()) {
     return null;

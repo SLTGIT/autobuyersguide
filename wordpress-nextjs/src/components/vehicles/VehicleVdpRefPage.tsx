@@ -12,6 +12,7 @@ import VehicleSimilarCarousel, {
 } from "./VehicleSimilarCarousel";
 import VehicleVdpRefInlineEnquiry from "./VehicleVdpRefInlineEnquiry";
 import VehicleTestDriveForm from "./VehicleTestDriveForm";
+import VdpAnalytics from "./VdpAnalytics";
 import VdpRefPhoneReveal from "./VdpRefPhoneReveal";
 import VdpScrollStickyBar from "./VdpScrollStickyBar";
 import VdpQuickSpecsRow, { type VdpQuickSpecItem } from "./VdpQuickSpecsRow";
@@ -138,8 +139,17 @@ export default function VehicleVdpRefPage({
   const heroSubtitle = buildHeroSubtitle(snapshot, ai.heroBadge);
   const quickSpecs = buildQuickSpecs(snapshot);
 
+  const vdpAnalytics = {
+    stockNumber: snapshot.stockNumber,
+    make: snapshot.make,
+    model: snapshot.model,
+    year: snapshot.year,
+    slug: snapshot.slug,
+  };
+
   return (
     <div className="vdp-ref">
+      <VdpAnalytics {...vdpAnalytics} />
       <VdpScrollStickyBar
         headline={headline}
         priceMain={priceMain}
@@ -250,6 +260,10 @@ export default function VehicleVdpRefPage({
                   dealerPhone={dealerPhone}
                   telHref={telHref}
                   stockNumber={snapshot.stockNumber}
+                  make={snapshot.make}
+                  model={snapshot.model}
+                  year={snapshot.year}
+                  slug={snapshot.slug}
                   showDivider={false}
                   className="mb-4 pb-4 border-bottom"
                 />
@@ -272,6 +286,10 @@ export default function VehicleVdpRefPage({
                   dealerPhone={dealerPhone}
                   telHref={telHref}
                   stockNumber={snapshot.stockNumber}
+                  make={snapshot.make}
+                  model={snapshot.model}
+                  year={snapshot.year}
+                  slug={snapshot.slug}
                   showDivider={false}
                   className="mb-4"
                 />
@@ -308,6 +326,10 @@ export default function VehicleVdpRefPage({
                     dealerPhone={dealerPhone}
                     telHref={telHref}
                     stockNumber={snapshot.stockNumber}
+                    make={snapshot.make}
+                    model={snapshot.model}
+                    year={snapshot.year}
+                    slug={snapshot.slug}
                     showDivider={false}
                     className="mb-4 pb-4 border-bottom"
                   />
@@ -318,13 +340,13 @@ export default function VehicleVdpRefPage({
                 </div>
 
                 <div className="cs-card p-4 mb-4 vdp-ref-location-card">
-                  <h3 className="h6 fw-bold mb-1">Call the dealer</h3>
+                  {/* <h3 className="h6 fw-bold mb-1">Call the dealer</h3>
                   <a
                     href={telHref}
                     className="vdp-ref-sidebar-phone d-block fw-bold text-decoration-none mb-3"
                   >
                     {dealerPhone}
-                  </a>
+                  </a> */}
                   <h3 className="h6 fw-bold mb-3">Location and hours</h3>
                   <div className="vstack gap-3">
                     <div className="cs-contact-row">
