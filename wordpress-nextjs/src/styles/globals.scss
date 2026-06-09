@@ -36,12 +36,17 @@
   cursor: pointer;
 
   &:hover {
-    background-color: #23898f !important;
+    background-color: var(--cs-primary-dark) !important;
+    color: var(--cs-card) !important;
   }
 }
 
 .text-primary {
   color: var(--cs-primary) !important;
+}
+
+.text-secondary {
+  color: var(--cs-muted) !important;
 }
 
 .btn-outline-primary {

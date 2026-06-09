@@ -5,13 +5,19 @@ import styles from "./BlogCard.module.scss";
 
 interface BlogCardProps {
   post: WPPost;
+  /** Use `2` on /blog listing (after page h1); default `3` when nested under a section h2. */
+  titleHeadingLevel?: 2 | 3;
 }
 
 function stripTags(html: string): string {
   return html.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 }
 
-export default function BlogCard({ post }: BlogCardProps) {
+export default function BlogCard({
+  post,
+  titleHeadingLevel = 3,
+}: BlogCardProps) {
+  const TitleTag = titleHeadingLevel === 2 ? "h2" : "h3";
 
   const featuredImage =
     post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
@@ -40,9 +46,9 @@ export default function BlogCard({ post }: BlogCardProps) {
         </Link>
       )}
       <div className={styles.body}>
-        <h3 className={styles.title}>
+        <TitleTag className={styles.title}>
           <Link href={href}>{plainTitle}</Link>
-        </h3>
+        </TitleTag>
         {/* {plainExcerpt ? (
           <p className={styles.excerpt}>{plainExcerpt}</p>
         ) : null} */}

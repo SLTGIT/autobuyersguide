@@ -186,7 +186,8 @@ export default function TextUsWidget() {
               type="button"
               className={styles.bubbleTrigger}
               onClick={handleOpen}
-              aria-controls={`${baseId}-panel`}
+              aria-expanded={false}
+              aria-haspopup="dialog"
               aria-label="Open text us: Hi there, have a question?"
             >
               <div className={styles.bubble}>
@@ -203,7 +204,8 @@ export default function TextUsWidget() {
             type="button"
             className={styles.launcher}
             onClick={handleOpen}
-            aria-controls={`${baseId}-panel`}
+            aria-expanded={false}
+            aria-haspopup="dialog"
             aria-label="Text us — open chat"
           >
             <span className={styles.launcherIcon} aria-hidden>

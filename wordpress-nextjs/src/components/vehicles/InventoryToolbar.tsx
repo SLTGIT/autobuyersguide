@@ -6,6 +6,7 @@ import { DEFAULT_INVENTORY_SORT } from "@/types/inventory";
 import { inventoryListingHrefForContext } from "@/lib/inventory/query";
 import { useInventorySearchUrl } from "@/components/vehicles/InventorySearchUrlContext";
 import { useStableInventoryFilters } from "@/components/vehicles/useStableInventoryFilters";
+import { useClientMounted } from "@/hooks/useClientMounted";
 
 interface InventoryToolbarProps {
   total: number;
@@ -20,9 +21,11 @@ export default function InventoryToolbar({
   notFoundLabel,
 }: InventoryToolbarProps) {
   const router = useRouter();
+  const mounted = useClientMounted();
   const current = useStableInventoryFilters();
   const { resultsView, setResultsView, listingBasePathname } =
     useInventorySearchUrl();
+  const activeView = mounted ? resultsView : "list";
 
   const setSort = (nextSort: InventorySort) => {
     const next: InventoryFilterState = {
@@ -64,9 +67,9 @@ export default function InventoryToolbar({
         <div className="inventory-view-toggle" role="group" aria-label="View mode">
           <button
             type="button"
-            className={`inventory-view-btn ${resultsView === "grid" ? "is-active" : ""}`}
+            className={`inventory-view-btn ${activeView === "grid" ? "is-active" : ""}`}
             onClick={() => setResultsView("grid")}
-            aria-pressed={resultsView === "grid"}
+            aria-pressed={activeView === "grid"}
             title="Grid view"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -75,9 +78,9 @@ export default function InventoryToolbar({
           </button>
           <button
             type="button"
-            className={`inventory-view-btn ${resultsView === "list" ? "is-active" : ""}`}
+            className={`inventory-view-btn ${activeView === "list" ? "is-active" : ""}`}
             onClick={() => setResultsView("list")}
-            aria-pressed={resultsView === "list"}
+            aria-pressed={activeView === "list"}
             title="List view"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>

@@ -38,7 +38,9 @@ export default function InventoryPagination({
           Previous
         </Link>
       ) : (
-        <span className="inventory-pagination-link is-disabled">Previous</span>
+        <span className="inventory-pagination-link is-disabled" aria-disabled="true">
+          Previous
+        </span>
       )}
       <span className="inventory-pagination-status">
         Page {page} of {totalPages}
@@ -48,7 +50,9 @@ export default function InventoryPagination({
           Next
         </Link>
       ) : (
-        <span className="inventory-pagination-link is-disabled">Next</span>
+        <span className="inventory-pagination-link is-disabled" aria-disabled="true">
+          Next
+        </span>
       )}
     </nav>
   );

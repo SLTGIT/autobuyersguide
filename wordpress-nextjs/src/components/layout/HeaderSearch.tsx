@@ -147,13 +147,17 @@ export default function HeaderSearch() {
           </svg>
         </span>
         <input
-          type="search"
+          type="text"
+          inputMode="search"
           className={styles["header-search__input"]}
           placeholder="Search Car..."
           value={q}
           onChange={(e) => setQ(e.target.value)}
           autoComplete="off"
+          role="combobox"
           aria-label="Search by make or model"
+          aria-autocomplete="list"
+          aria-haspopup="listbox"
           aria-expanded={showPanel}
           aria-controls={showPanel ? listId : undefined}
           aria-activedescendant={

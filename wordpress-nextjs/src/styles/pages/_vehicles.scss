@@ -171,14 +171,14 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 
 .inventory-breadcrumb {
     font-size: 0.875rem;
-    color: var(--secondary, #6c757d);
+    color: var(--cs-muted);
     margin-bottom: 1rem;
 
     a {
         color: inherit;
         text-decoration: none;
         &:hover {
-            color: var(--primary, $color-primary);
+            color: var(--cs-primary);
             text-decoration: underline;
         }
     }
@@ -186,7 +186,7 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 
 .inventory-breadcrumb-sep {
     margin: 0 0.35rem;
-    opacity: 0.6;
+    color: var(--cs-muted);
 }
 
 .inventory-breadcrumb-current {
@@ -208,7 +208,7 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 .inventory-srp-lead {
     margin: 0;
     max-width: 52rem;
-    color: var(--secondary, #6c757d);
+    color: var(--cs-muted);
     line-height: 1.5;
 }
 
@@ -308,7 +308,7 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 .inventory-applied-empty {
     margin: 0;
     font-size: 0.875rem;
-    color: var(--secondary, #6c757d);
+    color: var(--cs-muted);
 }
 
 .inventory-chips {
@@ -398,7 +398,7 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 
 .inventory-accordion-icon {
     display: flex;
-    color: var(--secondary, #6c757d);
+    color: var(--cs-muted);
 }
 
 .inventory-accordion-title {
@@ -406,7 +406,7 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 }
 
 .inventory-accordion-chevron {
-    color: var(--secondary, #888);
+    color: var(--cs-muted);
     font-size: 0.75rem;
 }
 
@@ -430,14 +430,14 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 }
 
 .inventory-count {
-    color: var(--secondary, #888);
+    color: var(--cs-muted);
     font-size: 0.8125rem;
 }
 
 .inventory-facet-empty {
     margin: 0;
     font-size: 0.8125rem;
-    color: var(--secondary, #6c757d);
+    color: var(--cs-muted);
 }
 
 .inventory-srp-main {
@@ -531,7 +531,7 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     border: none;
     background: #fff;
     cursor: pointer;
-    color: #666;
+    color: var(--cs-muted);
     &.is-active {
         background: #111;
         color: #fff;
@@ -1506,18 +1506,21 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     color: var(--search-listings-color, #222);
     font-weight: 500;
     &.is-disabled {
-        opacity: 0.4;
+        color: var(--cs-muted);
+        background: #f3f5f7;
+        border-color: var(--grey300, #dee2e6);
+        cursor: default;
         pointer-events: none;
     }
     &:not(.is-disabled):hover {
         border-color: var(--cs-primary);
-        color: rgb(2, 2, 2);
+        color: var(--cs-ink);
     }
 }
 
 .inventory-pagination-status {
     font-size: 0.875rem;
-    color: var(--secondary, #666);
+    color: var(--cs-muted);
 }
 
 .inventory-empty {
@@ -1657,13 +1660,21 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     box-shadow:
         0 4px 6px rgba(15, 23, 42, 0.04),
         0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.vehicle-gallery__stage-hit {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
     cursor: zoom-in;
-    outline: none;
 
     &:focus-visible {
-        box-shadow:
-            0 0 0 3px rgba($color-primary, 0.35),
-            0 12px 28px rgba(15, 23, 42, 0.08);
+        outline: none;
+        box-shadow: inset 0 0 0 3px rgba($color-primary, 0.45);
     }
 }
 
@@ -1679,38 +1690,60 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 0.65rem;
+    bottom: 0.35rem;
     z-index: 4;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.35rem;
-    padding: 0 3rem;
+    gap: 0.25rem;
+    padding: 0 2.5rem;
     pointer-events: auto;
 }
 
 .vehicle-gallery__dot {
-    width: 1.35rem;
-    height: 0.22rem;
-    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0.5rem;
     border: none;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.45);
+    background: transparent;
     cursor: pointer;
+}
+
+.vehicle-gallery__dot-indicator {
+    display: block;
+    width: 1.35rem;
+    height: 0.22rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     transition:
         background 0.2s,
         transform 0.2s,
         box-shadow 0.2s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+}
 
-    &:hover {
-        background: rgba(255, 255, 255, 0.75);
-    }
+.vehicle-gallery__dot:hover .vehicle-gallery__dot-indicator {
+    background: rgba(255, 255, 255, 0.75);
+}
 
-    &.is-active {
-        background: #fff;
-        transform: scaleY(1.35);
-        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9);
+.vehicle-gallery__dot.is-active .vehicle-gallery__dot-indicator {
+    background: #fff;
+    transform: scaleY(1.35);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.vehicle-gallery__dot:focus-visible {
+    outline: none;
+
+    .vehicle-gallery__dot-indicator {
+        box-shadow:
+            0 0 0 2px rgba(255, 255, 255, 0.95),
+            0 0 0 4px rgba($color-primary, 0.55);
     }
 }
 
@@ -2353,8 +2386,8 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     top: 0.75rem;
     right: 0.75rem;
     z-index: 4;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
     border: none;
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.92);
@@ -2376,8 +2409,8 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     top: 50%;
     transform: translateY(-50%);
     z-index: 3;
-    width: 2.85rem;
-    height: 2.85rem;
+    width: 2.75rem;
+    height: 2.75rem;
     border: none;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.94);

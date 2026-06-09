@@ -28,14 +28,14 @@ export default async function Header() {
       <div className="cs-topbar py-0 py-3 py-lg-0">
         <div className="container d-flex flex-wrap justify-content-center justify-content-lg-end align-items-center gap-3 gap-lg-4 ">
           <a
-            className="d-inline-flex align-items-center gap-2 text-decoration-none text-body"
+            className="d-inline-flex align-items-center gap-2 text-decoration-none"
             target="_blank"
             rel="noopener noreferrer"
             href={CAR_SALES_BRISBANE_GOOGLE_MAPS_URL}
             aria-label={`Google reviews: ${summaryLine}`}
           >
             <GoogleRatingStars score={score} />
-            <span style={{ fontSize: "0.82rem", lineHeight: "1", color: "#fff" }}>{summaryLine}</span>
+            <span className="cs-topbar__review-line">{summaryLine}</span>
           </a>
           <a
             className="d-inline-flex align-items-center gap-2"

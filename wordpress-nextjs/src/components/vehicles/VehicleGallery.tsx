@@ -166,19 +166,13 @@ export default function VehicleGallery({
       }}
     >
       <div className="vehicle-gallery__stage-wrap">
-        <div
-          className="vehicle-gallery__stage"
-          onClick={() => setLightboxOpen(true)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              setLightboxOpen(true);
-            }
-          }}
-          role="button"
-          tabIndex={0}
-          aria-label="Open full-screen gallery"
-        >
+        <div className="vehicle-gallery__stage">
+          <button
+            type="button"
+            className="vehicle-gallery__stage-hit"
+            aria-label="Open full-screen gallery"
+            onClick={() => setLightboxOpen(true)}
+          />
           {selectedImage ? (
             <Image
               key={selectedImage}
@@ -240,44 +234,44 @@ export default function VehicleGallery({
             </>
           ) : null}
 
-          {allImages.length > 1 ? (
+          {/* {allImages.length > 1 ? (
             <div
               className="vehicle-gallery__dots"
-              role="tablist"
+              role="group"
               aria-label="Slide indicators"
-              onClick={(e) => e.stopPropagation()}
             >
               {allImages.map((_, i) => (
                 <button
                   key={i}
                   type="button"
-                  role="tab"
-                  aria-selected={index === i}
+                  aria-current={index === i ? "true" : undefined}
                   aria-label={`Photo ${i + 1} of ${allImages.length}`}
                   className={`vehicle-gallery__dot ${index === i ? "is-active" : ""}`}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     bumpManualPause();
                     goTo(i);
                   }}
-                />
+                >
+                  <span className="vehicle-gallery__dot-indicator" aria-hidden />
+                </button>
               ))}
             </div>
-          ) : null}
+          ) : null} */}
         </div>
       </div>
 
       {allImages.length > 1 && (
         <div
           className="vehicle-gallery__thumb-grid"
-          role="tablist"
+          role="group"
           aria-label="Gallery thumbnails"
         >
           {gridPreviewImages.map((image, i) => (
             <button
               key={`${image.url}-${i}`}
               type="button"
-              role="tab"
-              aria-selected={index === i}
+              aria-current={index === i ? "true" : undefined}
               aria-label={`View photo ${i + 1} of ${allImages.length} in gallery`}
               className={`vehicle-gallery__grid-thumb ${index === i ? "is-active" : ""}`}
               onClick={(e) => {
@@ -288,7 +282,7 @@ export default function VehicleGallery({
               <span className="vehicle-gallery__grid-thumb-frame">
                 <Image
                   src={image.url}
-                  alt="Vehicle Image"
+                  alt=""
                   fill
                   className="vehicle-gallery__grid-thumb-img"
                   sizes="(max-width: 576px) 45vw, 22vw"
@@ -391,7 +385,7 @@ export default function VehicleGallery({
                 {allImages.length > 1 ? (
                   <div
                     className="vehicle-gallery__lightbox-thumbs"
-                    role="tablist"
+                    role="group"
                     aria-label="Select photo"
                   >
                     {allImages.map((image, i) => (
@@ -399,8 +393,8 @@ export default function VehicleGallery({
                         key={`lb-t-${image.url}-${i}`}
                         type="button"
                         className={`vehicle-gallery__lightbox-thumb ${index === i ? "is-active" : ""}`}
-                        aria-selected={index === i}
-                        aria-label={`Photo ${i + 1}`}
+                        aria-current={index === i ? "true" : undefined}
+                        aria-label={`Photo ${i + 1} of ${allImages.length}`}
                         onClick={() => {
                           bumpManualPause();
                           goTo(i);
@@ -408,7 +402,7 @@ export default function VehicleGallery({
                       >
                         <Image
                           src={image.url}
-                          alt="Vehicle Image"
+                          alt=""
                           width={112}
                           height={84}
                           className="vehicle-gallery__lightbox-thumb-img"

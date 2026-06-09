@@ -215,7 +215,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
                       key={post.id}
                       className="col-12 col-md-6 col-lg-4 d-flex"
                     >
-                      <BlogCard post={post} />
+                      <BlogCard post={post} titleHeadingLevel={2} />
                     </div>
                   ))}
                 </div>
@@ -236,7 +236,10 @@ export default async function Blog({ searchParams }: BlogPageProps) {
                         Previous
                       </Link>
                     ) : (
-                      <span className="blog-pagination-link is-disabled">
+                      <span
+                        className="blog-pagination-link is-disabled"
+                        aria-disabled="true"
+                      >
                         Previous
                       </span>
                     )}
@@ -256,7 +259,10 @@ export default async function Blog({ searchParams }: BlogPageProps) {
                         Next
                       </Link>
                     ) : (
-                      <span className="blog-pagination-link is-disabled">
+                      <span
+                        className="blog-pagination-link is-disabled"
+                        aria-disabled="true"
+                      >
                         Next
                       </span>
                     )}

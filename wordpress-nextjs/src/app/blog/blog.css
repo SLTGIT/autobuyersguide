@@ -63,18 +63,21 @@
 }
 
 .blog-pagination-link.is-disabled {
-  opacity: 0.4;
+  color: var(--cs-muted);
+  background: #f3f5f7;
+  border-color: var(--grey300, #dee2e6);
+  cursor: default;
   pointer-events: none;
 }
 
 .blog-pagination-link:not(.is-disabled):hover {
   border-color: var(--cs-primary);
-  color: rgb(2, 2, 2);
+  color: var(--cs-ink);
 }
 
 .blog-pagination-status {
   font-size: 0.875rem;
-  color: var(--secondary, #666);
+  color: var(--cs-muted);
   line-height: 1.25;
 }
 

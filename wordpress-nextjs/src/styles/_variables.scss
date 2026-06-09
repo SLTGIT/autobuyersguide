@@ -26,14 +26,14 @@ $colors: (
     "success": #28a745
 );
 
-$cs-primary: #3d8a94;
-$cs-primary-dark: #3d8a94;
+$cs-primary: #2a6d75;
+$cs-primary-dark: #1f5c64;
 $cs-ink: #1e2732;
-$cs-muted: #667281;
+$cs-muted: #5a6570;
 $cs-bg: #f3f7fb;
 $cs-card: #ffffff;
 $cs-line: #dbe6f2;
-$cs-accent: #3d8a94;
+$cs-accent: #2a6d75;
 
 // Fallback variables for backward compatibility if needed
 $color-primary: map.get($colors, "primary");
@@ -48,12 +48,18 @@ $color-light: map.get($colors, "light");
 // Generate Global CSS Variables
 // -----------------------------------------------------------------------------
 :root {
-  --cs-primary: #3d8a94;
-  --cs-primary-dark: #3d8a94;
+  --cs-primary: #2a6d75;
+  --cs-primary-dark: #1f5c64;
   --cs-ink: #1e2732;
-  --cs-muted: #667281;
+  --cs-muted: #5a6570;
   --cs-bg: #f3f7fb;
   --cs-card: #ffffff;
   --cs-line: #dbe6f2;
-  --cs-accent: #3d8a94;
+  --cs-accent: #2a6d75;
+  --bs-primary: #2a6d75;
+  --bs-primary-rgb: 42, 109, 117;
+  --bs-secondary: #5a6570;
+  --bs-secondary-rgb: 90, 101, 112;
+  --bs-link-color: #2a6d75;
+  --bs-link-hover-color: #1f5c64;
 }

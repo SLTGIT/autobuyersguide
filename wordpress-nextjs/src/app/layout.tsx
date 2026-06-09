@@ -6,6 +6,7 @@ import "@/styles/globals.scss";
 import { Manrope } from "next/font/google";
 import { Layout } from "@/components/layout";
 import { ClientImports } from "@/components/ClientImports";
+import GtmNoscript from "@/components/analytics/GtmNoscript";
 import {
   FAVICON_PATH,
   OG_SHARE_IMAGE_ALT,
@@ -132,14 +133,7 @@ export default async function RootLayout({
                 })(window,document,'script','dataLayer','${gtmId}');
               `}
             </Script>
-            <noscript>
-              <iframe
-                src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-                height="0"
-                width="0"
-                style={{ display: "none", visibility: "hidden" }}
-              />
-            </noscript>
+            <GtmNoscript gtmId={gtmId} />
           </>
         ) : null}
         <ClientImports />
