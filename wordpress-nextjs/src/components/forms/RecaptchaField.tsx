@@ -1,7 +1,16 @@
 "use client";
 
-import ReCAPTCHA from "react-google-recaptcha";
+import dynamic from "next/dynamic";
 import { useEffect, useRef } from "react";
+import type ReCAPTCHAType from "react-google-recaptcha";
+
+const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), {
+  ssr: false,
+  loading: () => (
+    <div aria-hidden style={{ minHeight: "78px" }} />
+  ),
+}) as typeof ReCAPTCHAType;
+
 import { useClientMounted } from "@/hooks/useClientMounted";
 
 type RecaptchaFieldProps = {
@@ -20,7 +29,7 @@ export default function RecaptchaField({
   className,
 }: RecaptchaFieldProps) {
   const mounted = useClientMounted();
-  const captchaRef = useRef<ReCAPTCHA>(null);
+  const captchaRef = useRef<ReCAPTCHAType>(null);
   const previousTokenRef = useRef<string | null>(token);
 
   useEffect(() => {

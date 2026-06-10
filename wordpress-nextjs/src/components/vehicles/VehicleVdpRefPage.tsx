@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import type {
   VehicleVdpAiContent,
@@ -7,11 +8,7 @@ import type {
 import type { VehicleImage } from "@/types/vehicle";
 import type { VehicleEnquiryItemPayload } from "./VehicleEnquiryForm";
 import VehicleGallery from "./VehicleGallery";
-import VehicleSimilarCarousel, {
-  type SimilarCarItem,
-} from "./VehicleSimilarCarousel";
-import VehicleVdpRefInlineEnquiry from "./VehicleVdpRefInlineEnquiry";
-import VehicleTestDriveForm from "./VehicleTestDriveForm";
+import type { SimilarCarItem } from "./VehicleSimilarCarousel";
 import VdpAnalytics from "./VdpAnalytics";
 import VdpRefPhoneReveal from "./VdpRefPhoneReveal";
 import VdpScrollStickyBar from "./VdpScrollStickyBar";
@@ -20,6 +17,12 @@ import VdpKeyHighlights from "./VdpKeyHighlights";
 import VdpDealerCommentsExpandable from "./VdpDealerCommentsExpandable";
 import VdpCarDetailsTabs from "./VdpCarDetailsTabs";
 import { ORG_GOOGLE_MAPS_PLACE_URL, ORG_POSTAL_ADDRESS } from "@/lib/json-ld";
+
+const VehicleVdpRefInlineEnquiry = dynamic(
+  () => import("./VehicleVdpRefInlineEnquiry"),
+);
+const VehicleTestDriveForm = dynamic(() => import("./VehicleTestDriveForm"));
+const VehicleSimilarCarousel = dynamic(() => import("./VehicleSimilarCarousel"));
 
 function formatDealerAddress(): string {
   const a = ORG_POSTAL_ADDRESS;

@@ -118,6 +118,17 @@ function normalizeSeoTitlePart(
   return t;
 }
 
+/** Inventory-only SEO when metadata must not wait on OpenAI. */
+export function buildVehicleVdpFallbackSeo(snapshot: VehicleVdpSnapshot): {
+  seoTitle: string;
+  metaDescription: string;
+} {
+  return {
+    seoTitle: normalizeSeoTitlePart("", snapshot),
+    metaDescription: buildFallbackMetaDescription(snapshot),
+  };
+}
+
 function buildFallbackMetaDescription(snapshot: VehicleVdpSnapshot): string {
   const priceLine =
     snapshot.showDriveAway && snapshot.driveAwayPrice?.trim()

@@ -24,38 +24,56 @@ export default function Footer() {
           <div className="col-lg-1"></div>
           <div className="col-lg-3">
             <h3 className="h5 fw-bold">Used Cars</h3>
-            <ul className="list-unstyled text-white-50 mb-0">
+            <ul className={`${styles.footerNav} mb-0`}>
               <li>
-                <Link href={"/search/4x4"}>Used 4x4 Cars for Sale</Link>
+                <Link href="/search/4x4" className={styles.footerLink}>
+                  Used 4x4 Cars for Sale
+                </Link>
               </li>
               <li>
-                <Link href={"/search/utility"}> Used Utility Cars for Sale </Link>
+                <Link href="/search/utility" className={styles.footerLink}>
+                  Used Utility Cars for Sale
+                </Link>
               </li>
               <li>
-                <Link href={"/search/suv"}>Used SUVs for Sale</Link>
+                <Link href="/search/suv" className={styles.footerLink}>
+                  Used SUVs for Sale
+                </Link>
               </li>
               <li>
-                <Link href={"/search/hatchback"}>Used Hatchback Cars for Sale</Link>
+                <Link href="/search/hatchback" className={styles.footerLink}>
+                  Used Hatchback Cars for Sale
+                </Link>
               </li>
             </ul>
           </div>
           <div className="col-lg-3">
             <h3 className="h5 fw-bold">Company</h3>
-            <ul className="list-unstyled text-white-50 mb-0">
+            <ul className={`${styles.footerNav} mb-0`}>
               <li>
-                <Link href="/about-us">About Us</Link>
+                <Link href="/about-us" className={styles.footerLink}>
+                  About Us
+                </Link>
               </li>
               <li>
-                <Link href="/contact">Contact Us</Link>
+                <Link href="/contact" className={styles.footerLink}>
+                  Contact Us
+                </Link>
               </li>
               <li>
-                <Link href="/privacy-policy">Privacy Policy</Link>
+                <Link href="/privacy-policy" className={styles.footerLink}>
+                  Privacy Policy
+                </Link>
               </li>
               <li>
-                <Link href="/terms-of-service">Terms of Service</Link>
+                <Link href="/terms-of-service" className={styles.footerLink}>
+                  Terms of Service
+                </Link>
               </li>
               <li>
-                <Link href="/finance-disclaimer">Finance Disclaimer</Link>
+                <Link href="/finance-disclaimer" className={styles.footerLink}>
+                  Finance Disclaimer
+                </Link>
               </li>
             </ul>
           </div>

@@ -10,6 +10,16 @@ const AUTOPLAY_INTERVAL_MS = 5000;
 const PAUSE_AFTER_MANUAL_MS = 12000;
 /** First N slots in the grid; remainder summarized on the count card (reference layout). */
 const GRID_THUMB_MAX = 7;
+/** Cap lightbox thumb strip to avoid dozens of parallel image requests. */
+const LIGHTBOX_THUMB_MAX = 12;
+
+function shouldEnableGalleryAutoplay(): boolean {
+  if (typeof window === "undefined") return false;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return false;
+  }
+  return window.matchMedia("(min-width: 992px)").matches;
+}
 
 function Chevron({ dir }: { dir: "prev" | "next" }) {
   const d = dir === "prev" ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6";
@@ -47,6 +57,7 @@ export default function VehicleGallery({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const pointerInsideRef = useRef(false);
   const resumeAutoplayAtRef = useRef(0);
+  const autoplayEnabledRef = useRef(false);
 
   const bumpManualPause = useCallback(() => {
     resumeAutoplayAtRef.current = Date.now() + PAUSE_AFTER_MANUAL_MS;
@@ -58,6 +69,21 @@ export default function VehicleGallery({
   const gridPreviewImages = showMorePhotosCard
     ? allImages.slice(0, GRID_THUMB_MAX)
     : allImages;
+
+  const lightboxThumbStart =
+    allImages.length <= LIGHTBOX_THUMB_MAX
+      ? 0
+      : Math.max(
+          0,
+          Math.min(
+            index - Math.floor(LIGHTBOX_THUMB_MAX / 2),
+            allImages.length - LIGHTBOX_THUMB_MAX,
+          ),
+        );
+  const lightboxThumbImages = allImages.slice(
+    lightboxThumbStart,
+    lightboxThumbStart + LIGHTBOX_THUMB_MAX,
+  );
 
   const go = useCallback(
     (dir: -1 | 1) => {
@@ -88,7 +114,13 @@ export default function VehicleGallery({
   );
 
   useEffect(() => {
-    if (allImages.length < 2 || lightboxOpen) return;
+    autoplayEnabledRef.current = shouldEnableGalleryAutoplay();
+  }, []);
+
+  useEffect(() => {
+    if (!autoplayEnabledRef.current || allImages.length < 2 || lightboxOpen) {
+      return;
+    }
 
     const id = window.setInterval(() => {
       if (document.visibilityState !== "visible") return;
@@ -180,8 +212,11 @@ export default function VehicleGallery({
               alt={`${title} — photo ${index + 1} of ${allImages.length}`}
               fill
               className="vehicle-gallery__stage-img"
-              sizes="(max-width: 991px) 100vw, 58vw"
+              sizes="(max-width: 575px) 100vw, (max-width: 991px) 92vw, 58vw"
               priority={index === 0}
+              fetchPriority={index === 0 ? "high" : "auto"}
+              loading={index === 0 ? "eager" : "lazy"}
+              quality={index === 0 ? 82 : 75}
             />
           ) : (
             <div className="vehicle-gallery__placeholder">
@@ -285,7 +320,9 @@ export default function VehicleGallery({
                   alt=""
                   fill
                   className="vehicle-gallery__grid-thumb-img"
-                  sizes="(max-width: 576px) 45vw, 22vw"
+                  sizes="(max-width: 576px) 22vw, 12vw"
+                  loading={i === 0 ? "eager" : "lazy"}
+                  quality={70}
                 />
               </span>
             </button>
@@ -388,7 +425,9 @@ export default function VehicleGallery({
                     role="group"
                     aria-label="Select photo"
                   >
-                    {allImages.map((image, i) => (
+                    {lightboxThumbImages.map((image, offset) => {
+                      const i = lightboxThumbStart + offset;
+                      return (
                       <button
                         key={`lb-t-${image.url}-${i}`}
                         type="button"
@@ -406,9 +445,12 @@ export default function VehicleGallery({
                           width={112}
                           height={84}
                           className="vehicle-gallery__lightbox-thumb-img"
+                          loading="lazy"
+                          quality={65}
                         />
                       </button>
-                    ))}
+                    );
+                    })}
                   </div>
                 ) : null}
               </div>

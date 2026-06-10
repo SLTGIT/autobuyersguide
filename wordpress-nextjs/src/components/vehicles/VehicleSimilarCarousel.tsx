@@ -92,6 +92,9 @@ export default function VehicleSimilarCarousel({
                     width={320}
                     height={220}
                     className="vdp-similar-card-img"
+                    sizes="(max-width: 768px) 72vw, 280px"
+                    loading="lazy"
+                    quality={72}
                   />
                 ) : (
                   <div className="vdp-similar-card-placeholder">No image</div>

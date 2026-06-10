@@ -1,7 +1,10 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
 import VehicleVdpRefPage from "@/components/vehicles/VehicleVdpRefPage";
-import { loadVehicleVdpBySlug } from "@/lib/openai/loadVehicleVdpBySlug";
+import {
+  loadVehicleVdpBySlug,
+  loadVehicleVdpMetaBySlug,
+} from "@/lib/openai/loadVehicleVdpBySlug";
 import { formatVehicleVdpBrowserTitle } from "@/lib/openai/vehicleVdpCopy";
 import { dealerVehicleToListing } from "@/lib/inventory/transform";
 import { buildVehicleSlug } from "@/lib/inventory/slug";
@@ -28,7 +31,8 @@ import {
 
 import "./vdp-ref.scss";
 
-export const dynamic = "force-dynamic";
+/** Align with dealer inventory `revalidate` (5 min). */
+export const revalidate = 300;
 
 interface VehicleDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -83,17 +87,17 @@ function toSimilarItem(v: DealerVehicle): SimilarCarItem {
 
 export async function generateMetadata({ params }: VehicleDetailPageProps) {
   const { slug } = await params;
-  const res = await loadVehicleVdpBySlug(slug);
+  const res = await loadVehicleVdpMetaBySlug(slug);
   if (!res.ok) {
     return { title: "Vehicle not found | Car Sales Brisbane" };
   }
-  const { listing, ai, vehicle: v } = res;
-  const image = v.Photos?.[0]?.PhotoUrl ?? listing.featured_image;
-  const canonicalPath = `/cars/${buildVehicleSlug(v)}`;
+  const { listing, vehicle: v, seoTitle, metaDescription, featuredImage, canonicalPath } =
+    res;
+  const image = featuredImage || listing.featured_image;
   const { currentUrl, currentRoute } =
     await getCurrentUrlAndRoute(canonicalPath);
-  const pageTitle = formatVehicleVdpBrowserTitle(ai.seoTitle);
-  const desc = ai.metaDescription;
+  const pageTitle = formatVehicleVdpBrowserTitle(seoTitle);
+  const desc = metaDescription;
   const origin = new URL(currentUrl).origin;
   return {
     title: pageTitle,

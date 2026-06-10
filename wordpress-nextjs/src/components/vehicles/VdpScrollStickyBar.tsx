@@ -86,6 +86,8 @@ export default function VdpScrollStickyBar({
               height={66}
               className="vdp-ref-sticky-bar__img"
               sizes="(max-width: 575px) 56px, 88px"
+              loading="lazy"
+              quality={70}
             />
           </div>
         ) : null}
