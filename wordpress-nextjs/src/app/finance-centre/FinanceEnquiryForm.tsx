@@ -20,7 +20,7 @@ const BUDGET_PRESETS = [
 ] as const;
 
 const DEFAULT_MESSAGE = "Looking for finance options";
-const FORM_TYPE = "Finance Enquiry";
+const FORM_TYPE = "Finance Enquiry (Finance Centre Form)";
 
 function formatBudgetChip(n: number): string {
   return `$${n.toLocaleString("en-AU")}`;

@@ -153,6 +153,10 @@ export default async function VehicleDetailPage({
 
   const dealerPhone = process.env.NEXT_PUBLIC_DEALER_PHONE || "0418 908 870";
   const telHref = `tel:${dealerPhone.replace(/\s/g, "")}`;
+  const priceMain =
+    listing.show_drive_away && listing.drive_away_price
+      ? listing.drive_away_price
+      : listing.formatted_price || "—";
   const enquiryItemImage = absoluteAssetUrl(featured, shareUrl);
   const enquiryItem = {
     image: enquiryItemImage,
@@ -164,6 +168,8 @@ export default async function VehicleDetailPage({
     status: "In stock",
     tag: "Car Sales Brisbane",
     url: shareUrl,
+    condition: listing.condition || v.Condition || "used",
+    price: priceMain !== "—" ? priceMain : "",
   };
 
   const similar = getSimilarVehicles(allVehicles, v, 6).map(toSimilarItem);
@@ -184,10 +190,6 @@ export default async function VehicleDetailPage({
       )
     : "/search";
 
-  const priceMain =
-    listing.show_drive_away && listing.drive_away_price
-      ? listing.drive_away_price
-      : listing.formatted_price || "—";
   const priceCaption =
     listing.show_drive_away && listing.drive_away_price
       ? "Drive away price"

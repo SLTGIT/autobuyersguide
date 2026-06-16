@@ -152,6 +152,12 @@ export default function VehicleVdpRefPage({
 
   return (
     <div className="vdp-ref">
+      <script
+        id="cs-textus-vehicle"
+        type="application/json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(enquiryItem) }}
+      />
       <VdpAnalytics {...vdpAnalytics} />
       <VdpScrollStickyBar
         headline={headline}

@@ -32,15 +32,20 @@ const ENQUIRY_OPTIONS: string[] = [
   "Sell My Car Enquiry",
 ];
 
+const CONTACT_DEFAULT_MESSAGE =
+  "I have a question and would like to get in touch. Please let me know how you can help.";
+
+const emptyForm: FormDataType = {
+  firstName: "",
+  lastName: "",
+  phone: "",
+  email: "",
+  enquiryType: "",
+  message: CONTACT_DEFAULT_MESSAGE,
+};
+
 export default function ContactForm() {
-  const [formData, setFormData] = useState<FormDataType>({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    email: "",
-    enquiryType: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState<FormDataType>(emptyForm);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
@@ -107,7 +112,7 @@ export default function ContactForm() {
         phone: digitsOnly(formData.phone),
         email: formData.email.trim(),
         message: formData.message,
-        form_type: formData.enquiryType,
+        form_type: formData.enquiryType + "(Contact Form)",
         budget: "",
         date: new Date().toISOString(),
         recaptchaToken,
@@ -121,14 +126,7 @@ export default function ContactForm() {
         setStatusMessage(
           "Thank you — your enquiry was sent successfully. We will get back to you soon.",
         );
-        setFormData({
-          firstName: "",
-          lastName: "",
-          phone: "",
-          email: "",
-          enquiryType: "",
-          message: "",
-        });
+        setFormData(emptyForm);
         setRecaptchaToken(null);
       } else {
         setStatus("error");

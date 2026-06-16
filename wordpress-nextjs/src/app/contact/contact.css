@@ -140,7 +140,7 @@
 
 .cs-contact-form__textarea {
   resize: vertical;
-  min-height: 120px;
+  min-height: 120px !important;
 }
 
 .cs-contact-form__subscribe .form-check-label {

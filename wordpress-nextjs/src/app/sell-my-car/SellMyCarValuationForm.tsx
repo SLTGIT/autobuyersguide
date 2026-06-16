@@ -13,7 +13,10 @@ import "@/app/contact/contact.css";
 import { useCallback, useState, ChangeEvent, FormEvent } from "react";
 import { SELL_MY_CAR_MAKES, sellMyCarMakeLabel } from "./sell-my-car-makes";
 
-const FORM_TYPE = "Sell My Car Enquiry";
+const FORM_TYPE = "Sell My Car Enquiry (Sell My Car Form)";
+
+const SELL_MY_CAR_DEFAULT_COMMENTS =
+  "I'm interested in selling my vehicle. Please contact me with your best offer.";
 
 const YEAR_OPTIONS: string[] = [];
 for (let y = 2026; y >= 1970; y -= 1) {
@@ -43,7 +46,7 @@ const emptyForm: FormFields = {
   vehicleModel: "",
   odometer: "",
   rego: "",
-  comments: "",
+  comments: SELL_MY_CAR_DEFAULT_COMMENTS,
 };
 
 /** Parses km from user input (digits only); null if invalid or out of range. */
@@ -421,16 +424,18 @@ export default function SellMyCarValuationForm() {
         <div className="mb-4">
           <label className="smc-form-label" htmlFor="smc-comments">
             Comments
+            <span className="smc-form-req">*</span>
           </label>
           <textarea
             id="smc-comments"
             name="comments"
             className="form-control smc-form-control smc-form-textarea"
-            rows={3}
+            rows={5}
             placeholder=""
             autoComplete="off"
             value={formData.comments}
             onChange={handleChange}
+            required
           />
         </div>
 

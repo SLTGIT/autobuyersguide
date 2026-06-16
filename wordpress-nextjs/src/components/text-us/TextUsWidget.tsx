@@ -8,6 +8,11 @@ import {
   sanitizeNameInput,
   sanitizePhoneInput,
 } from "@/lib/forms/validation";
+import type { VehicleEnquiryItemPayload } from "@/components/vehicles/VehicleEnquiryForm";
+import {
+  TEXT_US_DEFAULT_MESSAGE,
+  buildTextUsVehicleDefaultMessage,
+} from "@/lib/forms/vehicle-enquiry-message";
 import {
   useCallback,
   useEffect,
@@ -16,8 +21,42 @@ import {
   useState,
   type FormEvent,
 } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import styles from "./TextUsWidget.module.scss";
+
+const TEXT_US_VEHICLE_SCRIPT_ID = "cs-textus-vehicle";
+
+function readTextUsDefaults(): {
+  message: string;
+  vehicleItem: VehicleEnquiryItemPayload | null;
+} {
+  if (typeof document === "undefined") {
+    return { message: TEXT_US_DEFAULT_MESSAGE, vehicleItem: null };
+  }
+
+  const el = document.getElementById(TEXT_US_VEHICLE_SCRIPT_ID);
+  if (!el?.textContent?.trim()) {
+    return { message: TEXT_US_DEFAULT_MESSAGE, vehicleItem: null };
+  }
+
+  try {
+    const item = JSON.parse(el.textContent) as VehicleEnquiryItemPayload;
+    return {
+      message: buildTextUsVehicleDefaultMessage({
+        condition: item.condition,
+        year: item.year,
+        make: item.make,
+        model: item.model,
+        price: item.price,
+        listingSite: item.tag,
+      }),
+      vehicleItem: item,
+    };
+  } catch {
+    return { message: TEXT_US_DEFAULT_MESSAGE, vehicleItem: null };
+  }
+}
 
 function splitFullName(full: string): { firstName: string; lastName: string } {
   const t = full.trim();
@@ -42,27 +81,37 @@ const GREETING_AUTO_HIDE_MS = 12_000;
 
 export default function TextUsWidget() {
   const baseId = useId();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   /** false until client reads sessionStorage (avoids hydration mismatch). */
   const [showGreetingBubble, setShowGreetingBubble] = useState(false);
   const [phase, setPhase] = useState<"form" | "success">("form");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(TEXT_US_DEFAULT_MESSAGE);
+  const [vehicleItem, setVehicleItem] =
+    useState<VehicleEnquiryItemPayload | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [submittedPhoneDigits, setSubmittedPhoneDigits] = useState("");
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const { message: nextMessage, vehicleItem: nextItem } = readTextUsDefaults();
+    setMessage(nextMessage);
+    setVehicleItem(nextItem);
+  }, [pathname]);
 
   const phoneDigits = useMemo(() => digitsOnly(phone), [phone]);
   const nameOk = isValidName(fullName);
   const phoneOk = phoneDigits.length === 10;
 
   const reset = useCallback(() => {
+    const { message: nextMessage } = readTextUsDefaults();
     setPhase("form");
     setFullName("");
     setPhone("");
-    setMessage("");
+    setMessage(nextMessage);
     setError("");
     setSubmittedPhoneDigits("");
     setRecaptchaToken(null);
@@ -150,13 +199,25 @@ export default function TextUsWidget() {
         phone: phoneDigits,
         email: "",
         message: message.trim(),
-        form_type: "General Enquiry",
+        form_type: vehicleItem ? "Used Vehicle Enquiry (Quick Chat)" : "General Enquiry (Quick Chat)",
         budget: "",
         date: new Date().toISOString(),
         recaptchaToken,
-        item: {
-          tag: "Car Sales Brisbane",
-        },
+        item: vehicleItem
+          ? {
+              image: vehicleItem.image,
+              make: vehicleItem.make,
+              model: vehicleItem.model,
+              year: vehicleItem.year,
+              stock: vehicleItem.stock,
+              rego: vehicleItem.rego,
+              status: vehicleItem.status,
+              tag: vehicleItem.tag,
+              url: vehicleItem.url,
+            }
+          : {
+              tag: "Car Sales Brisbane",
+            },
       });
 
       if (data.success) {
@@ -262,6 +323,7 @@ export default function TextUsWidget() {
                             setFullName(sanitizeNameInput(e.target.value))
                           }
                           disabled={loading}
+                          required
                         />
                         <i
                           className={`bi bi-check-circle-fill ${styles.check} ${nameOk ? styles.checkVisible : ""}`}
@@ -293,6 +355,7 @@ export default function TextUsWidget() {
                           disabled={loading}
                           pattern="[0-9]{10}"
                           maxLength={10}
+                          required
                         />
                         <i
                           className={`bi bi-check-circle-fill ${styles.check} ${phoneOk ? styles.checkVisible : ""}`}
@@ -319,6 +382,7 @@ export default function TextUsWidget() {
                           onChange={(e) => setMessage(e.target.value)}
                           disabled={loading}
                           rows={2}
+                          required
                         />
                       </div>
                     </div>

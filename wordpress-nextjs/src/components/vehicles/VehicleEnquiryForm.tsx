@@ -10,8 +10,15 @@ import {
   sanitizeNameInput,
   sanitizePhoneInput,
 } from "@/lib/forms/validation";
+import { buildVehicleEnquiryDefaultMessage } from "@/lib/forms/vehicle-enquiry-message";
 import "@/app/contact/contact.css";
-import { useCallback, useState, ChangeEvent, FormEvent } from "react";
+import {
+  useCallback,
+  useMemo,
+  useState,
+  ChangeEvent,
+  FormEvent,
+} from "react";
 
 export type VehicleEnquiryItemPayload = {
   image: string;
@@ -23,6 +30,8 @@ export type VehicleEnquiryItemPayload = {
   status: string;
   tag: string;
   url: string;
+  condition?: string;
+  price?: string;
 };
 
 const DEALERSHIP_OPTIONS = [
@@ -47,11 +56,31 @@ export default function VehicleEnquiryForm({
   showCloseOnSuccess,
   onSuccessClose,
 }: VehicleEnquiryFormProps) {
+  const defaultMessage = useMemo(
+    () =>
+      buildVehicleEnquiryDefaultMessage({
+        condition: item.condition,
+        year: item.year,
+        make: item.make,
+        model: item.model,
+        price: item.price,
+        listingSite: item.tag,
+      }),
+    [
+      item.condition,
+      item.year,
+      item.make,
+      item.model,
+      item.price,
+      item.tag,
+    ],
+  );
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [comments, setComments] = useState("");
+  const [comments, setComments] = useState(defaultMessage);
   const [dealership, setDealership] = useState("");
   const [similarStock, setSimilarStock] = useState(false);
 
@@ -65,10 +94,10 @@ export default function VehicleEnquiryForm({
     setLastName("");
     setEmail("");
     setPhone("");
-    setComments("");
+    setComments(defaultMessage);
     setDealership("");
     setSimilarStock(false);
-  }, []);
+  }, [defaultMessage]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -313,7 +342,7 @@ export default function VehicleEnquiryForm({
           </div>
         </div>
 
-        {/* <div className="mb-3">
+        <div className="mb-3">
           <label className="cs-contact-form__label" htmlFor={`${idPrefix}-msg`}>
             Comments
             <span className="cs-contact-form__req" aria-hidden>
@@ -332,7 +361,7 @@ export default function VehicleEnquiryForm({
               setComments(e.target.value)
             }
           />
-        </div> */}
+        </div>
 
         {/* <div className="mb-3">
           <label
