@@ -81,7 +81,7 @@ export default function DriveawayCarousel({ images }: DriveawayCarouselProps) {
         aria-label="Gallery photos"
       >
         {images.map((src, i) => (
-          <article
+          <div
             key={`${src}-${i}`}
             className={styles.card}
             data-driveaway-card
@@ -97,7 +97,7 @@ export default function DriveawayCarousel({ images }: DriveawayCarouselProps) {
                 unoptimized
               />
             </div>
-          </article>
+          </div>
         ))}
       </div>
 

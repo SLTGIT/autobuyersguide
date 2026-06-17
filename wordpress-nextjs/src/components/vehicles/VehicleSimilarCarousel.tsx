@@ -82,7 +82,7 @@ export default function VehicleSimilarCarousel({
       </div>
       <div className="vdp-similar-scroller" ref={scrollerRef} role="list">
         {items.map((car) => (
-          <article key={car.slug} className="vdp-similar-card" role="listitem">
+          <div key={car.slug} className="vdp-similar-card" role="listitem">
             <Link href={`/cars/${car.slug}`} className="vdp-similar-card-link">
               <div className="vdp-similar-card-media">
                 {car.image ? (
@@ -131,7 +131,7 @@ export default function VehicleSimilarCarousel({
                 </div>
               </div>
             </Link>
-          </article>
+          </div>
         ))}
       </div>
     </section>
