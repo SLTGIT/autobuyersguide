@@ -26,7 +26,7 @@ const SLIDES: Slide[] = [
   {
     id: "vehicles",
     indicatorLabel: "Used cars and delivery",
-    title: "Quality used cars across Brisbane & Queensland",
+    title: "Quality Used Cars Across Brisbane & Queensland",
     lead: (
       <>
         Browse premium used 4x4s, SUVs, and commercial vehicles from our
@@ -45,7 +45,7 @@ const SLIDES: Slide[] = [
   {
     id: "five-dollar",
     indicatorLabel: "Finance from $5 per day",
-    title: "Cars From $5 per day on approved finance",
+    title: "Cars From $5 Per Day on Approved Finance",
     subtitle: "Low rates · Past problems, no problem · ABN welcome",
     lead: (
       <>
@@ -129,7 +129,7 @@ export default function HomeBanner() {
         <div className="row g-4 align-items-center">
           <div className="col-lg-7">
             <div aria-live="polite">
-              <h1 className="display-3 fw-bold mb-3 cs-title-tight">
+              <h1 className="display-4 fw-bold mb-3 cs-title-tight">
                 {slide.title}
               </h1>
               {slide.subtitle ? (
