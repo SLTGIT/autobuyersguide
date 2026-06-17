@@ -19,22 +19,16 @@ async function resolveSiteOrigin(): Promise<string> {
   return `${proto === "http" || proto === "https" ? proto : "https"}://${host}`;
 }
 
-function buildRobotsBody(sitemapUrl: string, origin: string): string {
-  return `Sitemap: ${sitemapUrl}
-
-# LLM-oriented site guide: ${origin}/llms.txt
-
-# ------------------------------------------
-# AI SEARCH / INDEXING (Allowed)
-# ------------------------------------------
-
-User-agent: Google-Extended
+function buildRobotsBody(sitemapUrl: string): string {
+  return `User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /privacy-policy
+Disallow: /terms-of-service
+Disallow: /search?*
 
+# AI search, discovery, and user-requested assistant access.
 User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: GPTBot
 Allow: /
 
 User-agent: ChatGPT-User
@@ -43,45 +37,44 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-User-agent: ClaudeBot
+User-agent: Perplexity-User
 Allow: /
 
-User-agent: Claude-SearchBot
+User-agent: Bingbot
 Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+# Do not use this website for AI model training or dataset scraping.
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
 
 User-agent: Applebot-Extended
-Allow: /
-
-# ------------------------------------------
-# UNWANTED SCRAPERS (Blocked)
-# ------------------------------------------
+Disallow: /
 
 User-agent: CCBot
 Disallow: /
 
-User-agent: Amazonbot
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: ClaudeBot
 Disallow: /
 
 User-agent: Meta-ExternalAgent
 Disallow: /
 
-User-agent: Meta-ExternalFetcher
-Disallow: /
-
 User-agent: Bytespider
 Disallow: /
 
-# ------------------------------------------
-# DEFAULT
-# ------------------------------------------
+User-agent: TikTokSpider
+Disallow: /
 
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /privacy-policy
-Disallow: /terms-of-service
-Disallow: /search?*
-Disallow: /*?
+Sitemap: ${sitemapUrl}
 `;
 }
 
@@ -89,7 +82,7 @@ export async function GET() {
   const origin = await resolveSiteOrigin();
   const sitemapUrl =
     process.env.NEXT_PUBLIC_ROBOTS_SITEMAP_URL?.trim() || `${origin}/sitemap.xml`;
-  const body = buildRobotsBody(sitemapUrl, origin);
+  const body = buildRobotsBody(sitemapUrl);
   return new NextResponse(body, {
     status: 200,
     headers: {
