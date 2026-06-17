@@ -17,7 +17,7 @@ import {
 import "../[slug]/cms-page.scss";
 import "./about.css";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 const ABOUT_SLUG = "about-us";
 const ABOUT_PATH = "/about-us";

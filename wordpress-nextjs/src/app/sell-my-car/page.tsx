@@ -19,7 +19,7 @@ import ContactInfo from "@/components/ContactInfo";
 import "../[slug]/cms-page.scss";
 import "./sell-my-car.css";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 const SELL_MY_CAR_SLUG = "sell-my-car";
 const SELL_MY_CAR_PATH = "/sell-my-car";

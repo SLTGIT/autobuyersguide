@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getPostBySlug, getPosts } from "@/lib/wordpress";
 import RelatedPostsSidebar from "@/components/blog/RelatedPostsSidebar";
 import type { WPPost } from "@/types/wordpress";
@@ -18,7 +19,7 @@ import {
 import "./blog-details.css";
 import { BlogPostScrollToBreadcrumb } from "./BlogPostScrollToBreadcrumb";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 interface BlogPostProps {
   params: Promise<{
@@ -99,7 +100,6 @@ export default async function BlogPost({ params }: BlogPostProps) {
     datePublished: post.date,
     dateModified: post.modified,
     description: seoDescription,
-    articleBody: stripHtml(post.content.rendered),
     authorName,
   });
   // console.log("post.acf?.faq", post.acf?.faq);
@@ -118,8 +118,8 @@ export default async function BlogPost({ params }: BlogPostProps) {
         />
       ) : null}
       <BlogPostScrollToBreadcrumb slug={slug} />
-      {/* <div className="container pt-4">
-        <nav id="blog-breadcrumb" aria-label="breadcrumb">
+      <div className="container pt-4">
+        <nav id="blog-breadcrumb" aria-label="Breadcrumb">
           <ol className="breadcrumb mb-3">
             <li className="breadcrumb-item">
               <Link href="/">Home</Link>
@@ -128,22 +128,12 @@ export default async function BlogPost({ params }: BlogPostProps) {
               <Link href="/blog">Blog</Link>
             </li>
             <li className="breadcrumb-item active" aria-current="page">
-              {slug}
+              {headline}
             </li>
           </ol>
         </nav>
-      </div> */}
-      {/* <div className="container pt-4">
-        Back Link
-        <Link
-          href="/blog"
-          className="d-inline-flex align-items-center fw-bold text-primary mb-4 text-decoration-none"
-        >
-          ← Back to Blog
-        </Link>
-      </div> */}
+      </div>
 
-      {/* Post Hero Section */}
       {heroHtml ? (
         <WpRenderedHtml
           as="section"
@@ -152,12 +142,19 @@ export default async function BlogPost({ params }: BlogPostProps) {
         />
       ) : null}
 
-      {/* Post Content */}
       <section className="py-5">
         <div className="container">
           <div className="row g-5">
             <div className="col-lg-8">
-              <WpRenderedHtml html={post.content.rendered} />
+              <article aria-labelledby="blog-post-title">
+                <h1
+                  id="blog-post-title"
+                  className={heroHtml ? "visually-hidden" : "h2 fw-bold mb-4"}
+                >
+                  {headline}
+                </h1>
+                <WpRenderedHtml html={post.content.rendered} />
+              </article>
             </div>
             <div className="col-lg-4">
               <RelatedPostsSidebar posts={relatedPosts} />

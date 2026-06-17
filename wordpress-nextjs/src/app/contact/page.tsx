@@ -19,7 +19,7 @@ import ContactInfo from "@/components/ContactInfo";
 import "../[slug]/cms-page.scss";
 import "./contact.css";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 const CONTACT_SLUG = "contact";
 const CONTACT_PATH = "/contact";

@@ -3,6 +3,7 @@
  * Functions for fetching and managing WordPress pages
  */
 
+import { cache } from 'react';
 import { WPPage } from '@/types/wordpress';
 import { normalizePageAcf } from '../acf';
 import { fetchAPI } from './client';
@@ -39,10 +40,10 @@ export async function getPages(params: {
 /**
  * Fetch a single page by slug
  */
-export async function getPageBySlug(slug: string): Promise<WPPage | null> {
+export const getPageBySlug = cache(async (slug: string): Promise<WPPage | null> => {
     const pages = await fetchAPI<WPPage[]>(`/wp/v2/pages?slug=${slug}&_embed=1`);
     return pages.length > 0 ? withNormalizedAcf(pages[0]) : null;
-}
+});
 
 /**
  * Fetch a single page by ID

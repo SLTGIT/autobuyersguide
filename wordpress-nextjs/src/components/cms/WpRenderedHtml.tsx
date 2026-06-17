@@ -1,9 +1,6 @@
-"use client";
-
-import { useEffect } from "react";
-import { useClientMounted } from "@/hooks/useClientMounted";
 import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
 import type { ComponentPropsWithoutRef, ElementType } from "react";
+import WpAosRefresh from "./WpAosRefresh";
 
 type WpRenderedHtmlProps = {
   html: string;
@@ -12,8 +9,8 @@ type WpRenderedHtmlProps = {
 } & Omit<ComponentPropsWithoutRef<"div">, "children" | "dangerouslySetInnerHTML">;
 
 /**
- * Renders WordPress HTML after client mount so invalid/block-nested markup from
- * the CMS cannot break React hydration (insertBefore / removeChild errors).
+ * Server-renders repaired WordPress HTML so content is present in the initial
+ * accessibility tree and layout is stable (no client-mount CLS).
  */
 export default function WpRenderedHtml({
   html,
@@ -21,37 +18,18 @@ export default function WpRenderedHtml({
   className,
   ...rest
 }: WpRenderedHtmlProps) {
-  const mounted = useClientMounted();
   const repaired = repairWpRenderedHtml(html.trim());
-
-  useEffect(() => {
-    if (!mounted || !repaired) return;
-    void import("aos").then((mod) => {
-      if (typeof mod.default.refresh === "function") {
-        mod.default.refresh();
-      }
-    });
-  }, [mounted, repaired]);
-
   if (!repaired) return null;
 
-  if (!mounted) {
-    return (
+  return (
+    <>
       <Tag
         className={className}
-        aria-busy="true"
+        dangerouslySetInnerHTML={{ __html: repaired }}
         suppressHydrationWarning
         {...rest}
       />
-    );
-  }
-
-  return (
-    <Tag
-      className={className}
-      dangerouslySetInnerHTML={{ __html: repaired }}
-      suppressHydrationWarning
-      {...rest}
-    />
+      <WpAosRefresh />
+    </>
   );
 }

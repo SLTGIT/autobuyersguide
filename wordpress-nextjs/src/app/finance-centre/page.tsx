@@ -19,7 +19,7 @@ import "../[slug]/cms-page.scss";
 import "../contact/contact.css";
 import "./finance-centre.css";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 const FINANCE_CENTRE_SLUG = "finance-centre";
 const FINANCE_CENTRE_PATH = "/finance-centre";
@@ -92,7 +92,7 @@ export default async function FinanceCentrePage() {
               <article className="cs-card h-100 p-4">
                 <div className="d-flex gap-3 align-items-center">
                   <span className="cs-trust-icon">
-                    <i className="bi bi-cash-stack"></i>
+                    <i className="bi bi-cash-stack" aria-hidden="true"></i>
                   </span>
                   <h3 className="h5 fw-bold">No-Deposit Finance</h3>
                 </div>
@@ -105,7 +105,7 @@ export default async function FinanceCentrePage() {
               <article className="cs-card h-100 p-4">
                 <div className="d-flex gap-3 align-items-center">
                   <span className="cs-trust-icon">
-                    <i className="bi bi-briefcase"></i>
+                    <i className="bi bi-briefcase" aria-hidden="true"></i>
                   </span>
                   <h3 className="h5 fw-bold">ABN Specialist</h3>
                 </div>
@@ -118,7 +118,7 @@ export default async function FinanceCentrePage() {
               <article className="cs-card h-100 p-4">
                 <div className="d-flex gap-3 align-items-center">
                   <span className="cs-trust-icon">
-                    <i className="bi bi-truck"></i>
+                    <i className="bi bi-truck" aria-hidden="true"></i>
                   </span>
                   <h3 className="h5 fw-bold">QLD Delivery</h3>
                 </div>

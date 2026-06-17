@@ -3,6 +3,7 @@
  * Functions for fetching and managing WordPress posts
  */
 
+import { cache } from 'react';
 import { WPPost, WPPostACFFields } from '@/types/wordpress';
 import { normalizeAcf } from '../acf';
 import { fetchAPI, fetchAPIWithMeta } from './client';
@@ -85,10 +86,10 @@ export async function getPostsPaginated(params: PostsQueryParams = {}): Promise<
 /**
  * Fetch a single post by slug
  */
-export async function getPostBySlug(slug: string): Promise<WPPost | null> {
+export const getPostBySlug = cache(async (slug: string): Promise<WPPost | null> => {
     const posts = await fetchAPI<WPPost[]>(`/wp/v2/posts?slug=${slug}&_embed=1`);
     return posts.length > 0 ? withNormalizedAcf(posts[0]) : null;
-}
+});
 
 /**
  * Fetch a single post by ID

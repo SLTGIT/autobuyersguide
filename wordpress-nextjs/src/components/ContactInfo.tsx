@@ -1,27 +1,18 @@
-import Image from "next/image";
 import GoogleRatingStars from "@/components/GoogleRatingStars";
-import { CAR_SALES_BRISBANE_GOOGLE_MAPS_URL, getGoogleReviews, stripLeadingStarEmojis } from "@/lib/google-reviews";
+import { CAR_SALES_BRISBANE_GOOGLE_MAPS_URL, getGoogleReviews } from "@/lib/google-reviews";
 import { getCustomSettings } from "@/lib/wordpress/api/settings";
 
 const FALLBACK_SCORE = 4.8;
-const MAX_REVIEWS = 5;
 const FALLBACK_FACEBOOK_URL = "https://www.facebook.com/share/1DREXJCBhb/?mibextid=wwXIfr";
 const FALLBACK_INSTAGRAM_URL =
   "https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr";
 const FALLBACK_TIKTOK_URL = "https://www.tiktok.com/@carsalesbrisbane?_r=1&_t=ZS-95OLtLR1kfQ";
-
-function formatReviewDate(isoDate: string): string {
-  const d = new Date(`${isoDate}T12:00:00`);
-  if (Number.isNaN(d.getTime())) return isoDate;
-  return d.toLocaleDateString("en-AU", { year: "numeric", month: "short", day: "numeric" });
-}
 
 export default async function ContactInfo() {
   const summary = await getGoogleReviews();
   const settings = await getCustomSettings();
   const score = summary?.averageScore ?? FALLBACK_SCORE;
   const reviewCount = summary?.reviewCount;
-  const reviews = summary?.reviews.slice(0, MAX_REVIEWS) ?? [];
   const facebookUrl = settings?.facebook_url || FALLBACK_FACEBOOK_URL;
   const instagramUrl = settings?.instagram_url || FALLBACK_INSTAGRAM_URL;
   const tiktokUrl = settings?.tiktok_url || FALLBACK_TIKTOK_URL;
@@ -40,13 +31,13 @@ export default async function ContactInfo() {
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3538.2886675510936!2d153.2562743!3d-27.522489600000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b91678932e7fccd%3A0x6a000d7f9589579b!2sCar%20Sales%20Brisbane!5e0!3m2!1sen!2sin!4v1775730243051!5m2!1sen!2sin"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Statewide Auto Group map"
+                title="Car Sales Brisbane location map"
               ></iframe>
             </div>
             <div className="col-lg-5">
               <div className="vstack gap-4">
                 <div className="cs-contact-row">
-                  <span className="cs-contact-icon">
+                  <span className="cs-contact-icon" aria-hidden="true">
                     <i className="bi bi-geo-alt-fill"></i>
                   </span>
                   <div>
@@ -68,7 +59,7 @@ export default async function ContactInfo() {
                 </div>
                 <hr className="my-0" />
                 <div className="cs-contact-row">
-                  <span className="cs-contact-icon">
+                  <span className="cs-contact-icon" aria-hidden="true">
                     <i className="bi bi-telephone-fill"></i>
                   </span>
                   <div>
@@ -91,7 +82,7 @@ export default async function ContactInfo() {
                 </div>
                 <hr className="my-0" />
                 <div className="cs-contact-row">
-                  <span className="cs-contact-icon">
+                  <span className="cs-contact-icon" aria-hidden="true">
                     <i className="bi bi-star-fill"></i>
                   </span>
                   <div>
@@ -101,7 +92,10 @@ export default async function ContactInfo() {
                     >
                       Google Reviews
                     </div>
-                    <div className="d-flex align-items-center gap-2 mb-2">
+                    <div
+                      className="d-flex align-items-center gap-2 mb-2"
+                      aria-hidden="true"
+                    >
                       <GoogleRatingStars score={score} />
                     </div>
                     <div className="fw-bold fs-4">
@@ -116,7 +110,7 @@ export default async function ContactInfo() {
                 </div>
                 <hr className="my-0" />
                 <div className="cs-contact-row">
-                  <span className="cs-contact-icon">
+                  <span className="cs-contact-icon" aria-hidden="true">
                     <i className="bi bi-share-fill"></i>
                   </span>
                   <div>
@@ -135,7 +129,7 @@ export default async function ContactInfo() {
                         rel="noopener noreferrer"
                       >
                         <img
-                          alt="Facebook"
+                          alt=""
                           loading="lazy"
                           width="24"
                           height="24"
@@ -153,7 +147,7 @@ export default async function ContactInfo() {
                         rel="noopener noreferrer"
                       >
                         <img
-                          alt="Instagram"
+                          alt=""
                           loading="lazy"
                           width="24"
                           height="24"
@@ -171,7 +165,7 @@ export default async function ContactInfo() {
                         rel="noopener noreferrer"
                       >
                         <img
-                          alt="TikTok"
+                          alt=""
                           loading="lazy"
                           width="24"
                           height="24"
@@ -189,7 +183,7 @@ export default async function ContactInfo() {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          <i className="bi bi-youtube"></i>
+                          <i className="bi bi-youtube" aria-hidden="true"></i>
                         </a>
                       ) : null}
                       {xUrl ? (
@@ -200,7 +194,7 @@ export default async function ContactInfo() {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          <i className="bi bi-twitter-x"></i>
+                          <i className="bi bi-twitter-x" aria-hidden="true"></i>
                         </a>
                       ) : null}
                       {linkedinUrl ? (
@@ -211,7 +205,7 @@ export default async function ContactInfo() {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          <i className="bi bi-linkedin"></i>
+                          <i className="bi bi-linkedin" aria-hidden="true"></i>
                         </a>
                       ) : null}
                     </div>
