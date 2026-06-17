@@ -45,7 +45,7 @@ const SLIDES: Slide[] = [
   {
     id: "five-dollar",
     indicatorLabel: "Finance from $5 per day",
-    title: "Cars From $5 Per Day on Approved Finance",
+    title: "Cars From $5 Per Day On Approved Finance",
     subtitle: "Low rates · Past problems, no problem · ABN welcome",
     lead: (
       <>
@@ -65,7 +65,7 @@ const SLIDES: Slide[] = [
   {
     id: "about-finance",
     indicatorLabel: "About us and finance",
-    title: "Welcome to Car Sales Brisbane!",
+    title: "Welcome To Car Sales Brisbane!",
     subtitle: "Best used cars & 4x4's in Brisbane & Redlands!",
     lead: (
       <>
