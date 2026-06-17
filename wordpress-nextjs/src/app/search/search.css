@@ -4,7 +4,7 @@
 
 /* Compact SRP hero — short height, capped image (full-size img was driving section height) */
 .search-page-hero-title {
-  font-size: clamp(1.35rem, 3.2vw, 1.85rem);
+  /* font-size: clamp(1.35rem, 3.2vw, 1.85rem); */
   line-height: 1.2;
 }
 

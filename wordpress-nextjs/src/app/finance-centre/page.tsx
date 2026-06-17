@@ -75,20 +75,28 @@ export default async function FinanceCentrePage() {
   return (
     <>
       <JsonLd data={jsonLd} />
-      {page.content?.rendered?.trim() ? (
-        <WpRenderedHtml html={page.content.rendered} />
-      ) : null}
+      <article aria-label={headline}>
+        {page.content?.rendered?.trim() ? (
+          <WpRenderedHtml html={page.content.rendered} />
+        ) : null}
+      </article>
 
-      <section className="py-5 border-bottom border-light-subtle fc-finance-form-section">
+      <section
+        className="py-5 border-bottom border-light-subtle fc-finance-form-section"
+        aria-labelledby="fc-form-heading"
+      >
         <div className="container">
           <FinanceEnquiryForm />
         </div>
       </section>
 
-      <section className="py-5">
+      <section className="py-5" aria-labelledby="fc-trust-heading">
         <div className="container">
-          <div className="row g-4">
-            <div className="col-md-4">
+          <h2 id="fc-trust-heading" className="visually-hidden">
+            Finance benefits
+          </h2>
+          <ul className="list-unstyled row g-4 mb-0">
+            <li className="col-md-4">
               <article className="cs-card h-100 p-4">
                 <div className="d-flex gap-3 align-items-center">
                   <span className="cs-trust-icon">
@@ -100,8 +108,8 @@ export default async function FinanceCentrePage() {
                   Finance options for approved applicants from our Ormiston hub.
                 </p>
               </article>
-            </div>
-            <div className="col-md-4">
+            </li>
+            <li className="col-md-4">
               <article className="cs-card h-100 p-4">
                 <div className="d-flex gap-3 align-items-center">
                   <span className="cs-trust-icon">
@@ -113,8 +121,8 @@ export default async function FinanceCentrePage() {
                   Specialist ABN and low-doc support for Brisbane tradies.
                 </p>
               </article>
-            </div>
-            <div className="col-md-4">
+            </li>
+            <li className="col-md-4">
               <article className="cs-card h-100 p-4">
                 <div className="d-flex gap-3 align-items-center">
                   <span className="cs-trust-icon">
@@ -126,8 +134,8 @@ export default async function FinanceCentrePage() {
                   Delivery support from Brisbane to regional Queensland.
                 </p>
               </article>
-            </div>
-          </div>
+            </li>
+          </ul>
         </div>
       </section>
     </>

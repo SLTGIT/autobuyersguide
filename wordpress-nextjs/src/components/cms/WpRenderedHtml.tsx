@@ -1,6 +1,5 @@
 import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
 import type { ComponentPropsWithoutRef, ElementType } from "react";
-import WpAosRefresh from "./WpAosRefresh";
 
 type WpRenderedHtmlProps = {
   html: string;
@@ -21,15 +20,16 @@ export default function WpRenderedHtml({
   const repaired = repairWpRenderedHtml(html.trim());
   if (!repaired) return null;
 
+  const mergedClassName = ["cms-rendered-content", className]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <>
-      <Tag
-        className={className}
-        dangerouslySetInnerHTML={{ __html: repaired }}
-        suppressHydrationWarning
-        {...rest}
-      />
-      <WpAosRefresh />
-    </>
+    <Tag
+      className={mergedClassName}
+      dangerouslySetInnerHTML={{ __html: repaired }}
+      suppressHydrationWarning
+      {...rest}
+    />
   );
 }

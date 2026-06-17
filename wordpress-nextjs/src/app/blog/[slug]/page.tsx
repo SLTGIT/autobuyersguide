@@ -118,7 +118,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
         />
       ) : null}
       <BlogPostScrollToBreadcrumb slug={slug} />
-      <div className="container pt-4">
+      {/* <div className="container pt-4">
         <nav id="blog-breadcrumb" aria-label="Breadcrumb">
           <ol className="breadcrumb mb-3">
             <li className="breadcrumb-item">
@@ -132,7 +132,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
             </li>
           </ol>
         </nav>
-      </div>
+      </div> */}
 
       {heroHtml ? (
         <WpRenderedHtml

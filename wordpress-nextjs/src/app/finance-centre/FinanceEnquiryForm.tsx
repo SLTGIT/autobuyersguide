@@ -208,20 +208,16 @@ export default function FinanceEnquiryForm() {
       <div className="row g-4 g-xl-5 align-items-start">
         <div className="col-lg-8">
           <div className="cs-panel p-4 p-lg-5 shadow-sm">
-            <p className="cs-contact-form__title mb-0">Finance application</p>
+            <h2 id="fc-form-heading" className="cs-contact-form__title mb-0">
+              Finance application
+            </h2>
             <p className="text-secondary mt-2 mb-4">
               Complete the form below — fields marked with{" "}
-              <span className="cs-contact-form__req">*</span> are required.
+              <span className="cs-contact-form__req" aria-hidden>
+                *
+              </span>{" "}
+              are required.
             </p>
-
-            <div
-              className="visually-hidden"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {status === "success" && statusMessage}
-              {status === "error" && statusMessage}
-            </div>
 
             {status === "success" && (
               <div
@@ -257,7 +253,7 @@ export default function FinanceEnquiryForm() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} noValidate>
+            <form onSubmit={handleSubmit} noValidate aria-labelledby="fc-form-heading">
               <div className="mb-3">
                 <label className="cs-contact-form__label" htmlFor="fc-budget">
                   Budget
@@ -511,7 +507,7 @@ export default function FinanceEnquiryForm() {
                 </label>
               </div>
 
-              <div className="mt-3">
+              <div className="mt-3 fc-recaptcha-slot">
                 <RecaptchaField
                   token={recaptchaToken}
                   onTokenChange={setRecaptchaToken}

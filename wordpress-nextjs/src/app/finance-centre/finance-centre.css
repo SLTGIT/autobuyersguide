@@ -97,6 +97,10 @@
     background: var(--cs-bg, #f3f7fb);
   }
 
+  .fc-recaptcha-slot {
+    min-height: 78px;
+  }
+
   .fc-finance-enquiry.cs-contact-form {
     max-width: none;
     margin-inline: 0;

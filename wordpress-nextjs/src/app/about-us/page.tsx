@@ -63,9 +63,11 @@ export default async function AboutUsPage() {
   return (
     <>
       <JsonLd data={jsonLd} />
-      {page.content?.rendered?.trim() ? (
-        <WpRenderedHtml html={page.content.rendered} />
-      ) : null}
+      <article aria-label={headline}>
+        {page.content?.rendered?.trim() ? (
+          <WpRenderedHtml html={page.content.rendered} />
+        ) : null}
+      </article>
     </>
   );
 }
