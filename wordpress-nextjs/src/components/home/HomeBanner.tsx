@@ -34,7 +34,7 @@ const SLIDES: Slide[] = [
         Brisbane to Cairns—so the right car is never out of reach.
       </>
     ),
-    primaryCta: { label: "Browse All Vehicles", href: "/search" },
+    primaryCta: { label: "Browse All Vehicles", href: "/search/car-sales-in-brisbane" },
     secondaryCta: { label: "Check Finance Eligibility", href: "/finance-centre" },
     imageSrc: "/assets/images/new banner-1.webp",
     imageAlt:
@@ -55,7 +55,7 @@ const SLIDES: Slide[] = [
       </>
     ),
     primaryCta: { label: "Cars From $5 per day", href: "/finance-centre" },
-    secondaryCta: { label: "Browse All Vehicles", href: "/search" },
+    secondaryCta: { label: "Browse All Vehicles", href: "/search/car-sales-in-brisbane" },
     imageSrc: "/assets/images/banner_2.webp",
     imageAlt: "Car Sales Brisbane yard with used SUVs and finance options",
     cardTitle: "Low repayments, clear terms, local support.",
