@@ -136,6 +136,18 @@ export default async function RootLayout({
             <GtmNoscript gtmId={gtmId} />
           </>
         ) : null}
+        <Script id="dealerdrive-config" strategy="afterInteractive">
+          {`
+            window._DD = {
+              pixelId: '1317945379966893',
+              dealerId: 'c1aea647-961c-4746-84ea-24ca30f04e35'
+            };
+          `}
+        </Script>
+        <Script
+          src="https://dealerdrive.us/static/pixel/dd-pixel.js?v=3"
+          strategy="afterInteractive"
+        />
         <ClientImports />
         <Layout>{children}</Layout>
       </body>
