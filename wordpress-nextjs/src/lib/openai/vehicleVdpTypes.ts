@@ -1,5 +1,6 @@
 import type { DealerVehicle, VehicleListing } from "@/types/inventory";
 import { dealerVehicleToListing, inventoryPriceField } from "@/lib/inventory/transform";
+import { vehicleCardTrimFromTitle } from "@/lib/inventory/card-display";
 import { buildVehicleSlug } from "@/lib/inventory/slug";
 
 /** Fields sent to OpenAI (no photo URLs required; counts only). */
@@ -17,6 +18,11 @@ export interface VehicleVdpSnapshot {
   transmission: string;
   bodyColour: string;
   odometerKm: number | null;
+  /** Trim line derived from listing title. */
+  trim: string;
+  /** Price shown on the VDP (drive-away when applicable). */
+  displayPrice: string;
+  vin: string;
   locationShort: string;
   stockNumber: string;
   advertisedPrice: string;
@@ -111,6 +117,10 @@ export function buildVehicleVdpSnapshot(
 ): VehicleVdpSnapshot {
   const advertised = inventoryPriceField(v.Pricing?.AdvertisedPrice);
   const driveAway = inventoryPriceField(v.Pricing?.DriveAwayPrice);
+  const displayPrice =
+    listing.show_drive_away && listing.drive_away_price
+      ? listing.drive_away_price.trim()
+      : listing.formatted_price?.trim() || "";
   return {
     itemId: v.ItemID,
     slug: buildVehicleSlug(v),
@@ -125,6 +135,9 @@ export function buildVehicleVdpSnapshot(
     transmission: (v.TransmissionType || listing.transmission).trim(),
     bodyColour: (v.BodyColour || "").trim(),
     odometerKm: listing.odometer,
+    trim: vehicleCardTrimFromTitle(listing),
+    displayPrice,
+    vin: (v.VIN || v.Vin || "").trim().toUpperCase(),
     locationShort: listing.location_short || (v.Location || "").trim(),
     stockNumber: listing.stock_number || String(v.ItemID),
     advertisedPrice: advertised,

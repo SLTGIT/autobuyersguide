@@ -44,11 +44,17 @@ function formatCondition(value: string): string {
   return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
 }
 
-/** Maps `{condition}`, `{make}`, `{model}`, `{year}`, `{bodytype}`, `{fueltype}`, `{drivetype}` to listing values. */
+function formatOdometer(km: number | null): string {
+  if (km == null || km <= 0) return "";
+  return `${km.toLocaleString("en-AU")} km`;
+}
+
+/** Maps WordPress VDP meta placeholders to listing snapshot values. */
 export function applyVdpMetaTemplate(
   template: string,
   snapshot: VehicleVdpSnapshot,
 ): string {
+  const drive = snapshot.driveType.trim();
   const tags: Record<string, string> = {
     condition: formatCondition(snapshot.condition),
     make: snapshot.make.trim(),
@@ -56,7 +62,13 @@ export function applyVdpMetaTemplate(
     year: snapshot.year ? String(snapshot.year) : "",
     bodytype: snapshot.bodyType.trim(),
     fueltype: snapshot.fuelType.trim(),
-    drivetype: snapshot.driveType.trim(),
+    drivetype: drive,
+    drivetrain: drive,
+    trim: snapshot.trim.trim(),
+    price: snapshot.displayPrice.trim(),
+    odometer: formatOdometer(snapshot.odometerKm),
+    color: snapshot.bodyColour.trim(),
+    vin: snapshot.vin.trim(),
   };
 
   const replaced = template.replace(/\{([a-z0-9_]+)\}/gi, (_, key: string) => {
