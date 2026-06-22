@@ -88,14 +88,6 @@ function formatHeroBadgeFromSnapshot(snapshot: VehicleVdpSnapshot): string {
   return normalizeHeroBadgeFuelPhrases(parts.join(" · "));
 }
 
-const VDP_BROWSER_TITLE_SUFFIX = " | Car Sales Brisbane";
-
-export function formatVehicleVdpBrowserTitle(seoTitlePart: string): string {
-  const p = seoTitlePart.trim();
-  if (!p) return `Cars for sale${VDP_BROWSER_TITLE_SUFFIX}`;
-  return `${p}${VDP_BROWSER_TITLE_SUFFIX}`;
-}
-
 function normalizeSeoTitlePart(
   raw: string,
   snapshot: VehicleVdpSnapshot,
@@ -118,7 +110,7 @@ function normalizeSeoTitlePart(
   return t;
 }
 
-/** Inventory-only SEO when metadata must not wait on OpenAI. */
+/** @deprecated VDP SEO comes from WordPress `csb/v1/vdp-meta`; kept for type compatibility. */
 export function buildVehicleVdpFallbackSeo(snapshot: VehicleVdpSnapshot): {
   seoTitle: string;
   metaDescription: string;
@@ -845,18 +837,6 @@ export function parseVehicleVdpAiContent(
   const goodNextStep = (raw as { goodNextStep?: unknown }).goodNextStep;
   if (typeof goodNextStep !== "string") return null;
 
-  const metaDescriptionRaw = (raw as { metaDescription?: unknown })
-    .metaDescription;
-  const metaStr =
-    typeof metaDescriptionRaw === "string" ? metaDescriptionRaw.trim() : "";
-
-  const seoTitleRaw =
-    (raw as { seoTitle?: unknown }).seoTitle ??
-    (raw as { pageTitle?: unknown }).pageTitle ??
-    (raw as { metaTitle?: unknown }).metaTitle;
-  const seoTitleParsed =
-    typeof seoTitleRaw === "string" ? seoTitleRaw.trim() : "";
-
   sanitizeSpecRowDisplayValues(carDetailsRows);
   sanitizeSpecRowDisplayValues(engineTowingRows);
   ensureSpecRowIcons(carDetailsRows);
@@ -877,8 +857,8 @@ export function parseVehicleVdpAiContent(
     dealerCommentsBullets,
     faqs,
     goodNextStep,
-    metaDescription: metaStr,
-    seoTitle: seoTitleParsed,
+    metaDescription: "",
+    seoTitle: "",
   });
 }
 
@@ -1125,8 +1105,6 @@ const JSON_INSTRUCTION = `Return a single JSON object only (no markdown). Requir
 - dealerCommentsBullets (array of 0–20 strings): feature/equipment lines as bullets when the source lists them (e.g. "Apple CarPlay", "Leather seats"); empty array if none.
 - faqs: 4–6 { question, answer } about THIS listing for Australian buyers (maximum 6 items). At least half the questions must reference details from comments, description, or snapshot fields (equipment, condition, odometer, fuel, transmission, body, price cues). Include 1–2 practical buying questions (finance, inspection, availability). You MAY answer spec questions (towing, CarPlay, engine) when grounded in listing text or clearly marked "confirm with dealer" for inferred figures. Do NOT invent accident history, one-owner status, or service records not in the listing. No warranty FAQs. Answers 2–5 sentences.
 - goodNextStep (string)
-- seoTitle (string): unique segment for the HTML <title> BEFORE the site suffix (we append " | Car Sales Brisbane" server-side). Max ~52 characters in that segment only. Include year + make + model or a tight variant hook; do not include the suffix text. Aliases accepted: pageTitle, metaTitle.
-- metaDescription (string): required, 140–160 characters for <meta name="description">. Summarise condition, year, model, location or price cue from the listing, and a CTA to view photos / confirm with the dealer. Australian English.
 
 Rules: Australian English. Never change price, VIN, stock number, or odometer from the listing. Icons: lowercase letters, digits, hyphen only; no bi- prefix.
 
@@ -1214,7 +1192,7 @@ const runCachedOpenAi = unstable_cache(
     return fetchVehicleVdpAiFromOpenAI(snapshot);
   },
   // Bump when prompt/schema changes so listings are not stuck on stale AI JSON.
-  ["vehicle-vdp-ai-openai", "v13-dealer-comments"],
+  ["vehicle-vdp-ai-openai", "v14-wp-meta-seo"],
   { revalidate: VDP_AI_REVALIDATE_SEC },
 );
 
@@ -1228,29 +1206,20 @@ export async function getVehicleVdpAiContent(
     const coerced = applyRuntimeVehicleVdpCoercion(
       fallbackVehicleVdpAiContent(snapshot),
     );
-    return ensureVehicleVdpSeoFields(
-      finalizeVehicleVdpAiContent(coerced, snapshot),
-      snapshot,
-    );
+    return finalizeVehicleVdpAiContent(coerced, snapshot);
   }
 
   try {
     const snapshotJson = JSON.stringify(snapshot);
     const content = await runCachedOpenAi(snapshotJson);
     const coerced = applyRuntimeVehicleVdpCoercion(content);
-    return ensureVehicleVdpSeoFields(
-      finalizeVehicleVdpAiContent(coerced, snapshot),
-      snapshot,
-    );
+    return finalizeVehicleVdpAiContent(coerced, snapshot);
   } catch (e) {
     console.error("[vehicleVdpCopy]", e);
     const coerced = applyRuntimeVehicleVdpCoercion(
       fallbackVehicleVdpAiContent(snapshot),
     );
-    return ensureVehicleVdpSeoFields(
-      finalizeVehicleVdpAiContent(coerced, snapshot),
-      snapshot,
-    );
+    return finalizeVehicleVdpAiContent(coerced, snapshot);
   }
 }
 

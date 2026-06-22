@@ -91,9 +91,9 @@ export interface VehicleVdpAiContent {
   dealerCommentsBullets: string[];
   faqs: VehicleVdpAiFaq[];
   goodNextStep: string;
-  /** Unique segment before ` | Car Sales Brisbane` (HTML `<title>`); filled by AI + server fallback. */
+  /** @deprecated VDP SEO comes from WordPress; not populated by OpenAI. */
   seoTitle: string;
-  /** Meta description ~150–160 chars for `<meta name="description">` and WebPage JSON-LD. */
+  /** @deprecated VDP SEO comes from WordPress; not populated by OpenAI. */
   metaDescription: string;
 }
 

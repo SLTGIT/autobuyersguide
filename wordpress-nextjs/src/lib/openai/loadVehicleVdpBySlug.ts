@@ -5,11 +5,10 @@ import { buildVehicleSlug, findVehicleByPublicSlug } from "@/lib/inventory/slug"
 import type { DealerVehicle, VehicleListing } from "@/types/inventory";
 import { buildVehicleVdpSnapshot } from "./vehicleVdpTypes";
 import type { VehicleVdpSnapshot } from "./vehicleVdpTypes";
-import {
-  buildVehicleVdpFallbackSeo,
-  getVehicleVdpAiContent,
-} from "./vehicleVdpCopy";
+import { getVehicleVdpAiContent } from "./vehicleVdpCopy";
 import type { VehicleVdpAiContent } from "./vehicleVdpTypes";
+import { resolveVehicleVdpSeo } from "@/lib/wordpress/vdp-meta";
+import type { VehicleVdpSeo } from "@/lib/wordpress/vdp-meta";
 
 const getDealerInventoryCached = cache(fetchDealerInventory);
 
@@ -54,6 +53,7 @@ export type LoadVehicleVdpBySlugResult =
       listing: VehicleListing;
       snapshot: VehicleVdpSnapshot;
       ai: VehicleVdpAiContent;
+      seo: VehicleVdpSeo;
       /** Full feed (for similar vehicles without a second fetch). */
       allVehicles: DealerVehicle[];
     }
@@ -75,7 +75,7 @@ export type LoadVehicleVdpMetaResult =
   | { ok: false; error: "redirect"; redirectTo: string };
 
 /**
- * Fast metadata path: inventory + fallback SEO only (no OpenAI wait).
+ * Fast metadata path: inventory + WordPress VDP meta templates (no OpenAI wait).
  */
 export const loadVehicleVdpMetaBySlug = cache(
   async (slug: string): Promise<LoadVehicleVdpMetaResult> => {
@@ -91,7 +91,7 @@ export const loadVehicleVdpMetaBySlug = cache(
     const v = resolved.vehicle;
     const listing = dealerVehicleToListing(v);
     const snapshot = buildVehicleVdpSnapshot(v, listing);
-    const { seoTitle, metaDescription } = buildVehicleVdpFallbackSeo(snapshot);
+    const { seoTitle, metaDescription } = await resolveVehicleVdpSeo(snapshot);
     const featuredImage =
       v.Photos?.[0]?.PhotoUrl ?? listing.featured_image ?? "";
     const canonicalPath = `/cars/${buildVehicleSlug(v)}`;
@@ -127,8 +127,11 @@ export const loadVehicleVdpBySlug = cache(
     const v = resolved.vehicle;
     const listing = dealerVehicleToListing(v);
     const snapshot = buildVehicleVdpSnapshot(v, listing);
-    const ai = await getVehicleVdpAiContent(snapshot);
+    const [ai, seo] = await Promise.all([
+      getVehicleVdpAiContent(snapshot),
+      resolveVehicleVdpSeo(snapshot),
+    ]);
 
-    return { ok: true, vehicle: v, listing, snapshot, ai, allVehicles: all };
+    return { ok: true, vehicle: v, listing, snapshot, ai, seo, allVehicles: all };
   },
 );

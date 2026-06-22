@@ -5,7 +5,7 @@ import {
   loadVehicleVdpBySlug,
   loadVehicleVdpMetaBySlug,
 } from "@/lib/openai/loadVehicleVdpBySlug";
-import { formatVehicleVdpBrowserTitle } from "@/lib/openai/vehicleVdpCopy";
+import { formatVehicleVdpBrowserTitle } from "@/lib/wordpress/vdp-meta";
 import { dealerVehicleToListing } from "@/lib/inventory/transform";
 import { buildVehicleSlug } from "@/lib/inventory/slug";
 import {
@@ -31,7 +31,7 @@ import {
 
 import "./vdp-ref.scss";
 
-/** Align with dealer inventory `revalidate` (5 min). */
+/** Align with dealer inventory (5 min); VDP meta templates refresh faster via `vdp-meta` cache tag. */
 export const revalidate = 300;
 
 interface VehicleDetailPageProps {
@@ -129,7 +129,7 @@ export default async function VehicleDetailPage({
   }
   if (!res.ok) notFound();
 
-  const { vehicle: v, listing, snapshot, ai, allVehicles } = res;
+  const { vehicle: v, listing, snapshot, ai, seo, allVehicles } = res;
   const canonicalSlug = buildVehicleSlug(v);
   const sharePath = `/cars/${canonicalSlug}`;
   let shareUrl = absoluteShareUrl(sharePath);
@@ -200,7 +200,7 @@ export default async function VehicleDetailPage({
   const origin = new URL(pageUrlHttps).origin;
   const vdpJsonLd = vehicleVdpCarListingGraphJsonLd(origin, v, listing, {
     canonicalPageUrl: pageUrlHttps,
-    description: ai.metaDescription,
+    description: seo.metaDescription,
     dealerPhoneE164: dealerPhoneToE164Au(dealerPhone),
     inventoryVehicles: allVehicles,
     faqs: ai.faqs,
