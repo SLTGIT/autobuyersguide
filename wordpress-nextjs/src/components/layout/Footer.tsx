@@ -18,7 +18,7 @@ export default function Footer() {
             <p className="text-white-50 mb-0">QLD Dealer License: 4065904</p>
             <p className={`${styles.poweredBy} text-white-50 mb-0 mt-3`}>
               Powered and maintained by{" "}
-              <a href="https://dealersales.com" target="_blank" rel="noopener noreferrer" className={styles.provider}>Dealer Sales LLC</a>
+              <a href="https://dealersales.co" target="_blank" rel="noopener noreferrer" className={styles.provider}>Dealer Sales LLC</a>
             </p>
           </div>
           <div className="col-lg-1"></div>
