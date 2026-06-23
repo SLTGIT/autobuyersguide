@@ -69,6 +69,8 @@ export interface VehicleListing {
   show_drive_away: boolean;
   location_short: string;
   year: number;
+  /** Feed BodyColour — exterior paint. */
+  body_colour: string;
   /** Feed TrimColour — shown in card headline after trim when present. */
   trim_colour: string;
 }

@@ -4,6 +4,58 @@ function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function removePhrase(s: string, phrase: string): string {
+  const p = phrase.trim();
+  if (!p) return s;
+  return s
+    .replace(new RegExp(`\\b${escapeRegExp(p)}\\b`, "gi"), " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function removeLeadingToken(s: string, token: string): string {
+  const t = token.trim();
+  if (!t) return s;
+  return s.replace(new RegExp(`^${escapeRegExp(t)}\\b\\s*`, "i"), "").trim();
+}
+
+/**
+ * Strip stock, colour, transmission, body type, and other feed fields from title
+ * remainder so only the variant / trim name is left (e.g. "Ascent Sport").
+ */
+function stripListingFieldsFromTrimRemainder(
+  remainder: string,
+  listing: VehicleListing,
+): string {
+  let s = remainder.replace(/\s+/g, " ").trim();
+  if (!s) return "";
+
+  if (listing.stock_number) {
+    s = removeLeadingToken(s, listing.stock_number);
+    s = removePhrase(s, listing.stock_number);
+  }
+
+  const phrases = [
+    listing.transmission,
+    listing.body_type,
+    listing.fuel_type,
+    listing.drive_type,
+    listing.type_code,
+    listing.body_colour,
+    listing.trim_colour,
+    listing.condition,
+  ]
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+
+  for (const phrase of phrases) {
+    s = removePhrase(s, phrase);
+  }
+
+  return s.replace(/\s+/g, " ").trim();
+}
+
 /** Primary card line: "Make, Model" (screenshot-style). */
 export function vehicleCardHeadline(listing: VehicleListing): string {
   const make = listing.make?.trim();
@@ -42,7 +94,7 @@ export function vehicleCardTrimFromTitle(listing: VehicleListing): string {
     if (next.length < s.length) s = next;
   }
 
-  return s.replace(/\s+/g, " ").trim();
+  return stripListingFieldsFromTrimRemainder(s, listing);
 }
 
 /** Card headline: "YEAR Make Model Trim" plus trim colour when present. */

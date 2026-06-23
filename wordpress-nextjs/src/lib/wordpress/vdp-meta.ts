@@ -69,14 +69,12 @@ function buildVdpMetaTags(snapshot: VehicleVdpSnapshot): Record<string, string> 
     year: snapshot.year ? String(snapshot.year) : "",
     bodytype: snapshot.bodyType.trim(),
     fueltype: snapshot.fuelType.trim(),
-    drivetype: drive,
     drivetrain: drive,
     trim: snapshot.trim.trim(),
     price: snapshot.displayPrice.trim(),
     odometer: formatOdometer(snapshot.odometerKm),
     color: snapshot.bodyColour.trim(),
     vin: snapshot.vin.trim(),
-    sky: snapshot.stockNumber.trim(),
     sku: snapshot.stockNumber.trim(),
   };
 }
