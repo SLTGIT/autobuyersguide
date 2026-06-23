@@ -1,5 +1,6 @@
 "use client";
 
+import FormSubmissionModal from "@/components/forms/FormSubmissionModal";
 import { trackVdpFormSubmit } from "@/lib/analytics/vdp";
 import { submitLead } from "@/lib/leads/submit-lead-client";
 import RecaptchaField from "@/components/forms/RecaptchaField";
@@ -85,9 +86,12 @@ export default function VehicleEnquiryForm({
   const [similarStock, setSimilarStock] = useState(false);
 
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalPhase, setModalPhase] = useState<"loading" | "success">("loading");
+  const [submittedFirstName, setSubmittedFirstName] = useState("");
 
   const resetForm = useCallback(() => {
     setFirstName("");
@@ -141,6 +145,10 @@ export default function VehicleEnquiryForm({
     const message = messageParts.filter(Boolean).join("\n\n");
 
     setLoading(true);
+    setSubmittedFirstName(firstName.trim());
+    setModalOpen(true);
+    setModalPhase("loading");
+
     try {
       const body = {
         firstName: firstName.trim(),
@@ -179,13 +187,11 @@ export default function VehicleEnquiryForm({
           },
           "enquiry",
         );
-        setStatus("success");
-        setStatusMessage(
-          "Thank you — your enquiry was sent. We will be in touch shortly.",
-        );
+        setModalPhase("success");
         resetForm();
         setRecaptchaToken(null);
       } else {
+        setModalOpen(false);
         setStatus("error");
         setStatusMessage(
           typeof data.message === "string" && data.message
@@ -195,6 +201,7 @@ export default function VehicleEnquiryForm({
       }
     } catch (err) {
       console.error(err);
+      setModalOpen(false);
       setStatus("error");
       setStatusMessage(
         "We could not send your enquiry. Check your connection and try again.",
@@ -203,29 +210,16 @@ export default function VehicleEnquiryForm({
     setLoading(false);
   };
 
+  const closeSubmissionModal = useCallback(() => {
+    setModalOpen(false);
+    setModalPhase("loading");
+    if (showCloseOnSuccess && onSuccessClose) {
+      onSuccessClose();
+    }
+  }, [onSuccessClose, showCloseOnSuccess]);
+
   return (
     <>
-      {status === "success" && (
-        <div
-          className="cs-contact-form__alert cs-contact-form__alert--success mb-3"
-          role="status"
-        >
-          <i className="bi bi-check-circle-fill" aria-hidden />
-          <div className="flex-grow-1">
-            <strong className="d-block mb-1">Sent</strong>
-            <span>{statusMessage}</span>
-            {showCloseOnSuccess && onSuccessClose ? (
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-success mt-2"
-                onClick={onSuccessClose}
-              >
-                Close
-              </button>
-            ) : null}
-          </div>
-        </div>
-      )}
       {status === "error" && (
         <div
           className="cs-contact-form__alert cs-contact-form__alert--error mb-3"
@@ -433,6 +427,13 @@ export default function VehicleEnquiryForm({
           </button>
         </div>
       </form>
+
+      <FormSubmissionModal
+        open={modalOpen}
+        phase={modalPhase}
+        firstName={submittedFirstName}
+        onClose={closeSubmissionModal}
+      />
     </>
   );
 }

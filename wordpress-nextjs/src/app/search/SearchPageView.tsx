@@ -35,6 +35,7 @@ import InventorySrpVehicleGrid from "@/components/vehicles/InventorySrpVehicleGr
 import { warmVehicleVdpCachesForVehicles } from "@/lib/openai/warmVehicleVdpCache";
 import { InventorySearchUrlProvider } from "@/components/vehicles/InventorySearchUrlContext";
 import type { MakeModelPathResolution } from "@/lib/inventory/search-make-model-paths";
+import { resolveSrpSearchMeta } from "@/lib/wordpress/srp-search-meta";
 
 export type SearchPageCustomHero = {
   heading: string;
@@ -145,25 +146,18 @@ export default async function SearchPageView({
   const origin = new URL(currentUrlHttps).origin;
 
   const hero = pathHeroLabel?.trim() ?? "";
+  const srpMeta = await resolveSrpSearchMeta(effectiveFilters, {
+    pathHeroLabel: hero || null,
+  });
   const customHeading = customHero?.heading?.trim() ?? "";
   const customDescription = customHero?.description?.trim() ?? "";
   const hasCustomHero = Boolean(customHeading);
 
-  const hasListingSeo = Boolean(listingSeo);
-  const listTitle = hasListingSeo
-    ? listingSeo!.title
-    : hasCustomHero
-      ? customHeading
-      : hero
-        ? `Used ${hero} for Sale in Brisbane | Car Sales Brisbane and Statewide Auto Group`
-        : "Used Cars for Sale in Brisbane | Car Sales Brisbane and Statewide Auto Group";
+  const hasListingSeo = Boolean(listingSeo?.title || listingSeo?.description);
+  const listTitle = hasListingSeo ? listingSeo!.title : srpMeta.title;
   const listDescription = hasListingSeo
     ? listingSeo!.description.trim() || listingSeo!.title
-    : hasCustomHero
-      ? customDescription || customHeading
-      : hero
-        ? `Browse used ${hero} vehicles, 4x4s, and SUVs with finance-first options from our Ormiston hub.`
-        : "Explore used cars, 4x4s, SUVs, and work-ready vehicles with finance-first options from our Ormiston hub.";
+    : srpMeta.description;
 
   const breadcrumbCurrentCustom = hasCustomHero
     ? customHero?.breadcrumbCurrent?.trim() || customHeading
@@ -248,13 +242,10 @@ export default async function SearchPageView({
   const wpHero = wpHeroHtml?.trim() ?? "";
   const showWpHero = Boolean(wpHero) && !hasCustomHero;
 
-  const heroTitle = hasCustomHero
-    ? customHeading
-    : hero
-      ? `Browse used ${hero} for sale in Brisbane`
-      : hasListingSeo
-        ? listingSeo!.title
-        : "Browse Used Cars for Sale in Brisbane";
+  const heroTitle = hasCustomHero ? customHeading : srpMeta.heading;
+  const heroDescription = hasCustomHero
+    ? customDescription || customHeading
+    : srpMeta.subHeading;
 
   return (
     <InventorySearchUrlProvider
@@ -274,7 +265,7 @@ export default async function SearchPageView({
                 {heroTitle}
               </h1>
               <p className="search-page-hero-lead mb-0">
-                {hasCustomHero ? customDescription || customHeading : listDescription}
+                {heroDescription}
               </p>
             </div>
             {/* <div className="col-lg-5" /> */}

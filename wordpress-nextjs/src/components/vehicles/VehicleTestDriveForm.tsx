@@ -1,5 +1,6 @@
 "use client";
 
+import FormSubmissionModal from "@/components/forms/FormSubmissionModal";
 import { trackVdpFormSubmit } from "@/lib/analytics/vdp";
 import { submitLead } from "@/lib/leads/submit-lead-client";
 import RecaptchaField from "@/components/forms/RecaptchaField";
@@ -42,9 +43,12 @@ export default function VehicleTestDriveForm({
     useState<(typeof PREFERRED_TIME_OPTIONS)[number]>("Morning");
 
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalPhase, setModalPhase] = useState<"loading" | "success">("loading");
+  const [submittedFirstName, setSubmittedFirstName] = useState("");
 
   const [minDate, setMinDate] = useState("");
 
@@ -100,6 +104,10 @@ export default function VehicleTestDriveForm({
     ].join("\n");
 
     setLoading(true);
+    setSubmittedFirstName(firstName.trim());
+    setModalOpen(true);
+    setModalPhase("loading");
+
     try {
       const body = {
         firstName: firstName.trim(),
@@ -140,13 +148,11 @@ export default function VehicleTestDriveForm({
           },
           "test_drive",
         );
-        setStatus("success");
-        setStatusMessage(
-          "Thank you — your test drive request was sent. We will be in touch shortly.",
-        );
+        setModalPhase("success");
         resetForm();
         setRecaptchaToken(null);
       } else {
+        setModalOpen(false);
         setStatus("error");
         setStatusMessage(
           typeof data.message === "string" && data.message
@@ -156,6 +162,7 @@ export default function VehicleTestDriveForm({
       }
     } catch (err) {
       console.error(err);
+      setModalOpen(false);
       setStatus("error");
       setStatusMessage(
         "We could not send your request. Check your connection and try again.",
@@ -164,20 +171,13 @@ export default function VehicleTestDriveForm({
     setLoading(false);
   };
 
+  const closeSubmissionModal = useCallback(() => {
+    setModalOpen(false);
+    setModalPhase("loading");
+  }, []);
+
   return (
     <>
-      {status === "success" && (
-        <div
-          className="cs-contact-form__alert cs-contact-form__alert--success mb-3"
-          role="status"
-        >
-          <i className="bi bi-check-circle-fill" aria-hidden />
-          <div className="flex-grow-1">
-            <strong className="d-block mb-1">Sent</strong>
-            <span>{statusMessage}</span>
-          </div>
-        </div>
-      )}
       {status === "error" && (
         <div
           className="cs-contact-form__alert cs-contact-form__alert--error mb-3"
@@ -348,6 +348,13 @@ export default function VehicleTestDriveForm({
           )}
         </button>
       </form>
+
+      <FormSubmissionModal
+        open={modalOpen}
+        phase={modalPhase}
+        firstName={submittedFirstName}
+        onClose={closeSubmissionModal}
+      />
     </>
   );
 }

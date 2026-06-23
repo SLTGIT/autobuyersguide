@@ -5,7 +5,12 @@ import { getMetadata, getAcfSeoCopy } from "@/lib/wordpress/seo";
 import { repairWpRenderedHtml } from "@/lib/wordpress/repair-rendered-html";
 import { mergeSiteUrlMetadata } from "@/lib/site-url";
 import { stripHtml } from "@/lib/json-ld";
-import { parseInventorySearchParams } from "@/lib/inventory/query";
+import {
+  hasActiveInventoryFilters,
+  inventoryListingQueryHref,
+  parseInventorySearchParams,
+} from "@/lib/inventory/query";
+import { resolveSrpSearchMeta } from "@/lib/wordpress/srp-search-meta";
 import SearchPageView from "./SearchPageView";
 
 export const dynamic = "force-dynamic";
@@ -17,12 +22,23 @@ interface SearchPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  searchParams,
+}: SearchPageProps): Promise<Metadata> {
   const page = await getPageBySlug(SEARCH_SLUG);
-  if (!page) {
-    return mergeSiteUrlMetadata({ title: "Search" }, SEARCH_PATH);
+  const raw = await searchParams;
+  const filters = parseInventorySearchParams(raw);
+
+  if (!hasActiveInventoryFilters(filters) && page) {
+    return mergeSiteUrlMetadata(getMetadata(page), SEARCH_PATH);
   }
-  return mergeSiteUrlMetadata(getMetadata(page), SEARCH_PATH);
+
+  const meta = await resolveSrpSearchMeta(filters);
+  const path = inventoryListingQueryHref(filters);
+  return mergeSiteUrlMetadata(
+    { title: meta.title, description: meta.description },
+    path,
+  );
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
@@ -31,15 +47,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     notFound();
   }
 
-  const acfSeo = getAcfSeoCopy(page);
-  const headline = stripHtml(page.title.rendered);
-  const excerpt = stripHtml(page.excerpt?.rendered || "");
-  const seoTitle = acfSeo?.title || headline;
-  const seoDescription = acfSeo?.description || excerpt || headline;
-
   const raw = await searchParams;
   const filters = parseInventorySearchParams(raw);
   const rendered = page.content?.rendered?.trim();
+
+  const acfSeo = getAcfSeoCopy(page);
+  const headline = stripHtml(page.title.rendered);
+  const excerpt = stripHtml(page.excerpt?.rendered || "");
+  const useWpPageSeo = !hasActiveInventoryFilters(filters);
+  const listingSeo = useWpPageSeo
+    ? {
+        title: acfSeo?.title || headline,
+        description: acfSeo?.description || excerpt || headline,
+      }
+    : null;
 
   return (
     <SearchPageView
@@ -47,7 +68,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       pathAugment={null}
       pathHeroLabel={null}
       wpHeroHtml={rendered ? repairWpRenderedHtml(rendered) : null}
-      listingSeo={{ title: seoTitle, description: seoDescription }}
+      listingSeo={listingSeo}
       initialSearchParams={raw}
     />
   );

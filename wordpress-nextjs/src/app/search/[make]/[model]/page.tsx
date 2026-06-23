@@ -8,6 +8,7 @@ import {
 } from "@/lib/inventory/query";
 import { resolveMakeModelFromPathSlugs } from "@/lib/inventory/search-make-model-paths";
 import { mergeSiteUrlMetadata } from "@/lib/site-url";
+import { resolveSrpSearchMeta } from "@/lib/wordpress/srp-search-meta";
 import SearchPageView from "../../SearchPageView";
 
 export const dynamic = "force-dynamic";
@@ -29,12 +30,17 @@ export async function generateMetadata({
     return { title: "Search | Car Sales Brisbane" };
   }
   const pathname = `/search/${makeSlug}/${modelSlug}`;
-  const hero = resolved.heroLabel.trim();
-  const base: Metadata = {
-    title: `Used ${hero} for Sale in Brisbane | Car Sales Brisbane`,
-    description: `Browse used ${hero} with finance-first options from our Ormiston hub.`,
-  };
-  return mergeSiteUrlMetadata(base, pathname);
+  const filters = mergeInventoryFiltersWithPathAugment(
+    parseInventorySearchParams({}),
+    resolved.pathAugment,
+  );
+  const meta = await resolveSrpSearchMeta(filters, {
+    pathHeroLabel: resolved.heroLabel,
+  });
+  return mergeSiteUrlMetadata(
+    { title: meta.title, description: meta.description },
+    pathname,
+  );
 }
 
 export default async function SearchByMakeModelPage({

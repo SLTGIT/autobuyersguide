@@ -73,6 +73,23 @@ export function parseInventorySearchParams(
   };
 }
 
+/** True when URL/query applies inventory filters beyond pagination and sort. */
+export function hasActiveInventoryFilters(f: InventoryFilterState): boolean {
+  if (f.q.trim()) return true;
+  if (f.condition.trim()) return true;
+  if (f.make.trim()) return true;
+  if (f.model.trim()) return true;
+  if (f.bodyType.length) return true;
+  if (f.fuelType.length) return true;
+  if (f.bodyColour.length) return true;
+  if (f.driveType.length) return true;
+  if (f.transmission.length) return true;
+  if (f.type.length) return true;
+  if (f.minPrice !== null || f.maxPrice !== null) return true;
+  if (f.minYear !== null || f.maxYear !== null) return true;
+  return false;
+}
+
 function norm(s: string | undefined | null): string {
   return (s ?? "").trim();
 }

@@ -13,6 +13,7 @@ import {
   cmsSrpMetadataForSlug,
   renderCmsSrpSearchPage,
 } from "@/lib/cms-srp/render-cms-srp-search";
+import { resolveSrpSearchMeta } from "@/lib/wordpress/srp-search-meta";
 import SearchPageView from "../SearchPageView";
 
 export const dynamic = "force-dynamic";
@@ -20,14 +21,6 @@ export const dynamic = "force-dynamic";
 interface SearchMakePageProps {
   params: Promise<{ make: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
-}
-
-function titleFromSlug(slug: string): string {
-  return slug
-    .split("-")
-    .filter(Boolean)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
 }
 
 export async function generateMetadata({
@@ -45,20 +38,17 @@ export async function generateMetadata({
     return { title: "Search | Car Sales Brisbane" };
   }
   const pathname = `/search/${slug}`;
-  if (resolved.kind === "make") {
-    const label = titleFromSlug(slug);
-    const base: Metadata = {
-      title: `Used ${label} for Sale in Brisbane | Car Sales Brisbane`,
-      description: `Browse used ${label} vehicles, 4x4s, and SUVs with finance-first options from our Ormiston hub.`,
-    };
-    return mergeSiteUrlMetadata(base, pathname);
-  }
-  const hero = resolved.heroLabel.trim();
-  const base: Metadata = {
-    title: `Used ${hero} for Sale in Brisbane | Car Sales Brisbane`,
-    description: `Browse used vehicles matching ${hero} with finance-first options from our Ormiston hub.`,
-  };
-  return mergeSiteUrlMetadata(base, pathname);
+  const filters = mergeInventoryFiltersWithPathAugment(
+    parseInventorySearchParams({}),
+    resolved.pathAugment,
+  );
+  const meta = await resolveSrpSearchMeta(filters, {
+    pathHeroLabel: resolved.heroLabel,
+  });
+  return mergeSiteUrlMetadata(
+    { title: meta.title, description: meta.description },
+    pathname,
+  );
 }
 
 export default async function SearchByMakePage({

@@ -1,5 +1,6 @@
 "use client";
 
+import FormSubmissionModal from "@/components/forms/FormSubmissionModal";
 import { submitLead } from "@/lib/leads/submit-lead-client";
 import RecaptchaField from "@/components/forms/RecaptchaField";
 import {
@@ -48,9 +49,12 @@ export default function ContactForm() {
   const [formData, setFormData] = useState<FormDataType>(emptyForm);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalPhase, setModalPhase] = useState<"loading" | "success">("loading");
+  const [submittedFirstName, setSubmittedFirstName] = useState("");
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
@@ -105,6 +109,10 @@ export default function ContactForm() {
       return;
     }
 
+    setSubmittedFirstName(formData.firstName.trim());
+    setModalOpen(true);
+    setModalPhase("loading");
+
     try {
       const data = await submitLead({
         firstName: formData.firstName.trim(),
@@ -122,13 +130,11 @@ export default function ContactForm() {
       });
 
       if (data.success) {
-        setStatus("success");
-        setStatusMessage(
-          "Thank you — your enquiry was sent successfully. We will get back to you soon.",
-        );
+        setModalPhase("success");
         setFormData(emptyForm);
         setRecaptchaToken(null);
       } else {
+        setModalOpen(false);
         setStatus("error");
         setStatusMessage(
           typeof data.message === "string" && data.message
@@ -138,6 +144,7 @@ export default function ContactForm() {
       }
     } catch (error) {
       console.error(error);
+      setModalOpen(false);
       setStatus("error");
       setStatusMessage(
         "We could not send your enquiry. Check your connection and try again.",
@@ -147,9 +154,9 @@ export default function ContactForm() {
     setLoading(false);
   };
 
-  const dismissSuccess = useCallback(() => {
-    setStatus("idle");
-    setStatusMessage("");
+  const closeSubmissionModal = useCallback(() => {
+    setModalOpen(false);
+    setModalPhase("loading");
   }, []);
 
   return (
@@ -161,30 +168,8 @@ export default function ContactForm() {
         </p>
 
         <div className="visually-hidden" aria-live="polite" aria-atomic="true">
-          {status === "success" && statusMessage}
           {status === "error" && statusMessage}
         </div>
-
-        {status === "success" && (
-          <div
-            className="cs-contact-form__alert cs-contact-form__alert--success mb-4"
-            role="status"
-          >
-            <i className="bi bi-check-circle-fill" aria-hidden />
-            <div className="flex-grow-1">
-              <strong className="d-block mb-1">Enquiry received</strong>
-              <span>{statusMessage}</span>
-              <button
-                type="button"
-                className="btn btn-link p-0 mt-2 d-block text-decoration-none fw-semibold"
-                style={{ color: "var(--cs-primary)" }}
-                onClick={dismissSuccess}
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        )}
 
         {status === "error" && (
           <div
@@ -371,6 +356,13 @@ export default function ContactForm() {
           </button>
         </form>
       </div>
+
+      <FormSubmissionModal
+        open={modalOpen}
+        phase={modalPhase}
+        firstName={submittedFirstName}
+        onClose={closeSubmissionModal}
+      />
     </div>
   );
 }
