@@ -407,6 +407,15 @@
     font-weight: 600;
   }
 
+  .vdp-ref-overview__body {
+    line-height: 1.6;
+
+    strong {
+      color: var(--cs-ink);
+      font-weight: 700;
+    }
+  }
+
   .vdp-ref-highlight-chips {
     margin: 0;
     padding: 0;

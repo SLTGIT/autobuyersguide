@@ -229,6 +229,7 @@ export default async function VehicleDetailPage({
         dealerPhone={dealerPhone}
         enquiryItem={enquiryItem}
         similarItems={similar}
+        cmsOverview={seo.overview}
       />
     </>
   );

@@ -14,6 +14,7 @@ import VdpRefPhoneReveal from "./VdpRefPhoneReveal";
 import VdpScrollStickyBar from "./VdpScrollStickyBar";
 import VdpQuickSpecsRow, { type VdpQuickSpecItem } from "./VdpQuickSpecsRow";
 import VdpKeyHighlights from "./VdpKeyHighlights";
+import VdpCmsOverview from "./VdpCmsOverview";
 import VdpDealerCommentsExpandable from "./VdpDealerCommentsExpandable";
 import VdpCarDetailsTabs from "./VdpCarDetailsTabs";
 import { ORG_GOOGLE_MAPS_PLACE_URL, ORG_POSTAL_ADDRESS } from "@/lib/json-ld";
@@ -118,6 +119,8 @@ export interface VehicleVdpRefPageProps {
   dealerPhone: string;
   enquiryItem: VehicleEnquiryItemPayload;
   similarItems: SimilarCarItem[];
+  /** WordPress CMS overview (tag-substituted), shown above Key highlights. */
+  cmsOverview?: string;
 }
 
 export default function VehicleVdpRefPage({
@@ -138,6 +141,7 @@ export default function VehicleVdpRefPage({
   dealerPhone,
   enquiryItem,
   similarItems,
+  cmsOverview = "",
 }: VehicleVdpRefPageProps) {
   const heroSubtitle = buildHeroSubtitle(snapshot, ai.heroBadge);
   const quickSpecs = buildQuickSpecs(snapshot);
@@ -244,6 +248,8 @@ export default function VehicleVdpRefPage({
               </div>
 
               <VdpQuickSpecsRow items={quickSpecs} />
+
+              <VdpCmsOverview text={cmsOverview} />
 
               <VdpKeyHighlights chips={ai.highlightChips} />
 

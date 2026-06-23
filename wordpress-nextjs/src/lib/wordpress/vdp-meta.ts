@@ -4,12 +4,15 @@ import type { VehicleVdpSnapshot } from "@/lib/openai/vehicleVdpTypes";
 export type VdpMetaTemplates = {
   title: string;
   description: string;
+  overview: string;
 };
 
 export type VehicleVdpSeo = {
   /** Segment before ` | Car Sales Brisbane` in the HTML `<title>`. */
   seoTitle: string;
   metaDescription: string;
+  /** CMS overview copy shown above Key highlights on the VDP. */
+  overview: string;
 };
 
 const VDP_BROWSER_TITLE_SUFFIX = "";
@@ -49,13 +52,17 @@ function formatOdometer(km: number | null): string {
   return `${km.toLocaleString("en-AU")} km`;
 }
 
-/** Maps WordPress VDP meta placeholders to listing snapshot values. */
-export function applyVdpMetaTemplate(
-  template: string,
-  snapshot: VehicleVdpSnapshot,
-): string {
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function buildVdpMetaTags(snapshot: VehicleVdpSnapshot): Record<string, string> {
   const drive = snapshot.driveType.trim();
-  const tags: Record<string, string> = {
+  return {
     condition: formatCondition(snapshot.condition),
     make: snapshot.make.trim(),
     model: snapshot.model.trim(),
@@ -69,13 +76,40 @@ export function applyVdpMetaTemplate(
     odometer: formatOdometer(snapshot.odometerKm),
     color: snapshot.bodyColour.trim(),
     vin: snapshot.vin.trim(),
+    sky: snapshot.stockNumber.trim(),
+    sku: snapshot.stockNumber.trim(),
   };
+}
 
+/** Maps WordPress VDP meta placeholders to listing snapshot values. */
+export function applyVdpMetaTemplate(
+  template: string,
+  snapshot: VehicleVdpSnapshot,
+): string {
+  const tags = buildVdpMetaTags(snapshot);
   const replaced = template.replace(/\{([a-z0-9_]+)\}/gi, (_, key: string) => {
     return tags[key.toLowerCase()] ?? "";
   });
 
   return collapseWhitespace(replaced);
+}
+
+/**
+ * Like {@link applyVdpMetaTemplate} but wraps each replaced value in `<strong>` for overview UI.
+ * Preserves `<strong>` / `</strong>` markup from the WordPress template.
+ */
+export function applyVdpMetaOverviewTemplate(
+  template: string,
+  snapshot: VehicleVdpSnapshot,
+): string {
+  const tags = buildVdpMetaTags(snapshot);
+  const replaced = template.replace(/\{([a-z0-9_]+)\}/gi, (_, key: string) => {
+    const value = tags[key.toLowerCase()] ?? "";
+    if (!value) return "";
+    return `<strong>${escapeHtml(value)}</strong>`;
+  });
+
+  return replaced.replace(/\s{2,}/g, " ").trim();
 }
 
 export function formatVehicleVdpBrowserTitle(seoTitlePart: string): string {
@@ -94,7 +128,7 @@ function buildFallbackSeo(snapshot: VehicleVdpSnapshot): VehicleVdpSeo {
   const metaDescription = collapseWhitespace(
     `${base}. View photos, specifications, features, pricing and finance options.`,
   );
-  return { seoTitle, metaDescription };
+  return { seoTitle, metaDescription, overview: "" };
 }
 
 function parseVdpMetaResponse(data: unknown): VdpMetaTemplates | null {
@@ -108,8 +142,10 @@ function parseVdpMetaResponse(data: unknown): VdpMetaTemplates | null {
     typeof payload.title === "string" ? payload.title.trim() : "";
   const description =
     typeof payload.description === "string" ? payload.description.trim() : "";
-  if (!title && !description) return null;
-  return { title, description };
+  const overview =
+    typeof payload.overview === "string" ? payload.overview.trim() : "";
+  if (!title && !description && !overview) return null;
+  return { title, description, overview };
 }
 
 async function fetchVdpMetaTemplatesUncached(): Promise<VdpMetaTemplates | null> {
@@ -133,7 +169,7 @@ async function fetchVdpMetaTemplatesUncached(): Promise<VdpMetaTemplates | null>
 
 const fetchVdpMetaTemplatesCached = unstable_cache(
   fetchVdpMetaTemplatesUncached,
-  ["vdp-meta-templates"],
+  ["vdp-meta-templates", "v2-overview"],
   {
     revalidate: VDP_META_CACHE_SECONDS,
     tags: ["vdp-meta"],
@@ -141,14 +177,14 @@ const fetchVdpMetaTemplatesCached = unstable_cache(
 );
 
 /**
- * Loads VDP title/description templates from WordPress `csb/v1/vdp-meta`.
+ * Loads VDP title, description, and overview templates from WordPress `csb/v1/vdp-meta`.
  * Cached for 60s. Bust via `POST /api/revalidate` with `{ "tag": "vdp-meta", "secret": "..." }`.
  */
 export async function fetchVdpMetaTemplates(): Promise<VdpMetaTemplates | null> {
   return fetchVdpMetaTemplatesCached();
 }
 
-/** Resolves per-vehicle SEO from WordPress templates + listing snapshot tags. */
+/** Resolves per-vehicle SEO + overview from WordPress templates + listing snapshot tags. */
 export async function resolveVehicleVdpSeo(
   snapshot: VehicleVdpSnapshot,
 ): Promise<VehicleVdpSeo> {
@@ -159,14 +195,16 @@ export async function resolveVehicleVdpSeo(
 
   const seoTitle = applyVdpMetaTemplate(templates.title, snapshot);
   const metaDescription = applyVdpMetaTemplate(templates.description, snapshot);
+  const overview = applyVdpMetaOverviewTemplate(templates.overview, snapshot);
+  const fallback = buildFallbackSeo(snapshot);
 
-  if (!seoTitle && !metaDescription) {
-    return buildFallbackSeo(snapshot);
+  if (!seoTitle && !metaDescription && !overview) {
+    return fallback;
   }
 
   return {
-    seoTitle: seoTitle || buildFallbackSeo(snapshot).seoTitle,
-    metaDescription:
-      metaDescription || buildFallbackSeo(snapshot).metaDescription,
+    seoTitle: seoTitle || fallback.seoTitle,
+    metaDescription: metaDescription || fallback.metaDescription,
+    overview,
   };
 }
