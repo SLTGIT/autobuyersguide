@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPostBySlug, getPosts } from "@/lib/wordpress";
+import BlogShareButton from "@/components/blog/BlogShareButton";
 import RelatedPostsSidebar from "@/components/blog/RelatedPostsSidebar";
 import type { WPPost } from "@/types/wordpress";
 import WpRenderedHtml from "@/components/cms/WpRenderedHtml";
@@ -157,7 +158,10 @@ export default async function BlogPost({ params }: BlogPostProps) {
               </article>
             </div>
             <div className="col-lg-4">
-              <RelatedPostsSidebar posts={relatedPosts} />
+              <aside className="blog-sidebar">
+                <BlogShareButton title={headline} shareUrl={articleHttps} />
+                <RelatedPostsSidebar posts={relatedPosts} />
+              </aside>
             </div>
           </div>
         </div>
