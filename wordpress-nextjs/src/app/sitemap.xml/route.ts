@@ -15,8 +15,8 @@ export async function GET() {
     `${base}/pages.xml`,
     `${base}/blog-detail.xml`,
     `${base}/vehicle-listing.xml`,
-    `${base}/inventory-make.xml`,
-    `${base}/inventory-make-model.xml`,
+    // `${base}/inventory-make.xml`,
+    // `${base}/inventory-make-model.xml`,
   ]);
   return xmlResponse(xml);
 }
