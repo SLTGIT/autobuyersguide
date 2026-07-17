@@ -91,7 +91,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {posts.map((post) => {
                                 const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
-                                const author = 'Car Sales Brisbane';
+                                const author = post._embedded?.author?.[0]?.name || 'Unknown';
                                 const postCategories = post._embedded?.['wp:term']?.[0] || [];
                                 const primaryCategory = postCategories[0]?.name || 'Uncategorized';
                                 const formattedDate = new Date(post.date).toLocaleDateString('en-US', {

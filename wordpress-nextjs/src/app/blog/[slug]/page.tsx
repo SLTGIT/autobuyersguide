@@ -37,7 +37,6 @@ export default async function BlogPost({ params }: BlogPostProps) {
   // Extract embedded data
   const featuredImage = post._embedded?.['wp:featuredmedia']?.[0];
   const author = post._embedded?.author?.[0];
-  const authorName = 'Car Sales Brisbane';
   const postCategories = post._embedded?.['wp:term']?.[0] || [];
   const primaryCategory = postCategories[0];
 
@@ -66,7 +65,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
             <div className="flex flex-wrap items-center justify-center gap-6 text-gray-500 font-medium bg-gray-50 py-4 px-6 rounded-2xl">
               <div className="flex items-center gap-2">
                 <span className="text-blue-600">👤</span>
-                <span>{authorName}</span>
+                <span>{author?.name || 'Unknown'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-blue-600">📅</span>
@@ -104,12 +103,12 @@ export default async function BlogPost({ params }: BlogPostProps) {
               {author.avatar_urls?.['96'] && (
                 <img 
                   src={author.avatar_urls['96']} 
-                  alt={authorName}
+                  alt={author.name} 
                   className="w-24 h-24 rounded-full shadow-lg border-4 border-white"
                 />
               )}
               <div className="text-center md:text-left">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">About {authorName}</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">About {author.name}</h3>
                 <p className="text-gray-600 leading-relaxed">
                   {author.description || 'Content creator and technical writer focusing on WordPress and modern web development technologies.'}
                 </p>
