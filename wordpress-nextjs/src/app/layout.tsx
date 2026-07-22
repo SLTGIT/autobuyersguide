@@ -139,7 +139,7 @@ export default async function RootLayout({
         <Script id="dealerdrive-config" strategy="afterInteractive">
           {`
             window._DD = {
-              pixelId: '1317945379966893',
+              pixelId: '310034032934792',
               dealerId: 'c1aea647-961c-4746-84ea-24ca30f04e35'
             };
           `}
