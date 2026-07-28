@@ -221,6 +221,7 @@ export default function VehicleVdpRefPage({
                 <VdpShareLinks
                   title={headline}
                   shareUrl={shareUrl}
+                  mediaUrl={enquiryItem.image}
                   className="vdp-ref-share--compact mb-2"
                 />
                 <div className="d-flex align-items-start justify-content-between gap-3">
@@ -333,6 +334,7 @@ export default function VehicleVdpRefPage({
                   <VdpShareLinks
                     title={headline}
                     shareUrl={shareUrl}
+                    mediaUrl={enquiryItem.image}
                     className="mb-3 pb-3 border-bottom"
                   />
                   <div className="cs-price mb-1">{priceMain || "—"}</div>

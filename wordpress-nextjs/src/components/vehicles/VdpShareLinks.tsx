@@ -5,12 +5,15 @@ import { useCallback, useState } from "react";
 interface VdpShareLinksProps {
   title: string;
   shareUrl: string;
+  /** Absolute image URL — used as the pinned media for Pinterest. */
+  mediaUrl?: string;
   className?: string;
 }
 
 export default function VdpShareLinks({
   title,
   shareUrl,
+  mediaUrl,
   className,
 }: VdpShareLinksProps) {
   const [copied, setCopied] = useState(false);
@@ -35,6 +38,9 @@ export default function VdpShareLinks({
 
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedText = encodeURIComponent(title);
+  const pinterestHref = `https://pinterest.com/pin/create/button/?url=${encodedUrl}&description=${encodedText}${
+    mediaUrl ? `&media=${encodeURIComponent(mediaUrl)}` : ""
+  }`;
 
   const networks = [
     {
@@ -44,10 +50,10 @@ export default function VdpShareLinks({
       href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
     },
     {
-      key: "whatsapp",
-      label: "Share on WhatsApp",
-      icon: "bi-whatsapp",
-      href: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
+      key: "pinterest",
+      label: "Share on Pinterest",
+      icon: "bi-pinterest",
+      href: pinterestHref,
     },
     {
       key: "x",
