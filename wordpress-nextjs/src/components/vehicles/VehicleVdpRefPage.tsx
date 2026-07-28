@@ -17,6 +17,7 @@ import VdpKeyHighlights from "./VdpKeyHighlights";
 import VdpCmsOverview from "./VdpCmsOverview";
 import VdpDealerCommentsExpandable from "./VdpDealerCommentsExpandable";
 import VdpCarDetailsTabs from "./VdpCarDetailsTabs";
+import VdpShareLinks from "./VdpShareLinks";
 import { ORG_GOOGLE_MAPS_PLACE_URL, ORG_POSTAL_ADDRESS } from "@/lib/json-ld";
 
 const VehicleVdpRefInlineEnquiry = dynamic(
@@ -119,6 +120,8 @@ export interface VehicleVdpRefPageProps {
   dealerPhone: string;
   enquiryItem: VehicleEnquiryItemPayload;
   similarItems: SimilarCarItem[];
+  /** Canonical absolute URL of this listing, used by the share buttons. */
+  shareUrl: string;
   /** WordPress CMS overview (tag-substituted), shown above Key highlights. */
   cmsOverview?: string;
 }
@@ -141,6 +144,7 @@ export default function VehicleVdpRefPage({
   dealerPhone,
   enquiryItem,
   similarItems,
+  shareUrl,
   cmsOverview = "",
 }: VehicleVdpRefPageProps) {
   const heroSubtitle = buildHeroSubtitle(snapshot, ai.heroBadge);
@@ -214,6 +218,11 @@ export default function VehicleVdpRefPage({
               </header>
 
               <div className="cs-card p-3 mb-3 d-lg-none vdp-ref-mobile-price">
+                <VdpShareLinks
+                  title={headline}
+                  shareUrl={shareUrl}
+                  className="vdp-ref-share--compact mb-2"
+                />
                 <div className="d-flex align-items-start justify-content-between gap-3">
                   <div className="min-w-0">
                     <p className="vdp-ref-mobile-price__label mb-1 small text-uppercase fw-semibold text-secondary">
@@ -321,6 +330,11 @@ export default function VehicleVdpRefPage({
             <aside className="col-lg-4 vdp-ref-sidebar">
               <div>
                 <div className="cs-card p-4 mb-4 shadow-sm vdp-ref-price-card d-none d-lg-block">
+                  <VdpShareLinks
+                    title={headline}
+                    shareUrl={shareUrl}
+                    className="mb-3 pb-3 border-bottom"
+                  />
                   <div className="cs-price mb-1">{priceMain || "—"}</div>
                   <p className="vdp-ref-price-caption text-primary small fw-semibold mb-2">
                     {priceCaption}
