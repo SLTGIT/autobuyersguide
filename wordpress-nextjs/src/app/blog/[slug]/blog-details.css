@@ -43,7 +43,7 @@
   line-height: 1.75;
 }
 .cs-prose a {
-  color: var(--cs-primary-dark);
+  color: #ffffff;
   text-decoration: none;
 }
 .cs-answer-box,
