@@ -122,3 +122,17 @@
     align-self: flex-start;
   }
 }
+
+/* Blog article only */
+.cms-rendered-content .cs-prose h2 {
+  font-size: 26px;
+}
+
+.cms-rendered-content .cs-prose h3 {
+  font-size: 20px;
+}
+
+/* Blog article buttons */
+.cms-rendered-content .cs-prose .btn {
+  color: #fff !important;
+}
