@@ -1,0 +1,41 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+@use "sass:color";
+.section {
+    padding: 80px 0;
+    // background-color: #fff;
+
+    @include md {
+        padding: 50px 0;
+    }
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+
+    h2 {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 15px;
+
+        @include md {
+            font-size: 28px;
+        }
+    }
+
+    p {
+        color: var(--text-color);
+        font-size: 16px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+}
+
+.viewAll {
+    text-align: center;
+    margin-top: 40px;
+
+    
+}

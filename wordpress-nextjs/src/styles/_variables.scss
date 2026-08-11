@@ -1,31 +1,65 @@
-// Typography
-$font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
-$font-family-serif: 'Georgia', serif;
+@use "sass:color";
+@use "sass:map";
 
-// Colors
-$color-primary: var(--primary, #fe0009);
-$color-primary-dark: var(--primary-darkened, #b20006);
-$color-secondary: var(--secondary, #6c757d);
-$color-accent: var(--warning, #ffc107);
+// -----------------------------------------------------------------------------
+// Responsive Breakpoints
+// -----------------------------------------------------------------------------
+$screen-sm-min: 575px !default;
+$screen-md-min: 767px !default;
+$screen-lg-min: 991px !default;
+$screen-xl-min: 1200px !default;
 
-$color-text-main: var(--grey900, #212529);
-$color-text-muted: var(--grey600, #6c757d);
-$color-bg-light: var(--light, #f8f9fa);
-$color-white: var(--white, #ffffff);
-$color-black: var(--black, #000000);
-$color-dark: var(--dark, #343a40);
-$color-border: var(--grey300, #dee2e6);
-$border-radius: var(--border-radius, 0.25rem);
+// -----------------------------------------------------------------------------
+// Color Palette Map
+// -----------------------------------------------------------------------------
+// Statewide Auto Group — teal (pin + “auto group”) + near-black wordmark
+$colors: (
+    "primary": rgb(20, 81, 181),
+    "secondary": #1a1a1a,
+    "light": #f9f9f9,
+    "white": #ffffff,
+    "text": #3d3d3d,
+    "dark": #0a0a0a,
+    "accent-1": #f5a623,
+    "accent-2": #8a1fff,
+    "info": #007bff,
+    "success": #28a745
+);
 
-// Breakpoints
-$breakpoint-sm: 640px;
-$breakpoint-md: 768px;
-$breakpoint-lg: 1024px;
-$breakpoint-xl: 1280px;
+$cs-primary: #2a6d75;
+$cs-primary-dark: #1f5c64;
+$cs-ink: #1e2732;
+$cs-muted: #5a6570;
+$cs-bg: #f3f7fb;
+$cs-card: #ffffff;
+$cs-line: #dbe6f2;
+$cs-accent: #2a6d75;
 
-// Spacing
-$spacing-unit: 1rem;
-$spacing-sm: $spacing-unit * 0.5;
-$spacing-md: $spacing-unit;
-$spacing-lg: $spacing-unit * 1.5;
-$spacing-xl: $spacing-unit * 2;
+// Fallback variables for backward compatibility if needed
+$color-primary: map.get($colors, "primary");
+$color-primary-dark: color.adjust($color-primary, $lightness: -10%);
+$color-secondary: map.get($colors, "secondary");
+$color-text: map.get($colors, "text");
+$color-white: map.get($colors, "white");
+$color-dark: map.get($colors, "dark");
+$color-light: map.get($colors, "light");
+
+// -----------------------------------------------------------------------------
+// Generate Global CSS Variables
+// -----------------------------------------------------------------------------
+:root {
+  --cs-primary: #2a6d75;
+  --cs-primary-dark: #1f5c64;
+  --cs-ink: #1e2732;
+  --cs-muted: #5a6570;
+  --cs-bg: #f3f7fb;
+  --cs-card: #ffffff;
+  --cs-line: #dbe6f2;
+  --cs-accent: #2a6d75;
+  --bs-primary: #2a6d75;
+  --bs-primary-rgb: 42, 109, 117;
+  --bs-secondary: #5a6570;
+  --bs-secondary-rgb: 90, 101, 112;
+  --bs-link-color: #2a6d75;
+  --bs-link-hover-color: #1f5c64;
+}

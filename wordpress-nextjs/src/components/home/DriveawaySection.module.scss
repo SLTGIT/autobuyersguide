@@ -1,0 +1,148 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+$driveaway-bg: #f9f8f6;
+$driveaway-gap: 1rem;
+$driveaway-radius: 1rem;
+
+.section {
+  padding: 5rem 0;
+  background-color: $driveaway-bg;
+
+  @include md {
+    padding: 3.25rem 0;
+  }
+}
+
+.header {
+  max-width: 42rem;
+  margin: 0 auto 3rem;
+  text-align: center;
+
+  @include md {
+    margin-bottom: 2rem;
+  }
+}
+
+.title {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--dark-color, #1a1a1a);
+}
+
+.description {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--text-color, #4a4a4a);
+
+  strong {
+    font-weight: 700;
+    color: inherit;
+  }
+}
+
+.carousel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  outline: none;
+}
+
+.arrow {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--cs-primary, #{$cs-primary});
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    opacity: 0.75;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--cs-primary, #{$cs-primary});
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+
+  @include md {
+    width: 2rem;
+    font-size: 1.5rem;
+  }
+}
+
+.arrowPrev {
+  margin-right: 0.25rem;
+}
+
+.arrowNext {
+  margin-left: 0.25rem;
+}
+
+.scroller {
+  flex: 1 1 auto;
+  display: flex;
+  gap: $driveaway-gap;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
+.card {
+  flex: 0 0 calc((100% - #{$driveaway-gap} * 4) / 5);
+  scroll-snap-align: start;
+  min-width: 0;
+
+  @media (max-width: 1199.98px) {
+    flex: 0 0 calc((100% - #{$driveaway-gap} * 3) / 4);
+  }
+
+  @media (max-width: 991.98px) {
+    flex: 0 0 calc((100% - #{$driveaway-gap} * 2) / 3);
+  }
+
+  @media (max-width: 767.98px) {
+    flex: 0 0 calc((100% - #{$driveaway-gap}) / 2);
+  }
+
+  @media (max-width: 575.98px) {
+    flex: 0 0 72%;
+  }
+}
+
+.cardImageWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: $driveaway-radius;
+  overflow: hidden;
+  background: #e8e6e3;
+}
+
+.cardImage {
+  object-fit: cover;
+}

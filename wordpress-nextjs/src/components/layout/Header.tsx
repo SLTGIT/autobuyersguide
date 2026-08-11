@@ -1,119 +1,89 @@
-import Link from 'next/link';
-import { getMenuByName, getNavigationPages, getSiteSettings } from '@/lib/wordpress';
-import MobileMenu from './MobileMenu';
-import Image from 'next/image';
+import "./Header.scss";
+import HeaderNavbar from "./HeaderNavbar";
+import GoogleRatingStars from "@/components/GoogleRatingStars";
+import { CAR_SALES_BRISBANE_GOOGLE_MAPS_URL, formatReviewSummaryLine, getGoogleReviews } from "@/lib/google-reviews";
+import { getCustomSettings } from "@/lib/wordpress/api/settings";
+
+const FALLBACK_SCORE = 4.8;
+const FALLBACK_LINE = "4.8 RATING OUT OF 240 REVIEWS";
+const FALLBACK_FACEBOOK_URL = "https://www.facebook.com/share/1DREXJCBhb/?mibextid=wwXIfr";
+const FALLBACK_INSTAGRAM_URL =
+  "https://www.instagram.com/carsalesbrisbaneau?igsh=MTg5bmtic2hjdnNzMg%3D%3D&utm_source=qr";
+const FALLBACK_TIKTOK_URL = "https://www.tiktok.com/@carsalesbrisbane?_r=1&_t=ZS-95OLtLR1kfQ";
 
 export default async function Header() {
-  // Fetch menu and site settings from WordPress
-  let menuItems: any[] = [];
-  let siteTitle = 'WordPress Next.js';
-  let sitelogo = '';
-  let settings: { title: string; description: string; url: string } | null = null;
-
-  try {
-    const [menu, fetchedSettings] = await Promise.all([
-      getMenuByName('main-menu'),
-      getSiteSettings()
-    ]);
-
-    settings = fetchedSettings;
-
-    if (settings?.title) {
-      siteTitle = settings.title;
-    }
-
-    // If menu exists, use it
-    if (menu && menu.items && menu.items.length > 0) {
-      menuItems = menu.items;
-    } else {
-      // Fallback: Use pages as navigation
-      const pages = await getNavigationPages();
-      menuItems = [
-        { title: 'Home', url: '/', ID: 0 },
-        ...pages.map(page => ({
-          title: page.title.rendered,
-          url: `/${page.slug}`,
-          ID: page.id
-        })),
-        { title: 'Blog', url: '/blog', ID: 9999 }
-      ];
-    }
-  } catch (error) {
-    console.error('Error fetching header data:', error);
-    // Customize fallback menu
-    menuItems = [
-      { title: 'Home', url: '/', ID: 1 },
-      { title: 'About', url: '/about', ID: 2 },
-      { title: 'Blog', url: '/blog', ID: 3 },
-      { title: 'Contact', url: '/contact', ID: 4 }
-    ];
-  }
-
-  // Normalize URLs centrally
-  const cmsUrl = settings?.url || process.env.NEXT_PUBLIC_WORDPRESS_API_URL?.split('/wp-json')[0] || '';
-
-  const normalizedMenuItems = menuItems.map(item => {
-    let href = item.url || '/';
-
-    // Only normalize internal links that start with the CMS URL
-    if (cmsUrl && href.startsWith(cmsUrl)) {
-      href = href.replace(cmsUrl, '');
-      if (!href.startsWith('/')) href = '/' + href;
-    }
-
-    return {
-      ...item,
-      url: href
-    };
-  });
+  const summary = await getGoogleReviews();
+  const settings = await getCustomSettings();
+  const score = summary?.averageScore ?? FALLBACK_SCORE;
+  const summaryLine = summary ? formatReviewSummaryLine(summary) : FALLBACK_LINE;
+  const facebookUrl = settings?.facebook_url || FALLBACK_FACEBOOK_URL;
+  const instagramUrl = settings?.instagram_url || FALLBACK_INSTAGRAM_URL;
+  const tiktokUrl = settings?.tiktok_url || FALLBACK_TIKTOK_URL;
+  const youtubeUrl = settings?.youtube_url || "";
+  const xUrl = settings?.x_url || "";
+  const linkedinUrl = settings?.linkedin_url || "";
 
   return (
-    <header className="header">
-      <nav className="header__nav">
-        {/* Logo */}
-        <Link href="/" className="header__logo">
-          <Image
-            src="/assets/images/logo.png"
-            alt={siteTitle}
-            width={160}
-            height={40}
-            priority
-            style={{ height: '40px', width: 'auto' }}
-          />
-        </Link>
-
-        {/* Desktop Menu */}
-        <ul className="header__menu">
-          {normalizedMenuItems.map((item) => {
-            const isExternal = item.url.startsWith('http');
-            const href = item.url;
-
-            return (
-              <li key={item.ID}>
-                {isExternal ? (
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="header__link"
-                    dangerouslySetInnerHTML={{ __html: item.title }}
-                  />
-                ) : (
-                  <Link
-                    href={href}
-                    className="header__link"
-                  >
-                    <span dangerouslySetInnerHTML={{ __html: item.title }} />
-                  </Link>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-
-        {/* Mobile Menu */}
-        <MobileMenu menuItems={normalizedMenuItems} />
-      </nav>
+    <header className="sticky-top cs-header">
+      <div className="cs-topbar py-0 py-3 py-lg-0">
+        <div className="container d-flex flex-wrap justify-content-center justify-content-lg-end align-items-center gap-3 gap-lg-4 ">
+          <a
+            className="d-inline-flex align-items-center gap-2 text-decoration-none"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={CAR_SALES_BRISBANE_GOOGLE_MAPS_URL}
+            aria-label={`Google reviews: ${summaryLine}`}
+          >
+            <GoogleRatingStars score={score} />
+            <span className="cs-topbar__review-line">{summaryLine}</span>
+          </a>
+          <a
+            className="d-inline-flex align-items-center gap-2"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={CAR_SALES_BRISBANE_GOOGLE_MAPS_URL}
+          >
+            <i className="bi bi-geo-alt-fill"></i>
+            <span>56 Freeth St W, Ormiston QLD 4160, Australia</span>
+          </a>
+          <a className="d-inline-flex align-items-center gap-2" href="tel:0418908870">
+            <i className="bi bi-telephone-fill"></i>
+            <span>0418908870</span>
+          </a>
+          <span className="d-inline-flex align-items-center gap-3">
+            <a href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+              <i className="bi bi-facebook"></i>
+            </a>
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <i className="bi bi-instagram"></i>
+            </a>
+            <a href={tiktokUrl} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <i className="bi bi-tiktok"></i>
+            </a>
+            {youtubeUrl ? (
+              <a href={youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                <i className="bi bi-youtube"></i>
+              </a>
+            ) : null}
+            {xUrl ? (
+              <a href={xUrl} target="_blank" rel="noopener noreferrer" aria-label="X">
+                <i className="bi bi-twitter-x"></i>
+              </a>
+            ) : null}
+            {linkedinUrl ? (
+              <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                <i className="bi bi-linkedin"></i>
+              </a>
+            ) : null}
+          </span>
+        </div>
+      </div>
+      <HeaderNavbar />
     </header>
   );
 }

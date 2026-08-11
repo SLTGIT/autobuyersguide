@@ -1,16 +1,18 @@
-import Header from './Header';
-import Footer from './Footer';
+import Header from "./Header";
+import Footer from "./Footer";
+import TextUsWidget from "@/components/text-us/TextUsWidget";
 
 interface LayoutProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
-    return (
-        <div className="flex flex-col min-h-screen">
-            <Header />
-            <main className="grow">{children}</main>
-            <Footer />
-        </div>
-    );
+  return (
+    <div className="d-flex flex-column min-vh-100">
+      <Header />
+      <main className="flex-grow-1">{children}</main>
+      <Footer />
+      <TextUsWidget />
+    </div>
+  );
 }

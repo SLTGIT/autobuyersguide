@@ -1,0 +1,40 @@
+/* .cs-page-hero {
+  background: var(--cs-primary);
+} */
+.cs-panel,
+.cs-card {
+  border: 1px solid var(--cs-line);
+  border-radius: 1.5rem;
+  background: var(--cs-card);
+}
+.cs-pill {
+  border-radius: 999px;
+}
+.cs-hero-chip {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+.cs-title-tight {
+  letter-spacing: -0.03em;
+}
+.cs-rating-star {
+  color: #ffb400;
+}
+.cs-trust-icon {
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: #eaf3ff;
+  color: var(--cs-primary);
+  margin-bottom: 0.9rem;
+  font-size: 1.15rem;
+}
+.cs-footer {
+  background: #122033;
+}
+.cs-accent-list li {
+  margin-bottom: 0.75rem;
+}

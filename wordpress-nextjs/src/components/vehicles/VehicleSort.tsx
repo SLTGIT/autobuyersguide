@@ -32,7 +32,7 @@ export default function VehicleSort({ currentSort, currentOrder }: VehicleSortPr
             params.set('order', 'ASC');
         }
 
-        router.push(`/vehicles?${params.toString()}`);
+        router.push(`/search?${params.toString()}`);
     };
 
     const currentValue = `${currentSort}-${currentOrder.toLowerCase()}`;

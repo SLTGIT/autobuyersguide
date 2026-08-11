@@ -1,33 +1,95 @@
-import { Metadata } from 'next';
-import { WPPost, WPPage } from '@/types/wordpress';
+import { Metadata } from "next";
+import { stripHtml } from "@/lib/json-ld";
+import { WPPost, WPPage } from "@/types/wordpress";
+import type { WPSeoACFFields } from "./acf";
 
-export function getMetadata(item: WPPost | WPPage, fallbackTitle?: string): Metadata {
+function readAcfSeo(item: WPPost | WPPage): {
+  title: string;
+  description: string;
+} {
+  const acf = item.acf;
+  if (!acf || typeof acf !== "object" || Array.isArray(acf)) {
+    return { title: "", description: "" };
+  }
+  const fields = acf as WPSeoACFFields;
+  const title = stripHtml(String(fields.meta_title ?? "")).trim();
+  const description = stripHtml(String(fields.meta_description ?? "")).trim();
+  return { title, description };
+}
+
+/** ACF meta title + meta description when present on the REST item. */
+export function getAcfSeoCopy(
+  item: WPPost | WPPage,
+): { title: string; description: string } | null {
+  const { title, description } = readAcfSeo(item);
+  if (!title && !description) return null;
+  return { title, description };
+}
+
+function featuredOgImages(
+  item: WPPost | WPPage,
+  pageTitle: string,
+): { url: string; width?: number; height?: number; alt: string }[] {
+  const media = item._embedded?.["wp:featuredmedia"]?.[0];
+  const url =
+    typeof media?.source_url === "string" ? media.source_url.trim() : "";
+  if (!url) return [];
+  const details = media?.media_details as
+    | { width?: number; height?: number }
+    | undefined;
+  const alt =
+    typeof media?.alt_text === "string" && media.alt_text.trim()
+      ? media.alt_text.trim()
+      : pageTitle;
+  return [
+    {
+      url,
+      width: details?.width,
+      height: details?.height,
+      alt,
+    },
+  ];
+}
+
+export function getMetadata(
+  item: WPPost | WPPage,
+  fallbackTitle?: string,
+): Metadata {
   if (!item) {
-    return { title: fallbackTitle || 'Not Found' };
+    return { title: fallbackTitle || "Not Found" };
   }
 
-  const yoast = item.yoast_head_json;
-  
-  if (yoast) {
+  const pageTitle = stripHtml(item.title.rendered);
+  const excerptPlain = stripHtml(item.excerpt?.rendered ?? "").slice(0, 160);
+  const { title: acfTitle, description: acfDescription } = readAcfSeo(item);
+  const ogImages = featuredOgImages(item, pageTitle);
+
+  if (acfTitle || acfDescription) {
     return {
-      title: yoast.title || item.title.rendered,
-      description: yoast.og_description || yoast.description || item.excerpt?.rendered?.replace(/<[^>]*>/g, '').slice(0, 160),
+      title: acfTitle || pageTitle,
+      description:
+        acfDescription ||
+        excerptPlain ||
+        `Read more about ${pageTitle}`,
       openGraph: {
-        title: yoast.og_title || yoast.title,
-        description: yoast.og_description || yoast.description,
-        images: yoast.og_image ? yoast.og_image.map((img: any) => ({
-          url: img.url,
-          width: img.width,
-          height: img.height,
-          alt: item.title.rendered
-        })) : []
-      }
+        title: acfTitle || pageTitle,
+        description: acfDescription || excerptPlain || undefined,
+        images: ogImages,
+      },
     };
   }
 
-  // Fallback to basic fields
   return {
-    title: `${item.title.rendered} | Auto Buyers Guide`,
-    description: item.excerpt?.rendered?.replace(/<[^>]*>/g, '').slice(0, 160) || `Read more about ${item.title.rendered}`,
+    title: `${pageTitle} | Car Sales Brisbane`,
+    description: excerptPlain || `Read more about ${pageTitle}`,
+    ...(ogImages.length
+      ? {
+          openGraph: {
+            title: pageTitle,
+            description: excerptPlain || undefined,
+            images: ogImages,
+          },
+        }
+      : {}),
   };
 }

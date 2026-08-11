@@ -1,0 +1,32 @@
+/* Shared WordPress CMS content — layout stability (CLS) + mobile overflow */
+.cms-rendered-content {
+  img {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+  }
+
+  iframe,
+  embed,
+  video {
+    max-width: 100%;
+  }
+
+  figure {
+    margin: 0 0 1rem;
+  }
+
+  .wp-block-image img,
+  .aligncenter,
+  .alignleft,
+  .alignright {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Hero sections from WP often use full-bleed rows */
+  .row,
+  [class*="col-"] {
+    min-width: 0;
+  }
+}

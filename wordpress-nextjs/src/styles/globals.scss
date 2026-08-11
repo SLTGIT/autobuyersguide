@@ -1,21 +1,33 @@
-@import "bootstrap/dist/css/bootstrap.min.css";
-@import "theme";
-@import "variables";
-@import "base";
-@import "utilities";
+// Bootstrap is imported in layout.tsx
 
-// Global utility classes using variables
+@use "variables";
+@use "mixins";
+@use "base/reboot";
+@use "base";
+@use "utilities";
+
+// Dealer inventory + vehicle detail (search, /cars/[slug])
+@use "pages/vehicles";
+
+// Components
+// @use "components/header";
+@use "components/megamenu";
+// @use "components/footer";
+@use "components/button";
+
+// Pages
+// @use "pages/home";
 .text-primary {
-  color: $color-primary;
+  color: var(--primary-color);
 }
 
 .bg-primary {
-  background-color: $color-primary;
+  background-color: var(--primary-color);
 }
 
 .btn-primary {
-  background-color: var(--primary, $color-primary);
-  color: var(--white, #ffffff);
+  background-color: var(--cs-primary);
+  color: var(--cs-card);
   padding: 0.75rem 1.5rem;
   border-radius: var(--border-radius, 0.25rem);
   font-weight: 600;
@@ -24,20 +36,57 @@
   cursor: pointer;
 
   &:hover {
-    background-color: var(--primary-darkened, $color-primary-dark);
+    background-color: var(--cs-primary-dark) !important;
+    color: var(--cs-card) !important;
   }
 }
 
-// Components
-@import "components/card";
-@import "components/header";
-@import "components/footer";
+.text-primary {
+  color: var(--cs-primary) !important;
+}
 
-// Pages
-@import "pages/blog";
-@import "pages/post-detail";
-@import "pages/cms-page";
-@import "pages/vehicles";
-@import "pages/home";
-@import "pages/contact";
-@import "pages/about";
+.text-secondary {
+  color: var(--cs-muted) !important;
+}
+
+.btn-outline-primary {
+  border-color: var(--cs-primary) !important;
+  color: var(--cs-primary) !important;
+  &:hover {
+    background-color: var(--cs-primary) !important;
+    color: var(--cs-card) !important;
+  }
+}
+
+.btn:hover{
+  border-color: rgb(176, 216, 195) !important;
+}
+
+// Pages will be migrated similarly
+// @import "pages/blog"; 
+// ...
+
+.dropdown-item.active, .dropdown-item:active {
+  background-color: var(--cs-primary) !important;
+}
+
+.cs-rating-star {
+  color: #ffb400;
+}
+
+.inventory-card-detail-btn:hover, .inventory-card-detail-btn:active, .inventory-card-detail-btn:focus {
+  color: #fff !important;
+}
+
+.cs-cta-strong {
+  border: 2px solid #eff2f8;
+  font-weight: 700;
+  padding: .9rem 1.5rem !important;
+  font-size: .9rem !important;
+}
+
+.btn-outline-primary:active {
+  background-color: unset !important;
+  color: var(--cs-primary) !important;
+  border-color: var(--cs-primary) !important;
+}

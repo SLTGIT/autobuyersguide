@@ -1,0 +1,99 @@
+/* Headless Next.js Preview - Admin Styles */
+
+.hnp-settings-container {
+    max-width: 900px;
+    margin-top: 20px;
+}
+
+.hnp-settings-container .form-table th {
+    padding: 20px 10px 20px 0;
+    width: 200px;
+}
+
+.hnp-settings-container .form-table td {
+    padding: 20px 10px;
+}
+
+.hnp-settings-container input[type="url"],
+.hnp-settings-container input[type="text"] {
+    width: 100%;
+    max-width: 500px;
+}
+
+.hnp-settings-container .button {
+    margin-left: 10px;
+}
+
+.hnp-settings-container fieldset label {
+    display: block;
+    margin-bottom: 10px;
+    padding: 5px 0;
+}
+
+.hnp-settings-container fieldset code {
+    margin-left: 5px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.hnp-info-section {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 30px;
+}
+
+.hnp-info-section h2 {
+    margin-top: 0;
+    color: #23282d;
+}
+
+.hnp-info-section h3 {
+    color: #555;
+    margin-top: 20px;
+}
+
+.hnp-info-section pre {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 13px;
+}
+
+.hnp-info-section code {
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.hnp-info-section ul,
+.hnp-info-section ol {
+    margin-left: 20px;
+}
+
+.hnp-info-section li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+/* Admin Bar Preview Link */
+#wp-admin-bar-hnp-preview .ab-item {
+    color: #00a0d2 !important;
+}
+
+#wp-admin-bar-hnp-preview .ab-item:hover {
+    color: #0073aa !important;
+}
+
+/* Success Messages */
+.hnp-messages.updated {
+    border-left-color: #46b450;
+}
+
+.hnp-messages.error {
+    border-left-color: #dc3232;
+}

@@ -1,0 +1,92 @@
+/* .cs-page-hero {
+  background: var(--cs-primary);
+} */
+
+/* Compact SRP hero — short height, capped image (full-size img was driving section height) */
+.search-page-hero-title {
+  /* font-size: clamp(1.35rem, 3.2vw, 1.85rem); */
+  line-height: 1.2;
+}
+
+.search-page-hero-lead {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.95;
+  /* max-width: 36rem; */
+}
+
+@media (min-width: 992px) {
+  .search-page-hero-lead {
+    font-size: 1rem;
+  }
+}
+
+/* Hero card image — tall enough to match SRP mockup (ute / pickup framed in card) */
+.search-page-hero-media {
+  height: 200px;
+  background: #e8eef5;
+  overflow: hidden;
+}
+
+@media (min-width: 576px) {
+  .search-page-hero-media {
+    height: 220px;
+  }
+}
+
+@media (min-width: 992px) {
+  .search-page-hero-media {
+    height: 240px;
+  }
+}
+
+.search-page-hero-img {
+  object-fit: cover;
+  object-position: center 48%;
+}
+
+.search-page-hero-card-body {
+  padding: 1rem 1.25rem !important;
+}
+
+.cs-pill {
+  border-radius: 999px;
+}
+
+.cs-hero-chip {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.cs-card img {
+  object-fit: cover;
+  height: 220px;
+}
+
+.cs-srp-card img {
+  height: 180px;
+}
+
+/* SRP vehicle cards — larger title & View details CTA */
+.vehicles-page.inventory-srp .inventory-card-headline {
+  font-size: 1.125rem;
+  line-height: 1.3;
+}
+
+.vehicles-page.inventory-srp .inventory-card-headline--list {
+  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+  line-height: 1.25;
+}
+
+.vehicles-page.inventory-srp .inventory-card-detail-btn {
+  font-size: 0.9375rem;
+  padding: 0.6rem 1.15rem;
+}
+
+.vehicles-page.inventory-srp .inventory-card-detail-btn--outline {
+  font-size: 1.0625rem !important;
+}
+
+.vehicles-page.inventory-srp .inventory-card-detail-btn--outline .inventory-card-detail-arrow {
+  font-size: 1.15rem;
+}

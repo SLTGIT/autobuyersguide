@@ -1,108 +1,93 @@
-import Link from 'next/link';
-import { getMenuByLocation, getSiteSettings, getNavigationPages } from '@/lib/wordpress';
+import Link from "next/link";
+import Image from "next/image";
+import styles from "./Footer.module.scss";
 
-export default async function Footer() {
+export default function Footer() {
   const currentYear = new Date().getFullYear();
-  
-  // Fetch footer menu and site settings from WordPress
-  let footerMenuItems: any[] = [];
-  let siteTitle = 'WordPress Next.js';
-  let siteDescription = 'A modern Next.js application powered by WordPress REST API. Built with TypeScript and Tailwind CSS for optimal performance.';
-
-  try {
-    const [footerMenu, settings] = await Promise.all([
-      getMenuByLocation('footer_menu'),
-      getSiteSettings()
-    ]);
-
-    if (settings?.title) {
-      siteTitle = settings.title;
-    }
-    if (settings?.description) {
-      siteDescription = settings.description;
-    }
-
-    // If footer menu exists, use it
-    if (footerMenu && footerMenu.items && footerMenu.items.length > 0) {
-      footerMenuItems = footerMenu.items;
-    } else {
-      // Fallback: Use pages as footer navigation
-      const pages = await getNavigationPages();
-      footerMenuItems = [
-        { title: 'Home', url: '/', ID: 0 },
-        ...pages.slice(0, 4).map(page => ({
-          title: page.title.rendered,
-          url: `/${page.slug}`,
-          ID: page.id
-        }))
-      ];
-    }
-  } catch (error) {
-    console.error('Error fetching footer data:', error);
-    // Default fallback menu
-    footerMenuItems = [
-      { title: 'Home', url: '/', ID: 1 },
-      { title: 'About', url: '/about', ID: 2 },
-      { title: 'Blog', url: '/blog', ID: 3 },
-      { title: 'Contact', url: '/contact', ID: 4 }
-    ];
-  }
 
   return (
-    <footer className="footer">
-      <div className="footer__content">
-        {/* About Section */}
-        <div className="footer__section">
-          <h3>{siteTitle}</h3>
-          <p>{siteDescription}</p>
-        </div>
-
-        {/* Quick Links */}
-        <div className="footer__section">
-          <h3>Quick Links</h3>
-          <ul className="footer__list">
-            {footerMenuItems.map((item) => {
-              const isExternal = item.url?.startsWith('http');
-              const href = isExternal ? item.url : (item.url || '/');
-
-              return (
-                <li key={item.ID}>
-                  {isExternal ? (
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="transition-colors"
-                      dangerouslySetInnerHTML={{ __html: item.title }}
-                    />
-                  ) : (
-                    <Link 
-                      href={href} 
-                      className="transition-colors"
-                    >
-                      <span dangerouslySetInnerHTML={{ __html: item.title }} />
-                    </Link>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
-        {/* Contact Info */}
-        <div className="footer__section">
-          <h3>Contact</h3>
-          <ul className="footer__contact">
-            <li>Email: info@example.com</li>
-            <li>Phone: +1 234 567 890</li>
-            <li>Address: 123 Main St, City, Country</li>
-          </ul>
+    <footer className=" text-white" style={{ background: "#122033" }}>
+      <div className="container py-5">
+        <div className="row g-4">
+          <div className="col-lg-5">
+            <h3 className="h5 fw-bold">Our Identity</h3>
+            <p className="text-white-50 mb-1">
+              Car Sales Brisbane is an online sales channel. We specialize in
+              vehicle sourcing, onsite finance, and Queensland-wide delivery.
+            </p>
+            <p className="text-white-50 mb-0">QLD Dealer License: 4065904</p>
+            <p className={`${styles.poweredBy} text-white-50 mb-0 mt-3`}>
+              Powered and maintained by{" "}
+              <a href="https://dealersales.co" target="_blank" rel="noopener noreferrer" className={styles.provider}>Dealer Sales LLC</a>
+            </p>
+          </div>
+          <div className="col-lg-1"></div>
+          <div className="col-lg-3">
+            <h3 className="h5 fw-bold">Used Cars</h3>
+            <ul className={`${styles.footerNav} mb-0`}>
+              <li>
+                <Link href="/search/4x4" className={styles.footerLink}>
+                  Used 4x4 Cars for Sale
+                </Link>
+              </li>
+              <li>
+                <Link href="/search/utility" className={styles.footerLink}>
+                  Used Utility Cars for Sale
+                </Link>
+              </li>
+              <li>
+                <Link href="/search/suv" className={styles.footerLink}>
+                  Used SUVs for Sale
+                </Link>
+              </li>
+              <li>
+                <Link href="/search/hatchback" className={styles.footerLink}>
+                  Used Hatchback Cars for Sale
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div className="col-lg-3">
+            <h3 className="h5 fw-bold">Company</h3>
+            <ul className={`${styles.footerNav} mb-0`}>
+              <li>
+                <Link href="/about-us" className={styles.footerLink}>
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className={styles.footerLink}>
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy-policy" className={styles.footerLink}>
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms-of-service" className={styles.footerLink}>
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href="/finance-disclaimer" className={styles.footerLink}>
+                  Finance Disclaimer
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
-
-      {/* Bottom Bar */}
-      <div className="footer__bottom">
-        <p>&copy; {currentYear} {siteTitle}. All rights reserved.</p>
+      <div className="copyright-text">
+        <div className="copyright-text-container">
+          <div className="copyright-text-content text-center">
+            <p className=" mb-1 text-white-50 fw-normal" suppressHydrationWarning>
+              Car Sales Brisbane - Car Dealership in Australia - Copyright
+              &copy; {currentYear} All rights reserved.
+            </p>
+          </div>
+        </div>
       </div>
     </footer>
   );

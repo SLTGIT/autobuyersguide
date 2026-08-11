@@ -1,4 +1,12 @@
-@import "variables";
+@use "variables" as *;
+
+// START FIX: Helper variables for migration
+$border-radius: 6px;
+$color-text-muted: #5a6570;
+$color-text-main: var(--dark-color);
+$breakpoint-md: $screen-md-min;
+$spacing-xl: 3rem;
+// END FIX
 
 // Alerts
 .alert {

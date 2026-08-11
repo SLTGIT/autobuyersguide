@@ -1,0 +1,139 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useRef } from "react";
+
+export interface SimilarCarItem {
+  slug: string;
+  /** Full dealer title (fallback + image alt). */
+  title: string;
+  year: number;
+  make: string;
+  model: string;
+  image: string | null;
+  condition: string;
+  price: string;
+  odometer: string | null;
+  location: string;
+  tags: string[];
+}
+
+function similarCardHeadline(car: SimilarCarItem): string {
+  const y = car.year != null && car.year > 0 ? String(car.year) : "";
+  const mk = car.make?.trim();
+  const md = car.model?.trim();
+  const parts = [y, mk, md].filter(Boolean);
+  if (parts.length) return parts.join(" ");
+  return car.title;
+}
+
+interface VehicleSimilarCarouselProps {
+  items: SimilarCarItem[];
+  /** Narrower cards + layout tweaks when rendered in the VDP right sidebar. */
+  variant?: "carousel" | "sidebar";
+}
+
+export default function VehicleSimilarCarousel({
+  items,
+  variant = "carousel",
+}: VehicleSimilarCarouselProps) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const isSidebar = variant === "sidebar";
+
+  const scrollBy = (dir: -1 | 1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>(".vdp-similar-card");
+    const gap = isSidebar ? 12 : 16;
+    const step = card ? card.offsetWidth + gap : el.clientWidth * 0.85;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
+
+  if (items.length === 0) return null;
+
+  return (
+    <section
+      className={`vdp-similar${isSidebar ? " vdp-similar--sidebar" : ""}`}
+      aria-labelledby="vdp-similar-heading"
+    >
+      <div className="vdp-similar-head">
+        <h2 id="vdp-similar-heading" className="vdp-similar-title">
+          Similar cars in stock
+        </h2>
+        <div className="vdp-similar-nav">
+          <button
+            type="button"
+            className="vdp-carousel-btn"
+            onClick={() => scrollBy(-1)}
+            aria-label="Previous similar vehicle"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            className="vdp-carousel-btn"
+            onClick={() => scrollBy(1)}
+            aria-label="Next similar vehicle"
+          >
+            ›
+          </button>
+        </div>
+      </div>
+      <div className="vdp-similar-scroller" ref={scrollerRef} role="list">
+        {items.map((car) => (
+          <div key={car.slug} className="vdp-similar-card" role="listitem">
+            <Link href={`/cars/${car.slug}`} className="vdp-similar-card-link">
+              <div className="vdp-similar-card-media">
+                {car.image ? (
+                  <Image
+                    src={car.image}
+                    alt={similarCardHeadline(car)}
+                    width={320}
+                    height={220}
+                    className="vdp-similar-card-img"
+                    sizes="(max-width: 768px) 72vw, 280px"
+                    loading="lazy"
+                    quality={72}
+                  />
+                ) : (
+                  <div className="vdp-similar-card-placeholder">No image</div>
+                )}
+              </div>
+              <div className="vdp-similar-card-body">
+                <div className="vdp-similar-card-title-block">
+                  <h3 className="vdp-similar-card-title">
+                    {similarCardHeadline(car)}
+                  </h3>
+                </div>
+                <div className="vdp-similar-card-tags-wrap">
+                  {car.tags.length > 0 ? (
+                    <ul className="vdp-similar-card-tags mb-1">
+                      {car.tags.slice(0, 4).map((t, ti) => (
+                        <li key={`${ti}-${t}`}>{t}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+                <div className="vdp-similar-card-meta">
+                  <div className="vdp-similar-card-km-slot mb-1">
+                    {car.odometer ? (
+                      <p className="vdp-similar-card-km">
+                        <i
+                          className="bi bi-speedometer2 vdp-similar-card-km-icon"
+                          aria-hidden
+                        />
+                        <span>{car.odometer}</span>
+                      </p>
+                    ) : null}
+                  </div>
+                  <p className="vdp-similar-card-price">{car.price || "—"}</p>
+                </div>
+              </div>
+            </Link>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
