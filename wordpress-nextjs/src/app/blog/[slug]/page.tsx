@@ -20,7 +20,7 @@ import {
 import "./blog-details.css";
 import { BlogPostScrollToBreadcrumb } from "./BlogPostScrollToBreadcrumb";
 
-export const revalidate = 3600;
+export const revalidate = 0; // Disabled for testing CSS changes
 
 interface BlogPostProps {
   params: Promise<{
