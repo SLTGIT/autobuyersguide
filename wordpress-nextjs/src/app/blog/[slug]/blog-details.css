@@ -139,3 +139,10 @@
 .cms-rendered-content .button {
   color: #fff !important;
 }
+
+/* Blog article links only — this file is imported solely by blog/[slug]/page.tsx,
+   and the .cms-rendered-content prefix keeps it inside the article body. */
+.cms-rendered-content .cs-prose a {
+  color: #ffffff !important;
+  text-decoration: none;
+}
