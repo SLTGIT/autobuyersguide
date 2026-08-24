@@ -804,7 +804,9 @@ export function vehicleJsonLdFromInventory(
   const node: Record<string, unknown> = {
     "@type": "Vehicle",
     "@id": `${productUrl}#vehicle`,
-    name: listing.title,
+    // Headline rather than the packed feed string, so the variant is the part
+    // that surfaces in rich results. Falls back to the raw title.
+    name: listing.headline || listing.title,
     description,
     url: productUrl,
     category: categoryLabel,

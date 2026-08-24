@@ -4,8 +4,8 @@ import {
   vehicleCardListPrimaryHeadline,
   vehicleCardListSubtitleLine,
   vehicleCardFeatureTags,
-  vehicleCardOdometerLabel,
 } from "@/lib/inventory/card-display";
+import { buildListingSpecRows } from "@/lib/inventory/vehicle-specs";
 import Link from "next/link";
 import Image from "next/image";
 import VehicleCardSave from "./VehicleCardSave";
@@ -27,11 +27,47 @@ export default function VehicleCard({
   const href = `/cars/${listing.slug}`;
   const imageAlt = vehicleCardHeadlineYearMakeModelTrim(listing);
   const isUsed = listing.condition.trim().toLowerCase() === "used";
-  const odoLabel = hideOdometer ? null : vehicleCardOdometerLabel(listing);
-  const odoSpec = hideOdometer ? "—" : (odoLabel ?? "—");
-  const fuelSpec = listing.fuel_type?.trim() || "—";
-  const transSpec = listing.transmission?.trim() || "—";
+  // Every spec the feed actually carries, in scan order. Rows without a value
+  // are already dropped, so a shorter grid means a sparser export — not a bug.
+  const specRows = buildListingSpecRows(listing).filter(
+    (row) => !(hideOdometer && row.key === "odometer"),
+  );
   const featureTags = vehicleCardFeatureTags(listing);
+
+  /**
+   * Rendered as a definition list so assistive tech reads
+   * "Transmission: Automatic" rather than an unexplained value.
+   */
+  const renderSpecs = (variant: "grid" | "list") => {
+    if (!specRows.length) return null;
+    const isList = variant === "list";
+    return (
+      <dl
+        className={`inventory-card-specs${isList ? " inventory-card-specs--list" : ""}`}
+        aria-label="Key specifications"
+      >
+        {specRows.map((row) => (
+          <div
+            key={row.key}
+            className={`inventory-card-spec${isList ? " inventory-card-spec--list" : ""}`}
+          >
+            <dt className="visually-hidden">{row.label}</dt>
+            <dd className="inventory-card-spec-body">
+              <i
+                className={`bi bi-${row.icon} inventory-card-spec-icon${
+                  isList ? " inventory-card-spec-icon--list" : ""
+                }`}
+                aria-hidden
+              />
+              <span className="inventory-card-spec-text inventory-card-spec-value">
+                {row.value}
+              </span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    );
+  };
 
   const articleClass = [
     "inventory-vehicle-card",
@@ -95,41 +131,7 @@ export default function VehicleCard({
             </Link>
           </div>
 
-          <div
-            className="inventory-card-specs inventory-card-specs--list"
-            aria-label="Key specifications"
-          >
-            <div className="inventory-card-spec inventory-card-spec--list">
-              <div className="d-flex align-items-center gap-2">
-                <i
-                  className="bi bi-speedometer2 inventory-card-spec-icon inventory-card-spec-icon--list"
-                  aria-hidden
-                />
-                {/* <span className="inventory-card-spec-label">Mileage</span> */}
-              </div>
-              <span className="inventory-card-spec-value">{odoSpec}</span>
-            </div>
-            <div className="inventory-card-spec inventory-card-spec--list">
-              <div className="d-flex align-items-center gap-2">
-              <i
-                className="bi bi-fuel-pump inventory-card-spec-icon inventory-card-spec-icon--list"
-                aria-hidden
-              />
-              {/* <span className="inventory-card-spec-label">Fuel type</span> */}
-              </div>
-              <span className="inventory-card-spec-value">{fuelSpec}</span>
-            </div>
-            <div className="inventory-card-spec inventory-card-spec--list">
-              <div className="d-flex align-items-center gap-2">
-              <i
-                className="bi bi-gear-wide-connected inventory-card-spec-icon inventory-card-spec-icon--list"
-                aria-hidden
-              />
-              {/* <span className="inventory-card-spec-label">Transmission</span> */}
-              </div>
-              <span className="inventory-card-spec-value">{transSpec}</span>
-            </div>
-          </div>
+          {renderSpecs("list")}
 
           {featureTags.length > 0 ? (
             <ul className="inventory-card-tags" aria-label="Highlights">
@@ -204,29 +206,7 @@ export default function VehicleCard({
 
           <hr className="inventory-card-rule" />
 
-          <div className="inventory-card-specs" aria-label="Key specifications">
-            <div className="inventory-card-spec">
-              <i
-                className="bi bi-speedometer2 inventory-card-spec-icon"
-                aria-hidden
-              />
-              <span className="inventory-card-spec-text">{odoSpec}</span>
-            </div>
-            <div className="inventory-card-spec">
-              <i
-                className="bi bi-fuel-pump inventory-card-spec-icon"
-                aria-hidden
-              />
-              <span className="inventory-card-spec-text">{fuelSpec}</span>
-            </div>
-            <div className="inventory-card-spec">
-              <i
-                className="bi bi-gear-wide-connected inventory-card-spec-icon"
-                aria-hidden
-              />
-              <span className="inventory-card-spec-text">{transSpec}</span>
-            </div>
-          </div>
+          {renderSpecs("grid")}
 
           <hr className="inventory-card-rule" />
         </div>

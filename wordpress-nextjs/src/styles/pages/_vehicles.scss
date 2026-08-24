@@ -813,7 +813,8 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 
 .inventory-card-specs--list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    // Flows to as many columns as fit, since row count now varies per vehicle.
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
     gap: 0.75rem 1rem;
     text-align: left;
     margin-bottom: 0.85rem;
@@ -834,13 +835,13 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 }
 
 .inventory-card-spec--list {
-    display: grid;
-    grid-template-columns: 1.35rem 1fr;
-    grid-template-rows: auto auto;
-    column-gap: 0.4rem;
-    row-gap: 0.06rem;
-    align-items: start;
     min-width: 0;
+}
+
+.inventory-card-specs--list .inventory-card-spec-body {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.4rem;
 }
 
 .inventory-card-spec--list .inventory-card-spec-label {
@@ -1241,12 +1242,26 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     text-align: center;
 }
 
+/*
+ * Spec rows are a definition list: <div><dt class="visually-hidden"><dd>.
+ * The dt gives screen readers "Transmission: Automatic"; the dd carries the
+ * icon and value. Row count varies with what the feed supplies.
+ */
 .inventory-card-spec {
+    min-width: 0;
+}
+
+.inventory-card-spec-body {
     display: flex;
-    flex-direction: column;
     align-items: center;
     gap: 0.35rem;
+    margin: 0;
     min-width: 0;
+}
+
+.inventory-card-specs .inventory-card-spec-body {
+    flex-direction: column;
+    justify-content: center;
 }
 
 .inventory-card-spec-icon {

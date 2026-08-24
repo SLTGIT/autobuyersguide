@@ -51,11 +51,26 @@ function FeaturesGrid({ items }: { items: VehicleVdpAiFeatureItem[] }) {
   );
 }
 
+/**
+ * Everything on this page that is not straight from the dealer feed carries
+ * this note, so a buyer can tell the record from compiled model research.
+ */
+function AiSourceNote() {
+  return (
+    <p className="cs-muted small mb-3 vdp-ref-source-note">
+      Compiled from model research, not supplied in the dealer listing. Confirm
+      with the dealer before purchase.
+    </p>
+  );
+}
+
 export interface VdpCarDetailsTabsProps {
   overviewParagraphs: string[];
   carDetailsRows: VehicleVdpAiSpecRow[];
   featureItems: VehicleVdpAiFeatureItem[];
   engineTowingRows: VehicleVdpAiSpecRow[];
+  /** Specification rows straight from the dealer feed — the authoritative set. */
+  feedRows: VehicleVdpAiSpecRow[];
 }
 
 const TABS: { id: TabId; label: string }[] = [
@@ -69,6 +84,7 @@ export default function VdpCarDetailsTabs({
   carDetailsRows,
   featureItems,
   engineTowingRows,
+  feedRows,
 }: VdpCarDetailsTabsProps) {
   const [active, setActive] = useState<TabId>("overview");
 
@@ -119,6 +135,7 @@ export default function VdpCarDetailsTabs({
         aria-labelledby="vdp-tab-features"
         hidden={active !== "features"}
       >
+        {featureItems.length > 0 ? <AiSourceNote /> : null}
         <FeaturesGrid items={featureItems} />
       </div>
 
@@ -128,7 +145,20 @@ export default function VdpCarDetailsTabs({
         aria-labelledby="vdp-tab-specifications"
         hidden={active !== "specifications"}
       >
-        <SpecGrid rows={engineTowingRows} />
+        <h3 className="vdp-ref-spec-subheading h6 fw-bold mb-2">
+          From the dealer listing
+        </h3>
+        <SpecGrid rows={feedRows} />
+
+        {engineTowingRows.length > 0 ? (
+          <>
+            <h3 className="vdp-ref-spec-subheading h6 fw-bold mt-4 mb-2">
+              Additional details
+            </h3>
+            <AiSourceNote />
+            <SpecGrid rows={engineTowingRows} />
+          </>
+        ) : null}
       </div>
     </section>
   );

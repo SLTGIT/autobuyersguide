@@ -36,7 +36,8 @@ const SLIDES: Slide[] = [
     ),
     primaryCta: { label: "Browse All Vehicles", href: "/search/car-sales-in-brisbane" },
     secondaryCta: { label: "Check Finance Eligibility", href: "/finance-centre" },
-    imageSrc: "/assets/images/new banner-1.webp",
+    imageSrc:
+      "https://admin.carsalesbrisbane.com.au/wp-content/uploads/2026/05/slider-img1.webp",
     imageAlt:
       "Quality used 4x4s and SUVs at Car Sales Brisbane, Ormiston",
     cardTitle: "Brisbane based, finance ready, statewide delivery.",
@@ -56,7 +57,8 @@ const SLIDES: Slide[] = [
     ),
     primaryCta: { label: "Cars From $5 per day", href: "/finance-centre" },
     secondaryCta: { label: "Browse All Vehicles", href: "/search/car-sales-in-brisbane" },
-    imageSrc: "/assets/images/banner_2.webp",
+    imageSrc:
+      "https://admin.carsalesbrisbane.com.au/wp-content/uploads/2026/05/slider-img2.webp",
     imageAlt: "Car Sales Brisbane yard with used SUVs and finance options",
     cardTitle: "Low repayments, clear terms, local support.",
     cardSubtitle:
@@ -77,8 +79,8 @@ const SLIDES: Slide[] = [
     ),
     primaryCta: { label: "Quick and easy get finance", href: "/finance-centre" },
     secondaryCta: { label: "About us", href: "/about-us" },
-    imageSrc: "/assets/images/new banner-3.webp",
-    imageObjectPosition: "center 85%",
+    imageSrc:
+      "https://admin.carsalesbrisbane.com.au/wp-content/uploads/2026/05/slider-img3.webp",
     imageAlt:
       "Car Sales Brisbane — used cars, finance, and customer service",
     cardTitle: "Local yard, customer-first service.",

@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { unstable_cache } from "next/cache";
 import { parseDealerCommentsBlocks } from "@/lib/inventory/dealer-comments";
+import { recoverPowertrain } from "@/lib/inventory/powertrain";
 import { splitVehicleDescription } from "@/lib/inventory/transform";
 import type {
   VehicleVdpAiBreakdownCard,
@@ -77,11 +78,19 @@ function normalizeHeroBadgeFuelPhrases(badge: string): string {
 }
 
 function formatHeroBadgeFromSnapshot(snapshot: VehicleVdpSnapshot): string {
+  // A hybrid filed under "Petrol - Unleaded" must not read "Petrol" here.
+  const fuel =
+    recoverPowertrain({
+      feedFuelType: snapshot.fuelType,
+      name: snapshot.description || snapshot.title,
+      comments: snapshot.comments,
+    }) ?? simplifyFuelTypeForHero(snapshot.fuelType);
+
   const parts = [
     String(snapshot.year),
     snapshot.condition,
     snapshot.bodyType,
-    simplifyFuelTypeForHero(snapshot.fuelType),
+    fuel,
   ]
     .map((p) => String(p ?? "").trim())
     .filter(Boolean);

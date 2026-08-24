@@ -97,36 +97,34 @@ export function vehicleCardTrimFromTitle(listing: VehicleListing): string {
   return stripListingFieldsFromTrimRemainder(s, listing);
 }
 
-/** Card headline: "YEAR Make Model Trim" plus trim colour when present. */
+/**
+ * Card headline: "YEAR Make Model Badge Series", e.g.
+ * "2019 Toyota Corolla Ascent Sport Hybrid ZWE211R".
+ *
+ * Built in `vehicle-name.ts` so cards, the VDP and structured data all agree.
+ * Falls back to year/make/model, then to the raw feed title.
+ */
 export function vehicleCardHeadlineYearMakeModelTrim(
   listing: VehicleListing,
 ): string {
+  const headline = listing.headline?.trim();
+  if (headline) return headline;
+
   const year =
     listing.year != null && listing.year > 0 ? String(listing.year) : "";
-  const make = listing.make?.trim() || "";
-  const model = listing.model?.trim() || "";
-  const trim = vehicleCardTrimFromTitle(listing);
-  const trimColour = listing.trim_colour?.trim() || "";
-  const parts = [year, make, model].filter(Boolean);
+  const parts = [year, listing.make?.trim(), listing.model?.trim()].filter(
+    Boolean,
+  );
   if (parts.length) return parts.join(" ");
   return vehicleCardHeadline(listing);
 }
 
-/** List row primary title: "New Make, Model" / "Used Make, Model". */
+/**
+ * List row primary title — the same full headline as the grid card, so a buyer
+ * can tell two variants apart in either view.
+ */
 export function vehicleCardListPrimaryHeadline(listing: VehicleListing): string {
-  const raw = listing.condition?.trim() || "";
-  const cond =
-    raw.length > 0
-      ? raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase()
-      : "";
-      const year = listing.year != null && listing.year > 0 ? String(listing.year) : "";
-  const make = listing.make?.trim() || "";
-  const model = listing.model?.trim() || "";
-  const mm =
-    make && model ? `${make}, ${model}` : make || model || "";
-  const lead = [year, mm].filter(Boolean).join(" ");
-  if (lead) return lead;
-  return vehicleCardHeadline(listing);
+  return vehicleCardHeadlineYearMakeModelTrim(listing);
 }
 
 /** List row subtitle: year + variant / trim line (screenshot-style). */

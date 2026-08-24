@@ -6,10 +6,15 @@ import type {
 } from "@/types/inventory";
 import {
   countByField,
+  countBySelector,
   filterDealerVehicles,
   mapToOptions,
   omitInventoryFilters,
 } from "./query";
+import {
+  vehicleDisplayFuelType,
+  vehicleDisplayTransmission,
+} from "./vehicle-specs";
 
 /** One row per make; URL value is lowercase, label keeps feed casing. */
 function mergeMakeFacetOptions(map: Map<string, number>): FilterOptionCount[] {
@@ -62,9 +67,9 @@ export function buildInventoryFacets(
     )
   );
   const fuelTypes = mapToOptions(
-    countByField(
+    countBySelector(
       filterDealerVehicles(all, omitInventoryFilters(f, ["fuelType"])),
-      "FuelType"
+      vehicleDisplayFuelType
     )
   );
   const colours = mapToOptions(
@@ -80,9 +85,9 @@ export function buildInventoryFacets(
     )
   );
   const transmissions = mapToOptions(
-    countByField(
+    countBySelector(
       filterDealerVehicles(all, omitInventoryFilters(f, ["transmission"])),
-      "TransmissionType"
+      vehicleDisplayTransmission
     )
   );
   const types = mapToOptions(

@@ -3,8 +3,14 @@ import Link from "next/link";
 import type {
   VehicleVdpAiContent,
   VehicleVdpAiFaq,
+  VehicleVdpAiSpecRow,
   VehicleVdpSnapshot,
 } from "@/lib/openai/vehicleVdpTypes";
+import {
+  displayFuelType,
+  recoverPowertrain,
+  simplifyTransmission,
+} from "@/lib/inventory/powertrain";
 import type { VehicleImage } from "@/types/vehicle";
 import type { VehicleEnquiryItemPayload } from "./VehicleEnquiryForm";
 import VehicleGallery from "./VehicleGallery";
@@ -23,6 +29,47 @@ import { ORG_GOOGLE_MAPS_PLACE_URL, ORG_POSTAL_ADDRESS } from "@/lib/json-ld";
 const VehicleVdpRefInlineEnquiry = dynamic(
   () => import("./VehicleVdpRefInlineEnquiry"),
 );
+
+/**
+ * Specification rows taken straight from the dealer feed — this is the record.
+ * Transmission and fuel keep their exact feed wording ("Constant Variable",
+ * "Petrol - Unleaded") even though cards show simplified/corrected values.
+ * A recovered powertrain is added as its own row only when it differs, so both
+ * the feed value and the correction are visible.
+ */
+function buildFeedSpecRows(snapshot: VehicleVdpSnapshot): VehicleVdpAiSpecRow[] {
+  const recovered = recoverPowertrain({
+    feedFuelType: snapshot.fuelType,
+    name: snapshot.description || snapshot.title,
+    comments: snapshot.comments,
+  });
+  const odometer =
+    snapshot.odometerKm != null && snapshot.odometerKm > 0
+      ? `${snapshot.odometerKm.toLocaleString("en-AU")} km`
+      : "";
+
+  const rows = [
+    { label: "Odometer", value: odometer, icon: "speedometer2" },
+    { label: "Fuel type", value: snapshot.fuelType, icon: "fuel-pump" },
+    ...(recovered && recovered.toLowerCase() !== snapshot.fuelType.toLowerCase()
+      ? [{ label: "Powertrain", value: recovered, icon: "lightning-charge" }]
+      : []),
+    {
+      label: "Transmission",
+      value: snapshot.transmission,
+      icon: "gear-wide-connected",
+    },
+    { label: "Body type", value: snapshot.bodyType, icon: "car-front" },
+    { label: "Drive type", value: snapshot.driveType, icon: "diagram-3" },
+    { label: "Colour", value: snapshot.bodyColour, icon: "palette" },
+    { label: "VIN", value: snapshot.vin, icon: "upc-scan" },
+    { label: "Stock number", value: snapshot.stockNumber, icon: "card-heading" },
+  ];
+
+  return rows
+    .filter((r) => r.value.trim().length > 0)
+    .map((r) => ({ ...r, sourceTag: "listing" as const }));
+}
 const VehicleTestDriveForm = dynamic(() => import("./VehicleTestDriveForm"));
 const VehicleSimilarCarousel = dynamic(() => import("./VehicleSimilarCarousel"));
 
@@ -49,13 +96,20 @@ function buildQuickSpecs(snapshot: VehicleVdpSnapshot): VdpQuickSpecItem[] {
     snapshot.odometerKm != null && snapshot.odometerKm > 0
       ? `${snapshot.odometerKm.toLocaleString("en-AU")} km`
       : "—";
+  // At-a-glance lines use buyer wording: the recovered powertrain and
+  // "Automatic"/"Manual". The exact feed values stay in the specifications tab.
+  const fuel = displayFuelType({
+    feedFuelType: snapshot.fuelType,
+    name: snapshot.description || snapshot.title,
+    comments: snapshot.comments,
+  });
   return [
     { label: "Odometer", value: odo, icon: "speedometer2" },
     { label: "Body type", value: snapshot.bodyType || "—", icon: "truck" },
-    { label: "Fuel", value: snapshot.fuelType || "—", icon: "fuel-pump-fill" },
+    { label: "Fuel", value: fuel || "—", icon: "fuel-pump-fill" },
     {
       label: "Transmission",
-      value: snapshot.transmission || "—",
+      value: simplifyTransmission(snapshot.transmission) || "—",
       icon: "gear-fill",
     },
   ];
@@ -221,6 +275,7 @@ export default function VehicleVdpRefPage({
                 <VdpShareLinks
                   title={headline}
                   shareUrl={shareUrl}
+                  mediaUrl={enquiryItem.image}
                   className="vdp-ref-share--compact mb-2"
                 />
                 <div className="d-flex align-items-start justify-content-between gap-3">
@@ -272,6 +327,7 @@ export default function VehicleVdpRefPage({
                 carDetailsRows={ai.carDetailsRows}
                 featureItems={ai.featureItems}
                 engineTowingRows={ai.engineTowingRows}
+                feedRows={buildFeedSpecRows(snapshot)}
               />
 
               <VdpFaqSection faqs={ai.faqs} />
@@ -333,6 +389,7 @@ export default function VehicleVdpRefPage({
                   <VdpShareLinks
                     title={headline}
                     shareUrl={shareUrl}
+                    mediaUrl={enquiryItem.image}
                     className="mb-3 pb-3 border-bottom"
                   />
                   <div className="cs-price mb-1">{priceMain || "—"}</div>
