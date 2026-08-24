@@ -1857,6 +1857,8 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     border-radius: 1rem;
     background: #fff;
     border: 1px solid #e2e6ec;
+    position: relative;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1877,12 +1879,43 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
     }
 }
 
+/* The tile shows the next four photos behind the count, so the slot reads as
+   more of the car rather than an empty white square. */
+.vehicle-gallery__grid-more-mosaic {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 1px;
+    border-radius: inherit;
+    overflow: hidden;
+}
+
+.vehicle-gallery__grid-more-cell {
+    position: relative;
+    overflow: hidden;
+    background: #eef1f5;
+}
+
+.vehicle-gallery__grid-more-img {
+    object-fit: cover;
+}
+
 .vehicle-gallery__grid-more-text {
+    position: relative;
+    z-index: 1;
     font-size: clamp(0.8rem, 2vw, 0.95rem);
-    font-weight: 600;
-    color: #6b7280;
+    font-weight: 700;
+    color: #fff;
     text-align: center;
     line-height: 1.35;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    /* Sits over photos now, so it carries its own contrast. */
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
 .vehicle-gallery__lightbox {
