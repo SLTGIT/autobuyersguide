@@ -6,6 +6,10 @@ import {
 } from "@/types/inventory";
 import { slugifyInventoryPart } from "@/lib/inventory/slug";
 import {
+  vehicleDisplayFuelType,
+  vehicleDisplayTransmission,
+} from "@/lib/inventory/vehicle-specs";
+import {
   mergePathAugmentIntoFilters,
   pathSlugForInventoryListing,
   serializeOmitKeysForPathFacet,
@@ -122,7 +126,9 @@ export function filterDealerVehicles(
       if (!b || !f.bodyType.includes(b)) return false;
     }
     if (f.fuelType.length > 0) {
-      const x = norm(v.FuelType);
+      // Match the corrected powertrain, so the "Hybrid" facet actually returns
+      // hybrids the feed filed under "Petrol - Unleaded".
+      const x = norm(vehicleDisplayFuelType(v));
       if (!x || !f.fuelType.includes(x)) return false;
     }
     if (f.bodyColour.length > 0) {
@@ -134,7 +140,7 @@ export function filterDealerVehicles(
       if (!x || !f.driveType.includes(x)) return false;
     }
     if (f.transmission.length > 0) {
-      const x = norm(v.TransmissionType);
+      const x = norm(vehicleDisplayTransmission(v));
       if (!x || !f.transmission.includes(x)) return false;
     }
     if (f.type.length > 0) {
@@ -211,6 +217,24 @@ export function countByField(
     const raw = v[field];
     const key =
       typeof raw === "string" ? raw.trim() : raw != null ? String(raw) : "";
+    if (!key) continue;
+    map.set(key, (map.get(key) ?? 0) + 1);
+  }
+  return map;
+}
+
+/**
+ * Facet counts over a derived value rather than a raw feed key — used where the
+ * displayed value differs from the feed (recovered powertrain, simplified
+ * transmission), so facet labels match what the cards show.
+ */
+export function countBySelector(
+  vehicles: DealerVehicle[],
+  select: (v: DealerVehicle) => string
+): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const v of vehicles) {
+    const key = select(v).trim();
     if (!key) continue;
     map.set(key, (map.get(key) ?? 0) + 1);
   }

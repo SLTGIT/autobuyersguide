@@ -147,9 +147,9 @@ export default async function VehicleDetailPage({
     alt: listing.title,
   }));
 
-  const headline =
-    [String(listing.year), v.Make, v.Model].filter(Boolean).join(" ").trim() ||
-    listing.title;
+  // Full "YEAR Make Model Badge Series" — the same string the cards show, so a
+  // buyer arriving from the grid sees the variant they clicked.
+  const headline = listing.headline || listing.title;
 
   const dealerPhone = process.env.NEXT_PUBLIC_DEALER_PHONE || "0418 908 870";
   const telHref = `tel:${dealerPhone.replace(/\s/g, "")}`;

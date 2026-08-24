@@ -1,5 +1,15 @@
 import type { DealerVehicle, VehicleListing } from "@/types/inventory";
 import { buildVehicleSlug } from "./slug";
+import {
+  vehicleDisplayFuelType,
+  vehicleDisplayTransmission,
+  vehicleDoors,
+  vehicleEngine,
+  vehicleHeadline,
+  vehicleNameParts,
+  vehicleRego,
+  vehicleSeats,
+} from "./vehicle-specs";
 
 /** Coerce dealer feed price fields (string or number) — same source as `listing` / VDP. */
 export function inventoryPriceField(raw: unknown): string {
@@ -87,18 +97,29 @@ export function dealerVehicleToListing(v: DealerVehicle): VehicleListing {
       ? formatAudPrice(egcRaw)
       : null;
 
+  const { badge, series } = vehicleNameParts(v);
+
   return {
     id: v.ItemID,
     slug: buildVehicleSlug(v),
     title,
+    headline: vehicleHeadline(v),
+    badge,
+    series,
     make,
     model,
     featured_image: photo,
     condition: v.Condition || "Used",
     body_type: v.BodyType?.trim() || "",
-    transmission: v.TransmissionType?.trim() || "",
-    fuel_type: v.FuelType?.trim() || "",
+    transmission: vehicleDisplayTransmission(v),
+    transmission_raw: v.TransmissionType?.trim() || "",
+    fuel_type: vehicleDisplayFuelType(v),
+    fuel_type_raw: v.FuelType?.trim() || "",
     drive_type: v.DriveType?.trim() || "",
+    engine: vehicleEngine(v),
+    seats: vehicleSeats(v),
+    doors: vehicleDoors(v),
+    rego: vehicleRego(v),
     type_code: v.Type?.trim() || "",
     odometer: parseInventoryOdometerKm(v.Odometer),
     stock_number: v.SKU?.trim() || "",
