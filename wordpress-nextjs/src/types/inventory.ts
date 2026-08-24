@@ -34,6 +34,41 @@ export interface DealerVehicle {
   /** Present on some Dealer Solutions exports. */
   VIN?: string;
   Vin?: string;
+
+  /**
+   * Model code as supplied by Dealer Solutions ("ZWE211R", "PX MkIII").
+   * The badge buyers shop by ("Ascent Sport", "GXL") is not this — it lives in
+   * `Description` and is recovered by the name parser when no badge field
+   * exists. Field naming varies between exports, so all spellings are optional
+   * and resolved in order.
+   */
+  Series?: string;
+  Badge?: string;
+  BadgeDescription?: string;
+  Variant?: string;
+  Trim?: string;
+
+  /**
+   * Engine displacement. Dealer Solutions publishes this as a bare litre figure
+   * ("1.5", "3.2") under `Capacity`; other exports use the alternates below.
+   */
+  Capacity?: string | number;
+  EngineSize?: string | number;
+  EngineCapacity?: string | number;
+  EngineDescription?: string;
+  Engine?: string;
+  Cylinders?: string | number;
+
+  /** Door and seat counts — named *Count in the Dealer Solutions export. */
+  DoorCount?: string | number;
+  SeatCount?: string | number;
+  Doors?: string | number;
+  Seats?: string | number;
+
+  /** Registration plate, on exports that publish it. Empty on many vehicles. */
+  Rego?: string;
+  RegistrationNumber?: string;
+  RegistrationPlate?: string;
 }
 
 export interface DealerInventoryFeed {

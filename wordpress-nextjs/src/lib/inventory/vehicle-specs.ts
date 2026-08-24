@@ -11,43 +11,24 @@ import { buildVehicleHeadline, extractVehicleNameParts } from "./vehicle-name";
  */
 
 /**
- * Reads the first non-empty value among candidate keys.
- *
- * Dealer Solutions exports differ between dealers, and the `DealerVehicle`
- * interface only declares the keys this site has confirmed. Probing keeps
- * optional specs working where the export carries them without inventing a
- * value where it does not — a miss returns "" and the row is dropped.
+ * First non-empty value among candidates. Exports spell these fields several
+ * ways, so each accessor resolves its alternates in order. A miss returns ""
+ * and the row is dropped rather than rendering blank.
  */
-export function feedString(v: DealerVehicle, keys: string[]): string {
-  const bag = v as unknown as Record<string, unknown>;
-  for (const key of keys) {
-    const raw = bag[key];
-    if (raw === undefined || raw === null) continue;
-    const s = typeof raw === "number" ? String(raw) : String(raw).trim();
-    if (s && s !== "0") return s;
+function firstNonEmpty(values: Array<string | number | undefined>): string {
+  for (const raw of values) {
+    const t = raw === undefined || raw === null ? "" : String(raw).trim();
+    if (t) return t;
   }
   return "";
 }
 
-/**
- * Candidate key names for specs the confirmed schema does not declare.
- * Unverified against the live export — absent keys simply yield "".
- */
-const OPTIONAL_KEYS = {
-  engine: ["EngineDescription", "Engine", "EngineSize", "EngineCapacity"],
-  seats: ["Seats", "SeatingCapacity", "SeatCapacity"],
-  doors: ["Doors", "DoorCount", "NumberOfDoors"],
-  rego: ["Registration", "RegistrationNumber", "Rego", "RegoNumber"],
-  badge: ["Badge", "Variant", "Trim"],
-  series: ["Series", "SeriesCode", "ModelCode"],
-} as const;
-
 export function vehicleFeedBadge(v: DealerVehicle): string {
-  return feedString(v, [...OPTIONAL_KEYS.badge]);
+  return firstNonEmpty([v.Badge, v.BadgeDescription, v.Variant, v.Trim]);
 }
 
 export function vehicleFeedSeries(v: DealerVehicle): string {
-  return feedString(v, [...OPTIONAL_KEYS.series]);
+  return firstNonEmpty([v.Series]);
 }
 
 /** Fuel with the powertrain recovered from Description / Comments. */
@@ -92,20 +73,52 @@ export function vehicleNameParts(v: DealerVehicle) {
   return extractVehicleNameParts(nameContext(v));
 }
 
+/**
+ * Engine displacement for display, e.g. "1.5 L" or "1868 cc".
+ *
+ * Dealer Solutions publishes a bare litre figure under `Capacity`. Exports that
+ * carry no engine field often still name the displacement inside `Description`
+ * (the motorcycle's "1868cc"), so that is read as a fallback — the value is in
+ * the feed either way, just embedded. Returns "" when neither has it.
+ */
 export function vehicleEngine(v: DealerVehicle): string {
-  return feedString(v, [...OPTIONAL_KEYS.engine]);
+  const direct = firstNonEmpty([
+    v.Capacity,
+    v.EngineSize,
+    v.EngineCapacity,
+    v.EngineDescription,
+    v.Engine,
+  ]);
+  const source = direct || (v.Description ?? "");
+
+  const litres = source.match(/\b(\d{1,2}(?:\.\d)?)\s*L(?:itre)?\b/i);
+  if (litres) return `${litres[1]} L`;
+  const cc = source.match(/\b(\d{3,5})\s*cc\b/i);
+  if (cc) return `${cc[1]} cc`;
+  // A bare number in a dedicated engine field is a litre figure.
+  if (direct && /^\d{1,2}(\.\d)?$/.test(direct)) return `${direct} L`;
+  return direct;
 }
 
+/** Seat count as a label, e.g. "5 seats". "" when the export omits it. */
 export function vehicleSeats(v: DealerVehicle): string {
-  return feedString(v, [...OPTIONAL_KEYS.seats]);
+  const n = firstNonEmpty([v.SeatCount, v.Seats]);
+  return n ? `${n} seats` : "";
 }
 
+/** Door count as a label, e.g. "5 doors". "" when the export omits it. */
 export function vehicleDoors(v: DealerVehicle): string {
-  return feedString(v, [...OPTIONAL_KEYS.doors]);
+  const n = firstNonEmpty([v.DoorCount, v.Doors]);
+  return n ? `${n} doors` : "";
 }
 
+/** Registration plate, on the exports that publish one. */
 export function vehicleRego(v: DealerVehicle): string {
-  return feedString(v, [...OPTIONAL_KEYS.rego]);
+  return firstNonEmpty([
+    v.Rego,
+    v.RegistrationNumber,
+    v.RegistrationPlate,
+  ]).toUpperCase();
 }
 
 export interface VehicleSpecRow {
