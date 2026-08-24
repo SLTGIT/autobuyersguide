@@ -313,8 +313,6 @@ export default function VehicleVdpRefPage({
 
               <VdpQuickSpecsRow items={quickSpecs} />
 
-              <VdpCmsOverview text={cmsOverview} />
-
               <VdpKeyHighlights chips={ai.highlightChips} />
 
               <VdpDealerCommentsExpandable
@@ -331,6 +329,10 @@ export default function VehicleVdpRefPage({
               />
 
               <VdpFaqSection faqs={ai.faqs} />
+
+              {/* SEO overview sits below the FAQ: buyers get vehicle, price,
+                  specs and photos first; Google still gets the content. */}
+              <VdpCmsOverview text={cmsOverview} />
 
               <section
                 className="cs-card p-4 p-lg-5 mt-4 d-lg-none"

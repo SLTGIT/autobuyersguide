@@ -34,40 +34,24 @@ export default function VehicleCard({
   );
   const featureTags = vehicleCardFeatureTags(listing);
 
-  /**
-   * Rendered as a definition list so assistive tech reads
-   * "Transmission: Automatic" rather than an unexplained value.
-   */
-  const renderSpecs = (variant: "grid" | "list") => {
-    if (!specRows.length) return null;
-    const isList = variant === "list";
-    return (
-      <dl
-        className={`inventory-card-specs${isList ? " inventory-card-specs--list" : ""}`}
-        aria-label="Key specifications"
-      >
-        {specRows.map((row) => (
-          <div
-            key={row.key}
-            className={`inventory-card-spec${isList ? " inventory-card-spec--list" : ""}`}
-          >
-            <dt className="visually-hidden">{row.label}</dt>
-            <dd className="inventory-card-spec-body">
-              <i
-                className={`bi bi-${row.icon} inventory-card-spec-icon${
-                  isList ? " inventory-card-spec-icon--list" : ""
-                }`}
-                aria-hidden
-              />
-              <span className="inventory-card-spec-text inventory-card-spec-value">
-                {row.value}
-              </span>
-            </dd>
-          </div>
-        ))}
-      </dl>
-    );
-  };
+  // Two-column list. Icons carry the meaning visually; each row keeps a hidden
+  // label so the grid is not a column of unexplained values to a screen reader.
+  const specGrid = specRows.length ? (
+    <ul className="inventory-card-spec-grid" aria-label="Key specifications">
+      {specRows.map((row) => (
+        <li key={row.key} className="inventory-card-spec-row">
+          <i
+            className={`bi bi-${row.icon} inventory-card-spec-row__icon`}
+            aria-hidden
+          />
+          <span className="visually-hidden">{`${row.label}: `}</span>
+          <span className="inventory-card-spec-row__value" title={row.value}>
+            {row.value}
+          </span>
+        </li>
+      ))}
+    </ul>
+  ) : null;
 
   const articleClass = [
     "inventory-vehicle-card",
@@ -131,7 +115,7 @@ export default function VehicleCard({
             </Link>
           </div>
 
-          {renderSpecs("list")}
+          {specGrid}
 
           {featureTags.length > 0 ? (
             <ul className="inventory-card-tags" aria-label="Highlights">
@@ -206,7 +190,7 @@ export default function VehicleCard({
 
           <hr className="inventory-card-rule" />
 
-          {renderSpecs("grid")}
+          {specGrid}
 
           <hr className="inventory-card-rule" />
         </div>

@@ -1243,25 +1243,47 @@ $vehicles-primary-dark: color.adjust($color-primary, $lightness: -10%);
 }
 
 /*
- * Spec rows are a definition list: <div><dt class="visually-hidden"><dd>.
- * The dt gives screen readers "Transmission: Automatic"; the dd carries the
- * icon and value. Row count varies with what the feed supplies.
+ * Two-column specification list on the card. Row count varies with what the
+ * feed supplies, so the grid flows rather than reserving fixed columns.
  */
-.inventory-card-spec {
-    min-width: 0;
+.inventory-card-spec-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem 0.9rem;
+    list-style: none;
+    margin: 0 0 0.85rem;
+    padding: 0;
 }
 
-.inventory-card-spec-body {
+.inventory-card-spec-row {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
-    margin: 0;
+    gap: 0.45rem;
     min-width: 0;
 }
 
-.inventory-card-specs .inventory-card-spec-body {
-    flex-direction: column;
-    justify-content: center;
+.inventory-card-spec-row__icon {
+    font-size: 0.95rem;
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.inventory-card-spec-row__value {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.3;
+    /* Values are single words or short phrases; ellipsis beats a wrapped row
+       breaking the two-column rhythm. */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 380px) {
+    .inventory-card-spec-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .inventory-card-spec-icon {
