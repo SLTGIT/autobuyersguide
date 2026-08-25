@@ -34,7 +34,9 @@ const SLIDES: Slide[] = [
         Brisbane to Cairns—so the right car is never out of reach.
       </>
     ),
-    primaryCta: { label: "Browse All Vehicles", href: "/search/car-sales-in-brisbane" },
+    // Same destination as before — the label leads with the action a buyer is
+    // ready to take. Slide 2 still carries a "Browse All Vehicles" link.
+    primaryCta: { label: "Book a Test Drive", href: "/search/car-sales-in-brisbane" },
     secondaryCta: { label: "Check Finance Eligibility", href: "/finance-centre" },
     imageSrc:
       "https://admin.carsalesbrisbane.com.au/wp-content/uploads/2026/05/slider-img1.webp",
